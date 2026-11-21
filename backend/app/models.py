@@ -149,6 +149,13 @@ class OutboundMessage(Base):
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
+class InboundMessage(Base):
+    """IDs de mensajes entrantes de Meta para ignorar reintentos del webhook."""
+    __tablename__ = "inbound_messages"
+    wa_message_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    received_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+
 class RegionalNotice(Base):
     """Aviso regional segmentado por alcance (adaptado del proyecto PACHAAGRO).
 
@@ -180,7 +187,7 @@ class WeatherCache(Base):
     key: Mapped[str] = mapped_column(String(120), primary_key=True)
     payload: Mapped[str] = mapped_column(Text)
     fetched_at: Mapped[datetime] = mapped_column(DateTime)
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, index=True)
 
 
 class ChatState(Base):
@@ -188,4 +195,4 @@ class ChatState(Base):
     __tablename__ = "chat_state"
     key: Mapped[str] = mapped_column(String(120), primary_key=True)
     data: Mapped[str] = mapped_column(Text, default="{}")
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)

@@ -252,12 +252,22 @@ def _frost(th, wx: WeatherView, fk) -> Criterion:
                 st, ex = YELLOW, f"Se pronostica una mínima de {t:.0f} °C el {_day(tmin_day['date'])}. Puede haber helada leve; a ras del suelo puede hacer más frío."
             else:
                 st, ex = GREEN, f"La mínima pronosticada es {t:.0f} °C. No se espera helada en los próximos días."
+            if wx.community_frost_reports:
+                if st == GREEN:
+                    st = YELLOW
+                ex += f" Además, hay {wx.community_frost_reports} reporte(s) comunitario(s) de helada confirmados en los últimos 7 días."
             return Criterion("helada", label, st, ex, fk, wx.forecast_source, f"{t} °C")
     if wx.frost_days_month is not None:
-        return Criterion("helada", label, YELLOW,
-                         f"No hay pronóstico disponible. En este mes suele haber unos {wx.frost_days_month:.0f} días con helada (promedio histórico). "
-                         "Sin pronóstico no podemos descartar heladas.", "climatologia", "NASA POWER (climatología)",
+        explanation = (f"No hay pronóstico disponible. En este mes suele haber unos {wx.frost_days_month:.0f} días con helada (promedio histórico). "
+                       "Sin pronóstico no podemos descartar heladas.")
+        if wx.community_frost_reports:
+            explanation += f" Además, hay {wx.community_frost_reports} reporte(s) comunitario(s) de helada confirmados en los últimos 7 días."
+        return Criterion("helada", label, YELLOW, explanation, "climatologia", "NASA POWER (climatología)",
                          f"{wx.frost_days_month} días/mes")
+    if wx.community_frost_reports:
+        return Criterion("helada", label, YELLOW,
+                         f"Hay {wx.community_frost_reports} reporte(s) comunitario(s) de helada confirmados en los últimos 7 días; no reemplazan un pronóstico oficial.",
+                         "comunidad", "Observaciones comunitarias de AgroBolivia")
     return Criterion("helada", label, GRAY, "No hay pronóstico ni historial de heladas disponible.", "sin_datos")
 
 
@@ -295,7 +305,12 @@ def _rain(th, a: Answers, wx: WeatherView, fk) -> Criterion:
     label = "Lluvia próxima (7 días)"
     if not (wx.forecast_available and wx.daily):
         return Criterion("lluvia", label, GRAY, "No hay pronóstico de lluvia disponible.", "sin_datos")
-    vals = [d.get("precip_mm") or 0.0 for d in wx.daily]
+    # Un valor None significa que el proveedor no entregó el dato, no que no lloverá.
+    if len(wx.daily) < 7 or any(d.get("precip_mm") is None for d in wx.daily):
+        return Criterion("lluvia", label, GRAY,
+                         "El pronóstico no contiene datos de lluvia para los siete días; no podemos calcular el acumulado semanal.",
+                         "sin_datos", wx.forecast_source)
+    vals = [float(d["precip_mm"]) for d in wx.daily]
     total, peak = sum(vals), max(vals)
     if peak >= th["heavy_rain_day_mm"]:
         return Criterion("lluvia", label, YELLOW, f"Se pronostica un día con lluvia fuerte ({peak:.0f} mm). Puede endurecer el suelo o arrastrar la semilla.", fk, wx.forecast_source, f"{total:.0f} mm", "lluvia_fuerte")

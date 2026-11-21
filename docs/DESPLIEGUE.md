@@ -5,7 +5,8 @@ Dos opciones configuradas en el repositorio. **Recomendada: Render** (servidor c
 | | Render (recomendado) | Vercel |
 |---|---|---|
 | Cómo corre el backend | Servidor normal (contenedor Docker) | Funciones *serverless* |
-| Caché del clima, chat simulado, límites de intentos | Se mantienen mientras el servidor esté encendido | Se reinician con cada instancia |
+| Caché del clima y estado de chat | Persisten en PostgreSQL | Persisten en PostgreSQL si se configura `DATABASE_URL` |
+| Limitador de intentos | En memoria por proceso | En memoria por instancia serverless |
 | Base de datos | PostgreSQL creada por el Blueprint | PostgreSQL de Neon (Marketplace) |
 | Archivos | `Dockerfile`, `render.yaml` | `vercel.json`, `api/index.py`, `requirements.txt` |
 
@@ -17,6 +18,7 @@ El archivo `render.yaml` (Blueprint) crea:
 - **agrobolivia**: servicio web que construye el `Dockerfile` (compila el frontend y arranca FastAPI, que sirve web + API).
 - **agrobolivia-db**: PostgreSQL. Su URL se pasa sola como `DATABASE_URL`.
 - `SECRET_KEY` se genera automáticamente.
+- `SEED_DEMO=false` por defecto: las cuentas y comunidades ficticias quedan desactivadas.
 
 ## Pasos
 
@@ -27,7 +29,7 @@ El archivo `render.yaml` (Blueprint) crea:
    - `ADMIN_PHONE`: su celular con prefijo, ej. `+59171234567`
    - `ADMIN_PASSWORD`: una clave segura
 5. **Apply / Deploy Blueprint**. La primera construcción tarda unos minutos.
-6. Abra la URL `https://agrobolivia-XXXX.onrender.com`. Verifique `…/api/health` → `{"status":"ok"}`.
+6. Abra la URL `https://agrobolivia-XXXX.onrender.com`. Verifique `…/api/health`: debe responder con `status: "ok"` y `database: true`.
 7. Cada `git push` a `main` vuelve a desplegar automáticamente.
 
 ## Plan gratuito: tenga en cuenta
@@ -50,7 +52,8 @@ docker build -t agrobolivia .
 ```
 
 ```bash
-docker run -p 8000:8000 -e SECRET_KEY=algo-largo -e ADMIN_PASSWORD=admin12345 agrobolivia
+export SECRET_KEY="$(python -c "import secrets; print(secrets.token_urlsafe(48))")"
+docker run -p 8000:8000 -e SECRET_KEY="$SECRET_KEY" -e ADMIN_PASSWORD="SU_CLAVE_SEGURA" agrobolivia
 ```
 
 Luego abra <http://localhost:8000>.
@@ -90,7 +93,7 @@ Configuración ya incluida en el repositorio: `vercel.json`, `api/index.py`, `re
 6. Agregue la base de datos: en el proyecto → **Storage** → **Create Database** → **Neon (Postgres)** → conéctela al proyecto. Vercel crea la variable `DATABASE_URL` automáticamente.
    *Si su integración crea la variable con otro nombre (p. ej. `POSTGRES_URL`), agregue manualmente `DATABASE_URL` con el mismo valor.*
 7. **Deployments → … → Redeploy** para que tome `DATABASE_URL`. Las tablas y los datos de demostración se crean solos en la primera petición.
-8. Verifique: `https://<su-proyecto>.vercel.app/api/health` debe responder `{"status":"ok"}`.
+8. Verifique: `https://<su-proyecto>.vercel.app/api/health` debe responder `status: "ok"` y `database: true`.
 
 ## Rama de producción
 
@@ -99,7 +102,7 @@ Vercel publica en producción la rama **`main`**. Si el código está en otra ra
 ## Limitaciones en Vercel
 
 - **Arranque en frío**: la primera petición tras un rato inactivo tarda unos segundos más. Abra la app antes de presentar.
-- **Estado en memoria por instancia**: caché del clima, conversaciones del simulador de WhatsApp y límites de intentos se reinician cuando Vercel recicla la función. Funciona para la demo; en producción usar Redis.
+- **Limitador de intentos en memoria por instancia**: se reinicia cuando Vercel recicla la función y no comparte contadores entre instancias. Para producción multiinstancia, use Redis o un almacén compartido. El estado de conversaciones y la caché meteorológica sí se guardan en `DATABASE_URL`.
 - **Open-Meteo gratuito** cuenta las consultas por IP; en plataformas en la nube la IP puede ser compartida y alcanzar el límite. La app muestra entonces historial de NASA POWER si hay datos históricos disponibles.
 - **WhatsApp real** necesita la URL pública HTTPS de Vercel como webhook: `https://<su-proyecto>.vercel.app/api/whatsapp/webhook` (ver `WHATSAPP.md`).
 

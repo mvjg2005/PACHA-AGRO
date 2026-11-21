@@ -101,7 +101,7 @@ body { background: #ffffff; color: var(--color-tinta); font-family: var(--font-s
   .home-sections { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .compare-form, .compare-result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
-@media (min-width: 56rem) {
+@media (max-width: 55.999rem) { .site-header-inner { gap: .5rem; } }\n@media (min-width: 56rem) {
   .home-grid { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
   .site-nav-mobile { display: none; }
   .site-nav-desktop { display: block; }

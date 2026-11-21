@@ -30,6 +30,8 @@ def decide(cid: int, decision: str, admin: User = Depends(admin_user), db: Sessi
     c = db.get(Community, cid)
     if c is None:
         raise HTTPException(404, "Comunidad no encontrada.")
+    if c.status != "pending":
+        raise HTTPException(409, "Esta solicitud de comunidad ya fue resuelta.")
     c.status = "approved" if decision == "approve" else "rejected"
     # Aprobar la comunidad aprueba también al solicitante como representante.
     for m in db.scalars(select(Membership).where(Membership.community_id == cid, Membership.user_id == c.created_by)):

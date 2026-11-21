@@ -6,9 +6,9 @@ const ITEMS = [
   { path: 'aprender', label: 'Aprender', d: 'M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zm16 0h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z' },
 ]
 
-export function BottomNav({ current, desktop = false }: { current: string; desktop?: boolean }) {
+export function BottomNav({ current, desktop = false, viewportWidth }: { current: string; desktop?: boolean; viewportWidth?: number }) {
   return (
-    <nav aria-label="Navegación principal" className={desktop ? 'site-nav-desktop' : 'site-nav-mobile fixed inset-x-0 bottom-0 z-20 border-t border-linea bg-white pb-[env(safe-area-inset-bottom)]'}>
+    <nav aria-label="Navegación principal" style={!desktop && viewportWidth ? { width: `${viewportWidth}px` } : undefined}\n      className={desktop ? 'site-nav-desktop' : 'site-nav-mobile fixed left-0 bottom-0 z-20 border-t border-linea bg-white pb-[env(safe-area-inset-bottom)]'}>
       <ul className="mx-auto grid max-w-xl grid-cols-5">
         {ITEMS.map(it => {
           const active = current === it.path

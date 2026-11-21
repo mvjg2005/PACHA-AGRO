@@ -1,12 +1,12 @@
 # Pruebas y validación
 
-Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el servidor local y consulta las fuentes meteorológicas disponibles.
+Los resultados numéricos de la tabla (**98/98**, **7/7**, **26/26**) corresponden a la ejecución registrada en `main` antes de esta auditoría (21-11-2026); no son el resultado de los cambios de esta rama. Las pruebas de regresión añadidas aquí deben ejecutarse en el pull request. El backend usa fixtures. La suite de navegador usa el servidor local.
 
 | Suite | Comando | Resultado |
 |---|---|---|
-| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **98/98** aprobadas |
+| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **98/98** históricas de `main`; esta rama incorpora pruebas adicionales pendientes de ejecutar |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **7/7** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `node e2e/run.cjs http://localhost:8000` | **26/26** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `cd e2e && npm install && npx playwright install chromium && npm test -- http://localhost:8000` | **26/26** históricas de `main`; volver a validar en CI tras instalar Playwright desde `e2e/package.json` |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
 
 ## Casos de prueba por área
@@ -25,7 +25,10 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 | Sin conexión | La app abre sin internet y muestra el último clima guardado con aviso y fecha | Sí (Chromium) | e2e |
 | Cuentas | Cambio de clave, eliminación de datos personales, clave temporal obligatoria de cambiar (también en el servidor) | Sí | `test_production`, e2e |
 | Producción | No arranca con SECRET_KEY débil, CORS `*`, SQLite o WhatsApp incompleto; HSTS; `/api/health` revisa la base | Sí, también con PostgreSQL 16 | `test_production`, manual |
+| Inicio de aplicación | Error real de conexión o esquema al crear tablas/agregar columnas | Se propaga y bloquea el arranque; solo se toleran conflictos DDL/seed por concurrencia reconocidos | `db.py` |
 | WhatsApp | Estado de conversación guardado en la base de datos | Sí | `test_production` |
+| WhatsApp | Reintento del mismo `wamid` recibido por Meta | El webhook registra/procesa el ID una sola vez; los ID antiguos se depuran a los 30 días | `test_api` |
+| WhatsApp | Respuesta SI/NO sin contexto o tras cancelar la reunión consultada | No registra asistencia en otra reunión | `test_api` |
 | Avisos regionales | Segmentación por alcance (9 casos), validación de jerarquía, vigencia, retiro, filtros públicos y «mis avisos» | Correctos | `test_ported` |
 | Avisos regionales | Agricultor no publica; la API no otorga admin; editor publica y notifica solo a quien corresponde (simulado) | 403 / 422 / correcto | `test_ported`, e2e |
 | Cultivos de interés | Guardar, quitar duplicados, rechazar cultivos inexistentes; avisos por cultivo aparecen | Sí | `test_ported`, e2e |
@@ -40,9 +43,12 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 | Recomendación | "No sé" la humedad → usa modelo; sin modelo → ⚪ | Etiqueta "estimación" / insuficiente | `test_engine` |
 | Recomendación | Fuera de calendario; ventana que cruza el año (maíz nov–ene) | 🔴; 🟡 en enero | `test_engine` |
 | Recomendación | Haba (sin reglas); quinua en llanos | ⚪ sin criterios | `test_engine`, e2e #3 |
-| Recomendación | Reporte comunitario de granizo influye | Criterio "tormenta" con `data_kind=comunidad` y texto "no es aviso oficial" | `test_api` |
+| Recomendación | Reporte comunitario de granizo influye | Solo tras revisión `confirmada`, con comunidad aprobada y usuario activo | `test_api` |
+| Recomendación | Observación sin revisar o descartada | No modifica el riesgo ni el resultado | `test_api` |
+| Recomendación | Reportes comunitarios de helada confirmados | Añaden precaución, sin reemplazar ni suavizar el pronóstico | `test_engine` |
 | Datos faltantes | Open-Meteo con límite diario | Error en español, riesgo por climatología, confianza baja | `test_weather`, `test_engine` |
 | Datos faltantes | Todas las fuentes caídas | Riesgo "desconocido", ⚪ | `test_weather` |
+| Datos faltantes | Precipitación `null` o menos de 7 días disponibles | El criterio de lluvia queda gris; no se interpreta como cero ni se suma una semana incompleta | `test_engine` |
 | Datos faltantes | Interfaz sin pronóstico | Mensaje claro y botón «Intentar de nuevo» | e2e #4 |
 | Datos faltantes | Sin conexión al backend | "No hay conexión… Intente de nuevo" + botón | e2e #5 |
 | Datos | Días `-999` de NASA POWER descartados; caché evita llamadas repetidas | Sí | `test_weather` |
@@ -64,12 +70,16 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 | WhatsApp | Webhook sin credenciales 503; firma inválida 401; firma válida 200 | Sí | `test_api` |
 | Validación | Municipio inexistente, cultivo desconocido, variedad `<script>`, valor fuera de lista | 404 / 422 | `test_api` |
 | Seguridad | Encabezados `nosniff`, `X-Frame-Options` | Presentes | `test_api` |
+| Registro | Dos solicitudes simultáneas con el mismo teléfono | La restricción única se traduce en 409 en lugar de error 500 | `test_api` |
+| Comunidades | Repetir una decisión sobre una solicitud resuelta | Respuesta 409 sin modificar de nuevo la decisión | `test_api` |
+| Hora local | Fechas con offset y fechas sin zona | Los valores con offset se convierten a `America/La_Paz`; los naïve se interpretan como hora boliviana | `test_time`, `test_api` |
+| NASA POWER | Valores de relleno `-999` en heladas y precipitación climatológica | Se normalizan como datos ausentes (`None`) | `test_weather` |
 | Educación | ≥7 lecciones con fuentes; quechua/aimara "pendiente"; `lang` no permitido | 422 | `test_api`, e2e #11 |
 | Rendimiento | Red emulada ≈400 kbps + 400 ms latencia | Acciones de inicio visibles en **≈2.1 s** | e2e #13 |
 | Rendimiento | Peso de la primera carga | ≈62 KB comprimidos (JS 56 KB + CSS 5 KB); mapa (44 KB) solo bajo demanda | `npm run build` |
 | Accesibilidad | Contraste de todos los pares texto/fondo de la paleta | ≥ 4.95:1 (WCAG AA) | cálculo en revisión |
 
-> Nota: los límites de seguridad (8 inicios de sesión cada 5 min por cuenta e IP, 5 reportes por hora) viven en memoria. Si se ejecuta la suite e2e varias veces seguidas contra el mismo servidor, las pruebas que inician sesión pueden recibir `429`: reinicie el servidor antes de cada ejecución.
+> Nota: `SECRET_KEY` ahora es obligatoria en toda configuración y debe tener al menos 32 caracteres. Genérela con `python -c "import secrets; print(secrets.token_urlsafe(48))"`. En E2E configure `SEED_DEMO=true` solo contra SQLite local desechable. El limitador de intentos sigue siendo local a cada proceso (ahora con limpieza y máximo de claves), no sustituye a Redis en un despliegue multiinstancia. Los límites de seguridad (8 inicios de sesión cada 5 min por cuenta e IP, 5 reportes por hora) viven en memoria. Si se ejecuta la suite e2e varias veces seguidas contra el mismo servidor, las pruebas que inician sesión pueden recibir `429`: reinicie el servidor antes de cada ejecución.
 
 ## Lo que NO se ha validado
 

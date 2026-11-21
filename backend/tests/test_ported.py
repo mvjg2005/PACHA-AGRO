@@ -89,7 +89,8 @@ def test_expired_and_archived_notices_are_hidden(app_client):
     h = editor(c)
     nid = c.post("/api/notices", json=NOTICE, headers=h).json()["id"]
     with dbmod.SessionLocal() as s:
-        s.get(RegionalNotice, nid).expires_at = datetime.now() - timedelta(minutes=1)
+        from app.core.time import local_now
+        s.get(RegionalNotice, nid).expires_at = local_now() - timedelta(minutes=1)
         s.commit()
     assert c.get("/api/notices").json() == []
     nid2 = c.post("/api/notices", json=NOTICE, headers=h).json()["id"]
