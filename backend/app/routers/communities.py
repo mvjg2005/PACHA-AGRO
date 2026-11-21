@@ -49,7 +49,7 @@ def meeting_out(db: Session, mt: Meeting, user: User | None) -> dict:
     mine = db.scalar(select(Attendance.response).where(Attendance.meeting_id == mt.id, Attendance.user_id == user.id)) if user else None
     author = db.get(User, mt.created_by)
     return {"id": mt.id, "community_id": mt.community_id, "title": mt.title, "description": mt.description, "place": mt.place,
-            "starts_at": mt.starts_at.isoformat(timespec="minutes"), "cancelled": mt.cancelled,
+            "starts_at": mt.starts_at.isoformat(timespec="minutes") + "-04:00", "cancelled": mt.cancelled,
             "created_by": author.full_name if author else None,
             "attendance": {"si": counts.get("si", 0), "no": counts.get("no", 0), "tal_vez": counts.get("tal_vez", 0)},
             "my_response": mine}
@@ -95,7 +95,10 @@ def create_community(body: CommunityIn, user: User = Depends(current_user), db: 
 
 @router.get("/me/communities")
 def my_communities(user: User = Depends(current_user), db: Session = Depends(get_db)):
-    rows = db.scalars(select(Community).join(Membership).where(Membership.user_id == user.id)).all()
+    query = select(Community).join(Membership).where(Membership.user_id == user.id)
+    if not get_settings().seed_demo:
+        query = query.where(Community.is_demo.is_(False))
+    rows = db.scalars(query).all()
     return [community_out(db, c, user) for c in rows]
 
 
@@ -104,7 +107,9 @@ def get_community(cid: int, user: User = Depends(current_user), db: Session = De
     c = db.get(Community, cid)
     if c is None:
         raise HTTPException(404, "Comunidad no encontrada.")
-    if c.status != "approved" and c.created_by != user.id and user.role != "admin":
+    if (c.is_demo and not get_settings().seed_demo) or (
+        c.status != "approved" and c.created_by != user.id and user.role != "admin"
+    ):
         raise HTTPException(404, "Comunidad no encontrada.")
     return community_out(db, c, user)
 
@@ -116,7 +121,11 @@ def join(cid: int, user: User = Depends(current_user), db: Session = Depends(get
         raise HTTPException(409, "Ya envió una solicitud o ya es miembro.")
     db.add(Membership(user_id=user.id, community_id=c.id, role="member", status="pending"))
     log(db, "solicitud_union", user.full_name, user.id, c.id)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(409, "Ya existe una solicitud o ya es miembro.")
     return {"status": "pending", "message": "Solicitud enviada. El representante debe aprobarla."}
 
 
@@ -317,7 +326,7 @@ def list_observations(cid: int, user: User = Depends(current_user), db: Session 
     require_member(db, user, cid)
     rows = db.execute(select(Observation, User).join(User, User.id == Observation.user_id).where(Observation.community_id == cid).order_by(Observation.observed_at.desc()).limit(50)).all()
     return [{"id": o.id, "kind": o.kind, "kind_label": KIND_LABEL[o.kind], "description": o.description, "author": u.full_name,
-             "observed_at": o.observed_at.isoformat(timespec="minutes"), "review_status": o.review_status, "channel": o.channel,
+             "observed_at": o.observed_at.isoformat(timespec="minutes") + "-04:00", "review_status": o.review_status, "channel": o.channel,
              "label": "Observación comunitaria (no es un aviso oficial)"} for o, u in rows]
 
 
