@@ -36,6 +36,8 @@ def fetch_forecast(lat: float, lon: float, client: httpx.Client) -> Block:
         data = r.json()
     except ValueError as e:
         raise ProviderError("Open-Meteo respondió con un formato inesperado.") from e
+    if not isinstance(data, dict):
+        raise ProviderError("Open-Meteo respondió con un formato inesperado.")
     if r.status_code != 200 or data.get("error"):
         reason = str(data.get("reason", r.status_code))
         if "limit" in reason.lower() or r.status_code == 429:
@@ -45,28 +47,34 @@ def fetch_forecast(lat: float, lon: float, client: httpx.Client) -> Block:
 
 
 def parse_forecast(data: dict) -> Block:
-    d = data.get("daily") or {}
+    if not isinstance(data, dict):
+        raise ProviderError("Open-Meteo respondió con un formato inesperado.")
+    d = data.get("daily")
+    d = d if isinstance(d, dict) else {}
     dates = d.get("time") or []
-    if not dates:
+    if not isinstance(dates, list) or not dates:
         raise ProviderError("Open-Meteo no incluyó pronóstico diario.")
     daily = []
     for i, day in enumerate(dates):
-        code = _at(d.get("weather_code"), i)
+        code = _as_int(_at(d.get("weather_code"), i))
         daily.append(DailyValue(
             date=day,
             tmin=_at(d.get("temperature_2m_min"), i),
             tmax=_at(d.get("temperature_2m_max"), i),
             precip_mm=_at(d.get("precipitation_sum"), i),
             precip_prob=_at(d.get("precipitation_probability_max"), i),
-            weather_code=int(code) if code is not None else None,
+            weather_code=code,
             storm=code in STORM_CODES if code is not None else False,
         ))
     soil = None
-    hourly = data.get("hourly") or {}
-    sm = [v for v in (hourly.get("soil_moisture_3_to_9cm") or [])[:24] if v is not None]
+    hourly = data.get("hourly")
+    hourly = hourly if isinstance(hourly, dict) else {}
+    raw_soil = hourly.get("soil_moisture_3_to_9cm")
+    sm = [v for v in (raw_soil if isinstance(raw_soil, list) else [])[:24] if isinstance(v, (int, float))]
     if sm:
         soil = round(sum(sm) / len(sm), 3)
-    cur = data.get("current") or {}
+    cur = data.get("current")
+    cur = cur if isinstance(cur, dict) else {}
     return Block(
         available=True,
         source=SOURCE,
@@ -86,3 +94,10 @@ def _at(arr, i):
     if not arr or i >= len(arr):
         return None
     return arr[i]
+
+
+def _as_int(value):
+    try:
+        return int(value) if value is not None else None
+    except (TypeError, ValueError):
+        return None

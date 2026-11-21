@@ -122,12 +122,14 @@ export default function Weather() {
 
 function FrostCard({ wx }: { wx: W }) {
   const f = wx.frost_risk
-  const ui = FROST[f.level]
+  const ui = FROST[f.level] ?? FROST.desconocido
   return (
     <section className={`border-l-4 px-4 py-3.5 ${ui.cls}`} aria-live="polite">
       <h2 className="flex items-center gap-2 font-display text-[1.4rem] leading-tight"><Icon name="frost" size={22} />{ui.title}</h2>
       {f.basis === 'pronostico' && f.min_tmin != null && <p className="mt-1 text-lg">Mínima más baja: <strong>{round(f.min_tmin)}</strong> el {dayLabel(f.date!)} (próximos 7 días).</p>}
-      {f.basis === 'climatologia' && <p className="mt-1 text-lg">Sin pronóstico. En este mes suele haber unos <strong>{Math.round(f.frost_days_month ?? 0)} días con helada</strong> (promedio histórico).</p>}
+      {f.basis === 'climatologia' && (f.frost_days_month != null
+        ? <p className="mt-1 text-lg">Sin pronóstico. En este mes suele haber unos <strong>{Math.round(f.frost_days_month)} días con helada</strong> (promedio histórico).</p>
+        : <p className="mt-1 text-lg">Sin pronóstico y sin promedio histórico disponible para este mes.</p>)}
       {f.basis === null && <p className="mt-1">No hay datos suficientes para estimar el riesgo.</p>}
       {f.basis && <div className="mt-2"><DataTag kind={wx.mode === 'simulado' ? 'simulado' : f.basis} /></div>}
     </section>
@@ -148,12 +150,14 @@ function StormCard({ wx }: { wx: W }) {
 
 function RecentCard({ wx }: { wx: W }) {
   const r = wx.recent
-  const total = r.daily.reduce((a, d) => a + (d.precip_mm ?? 0), 0)
-  const coldest = Math.min(...r.daily.map(d => d.tmin ?? 99))
+  const rains = r.daily.map(d => d.precip_mm).filter((v): v is number => v != null)
+  const mins = r.daily.map(d => d.tmin).filter((v): v is number => v != null)
+  const total = rains.length ? rains.reduce((a, v) => a + v, 0) : null
+  const coldest = mins.length ? Math.min(...mins) : null
   return (
     <Card>
       <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-lg font-bold">Lo que pasó los últimos días</h2><DataTag kind="estimacion" /></div>
-      <p className="mt-1">Lluvia acumulada: <strong>{total.toFixed(0)} mm</strong> en {r.daily.length} días · Mínima más baja: <strong>{round(coldest)}</strong></p>
+      <p className="mt-1">Lluvia acumulada: <strong>{total === null ? '—' : `${total.toFixed(0)} mm`}</strong>{total !== null && ` en ${rains.length} días`} · Mínima más baja: <strong>{coldest === null ? '—' : round(coldest)}</strong></p>
       <p className="mt-1 text-sm text-musgo">Hasta el {r.extra?.last_date}. {r.source}. Los datos llegan con algunos días de retraso.</p>
     </Card>
   )

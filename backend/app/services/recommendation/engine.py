@@ -295,7 +295,13 @@ def _rain(th, a: Answers, wx: WeatherView, fk) -> Criterion:
     label = "Lluvia próxima (7 días)"
     if not (wx.forecast_available and wx.daily):
         return Criterion("lluvia", label, GRAY, "No hay pronóstico de lluvia disponible.", "sin_datos")
-    vals = [d.get("precip_mm") or 0.0 for d in wx.daily]
+    # `None` significa "el proveedor no entregó el dato", no "no va a llover".
+    # Para comparar la semana exigimos los siete días completos.
+    if len(wx.daily) < 7 or any(d.get("precip_mm") is None for d in wx.daily):
+        return Criterion("lluvia", label, GRAY,
+                         "El pronóstico no tiene los datos de lluvia de los siete días; no podemos calcular el acumulado semanal.",
+                         "sin_datos", wx.forecast_source)
+    vals = [float(d["precip_mm"]) for d in wx.daily]
     total, peak = sum(vals), max(vals)
     if peak >= th["heavy_rain_day_mm"]:
         return Criterion("lluvia", label, YELLOW, f"Se pronostica un día con lluvia fuerte ({peak:.0f} mm). Puede endurecer el suelo o arrastrar la semilla.", fk, wx.forecast_source, f"{total:.0f} mm", "lluvia_fuerte")

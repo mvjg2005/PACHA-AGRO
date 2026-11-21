@@ -106,6 +106,13 @@ def test_storm_and_community_hail_reports_mark_caution():
     assert storm2["data_kind"] == "comunidad" and "no es aviso oficial" in storm2["explanation"]
 
 
+def test_missing_rain_is_not_counted_as_zero():
+    w = wx([3] * 7)
+    w.daily[0]["precip_mm"] = None
+    rain = next(c for c in run(w)["criteria"] if c["id"] == "lluvia")
+    assert rain["status"] == "gris" and rain["data_kind"] == "sin_datos"
+
+
 def test_simulated_mode_is_labeled():
     r = run(wx([3] * 7, mode="simulado"))
     assert r["mode"] == "simulado" and r["confidence"] == "baja"

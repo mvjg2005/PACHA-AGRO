@@ -6,6 +6,7 @@ from datetime import date, datetime, timedelta, timezone
 import httpx
 
 from app.core.config import get_settings
+from app.core.time import local_today
 from app.services.weather.base import Block, DailyValue, ProviderError
 
 SOURCE = "NASA POWER (reanálisis satelital, ~50 km de resolución)"
@@ -20,13 +21,15 @@ def _get(client: httpx.Client, url: str, params: dict) -> dict:
         data = r.json()
     except (httpx.HTTPError, ValueError) as e:
         raise ProviderError(f"No se pudo obtener datos de NASA POWER ({type(e).__name__}).") from e
-    if r.status_code != 200 or "properties" not in data:
+    if r.status_code != 200:
         raise ProviderError(f"NASA POWER no entregó datos ({r.status_code}).")
+    if not isinstance(data, dict) or "properties" not in data:
+        raise ProviderError("NASA POWER respondió con un formato inesperado.")
     return data
 
 
 def fetch_recent(lat: float, lon: float, client: httpx.Client, today: date | None = None) -> Block:
-    today = today or date.today()
+    today = today or local_today()
     start = today - timedelta(days=14)
     data = _get(client, f"{get_settings().nasa_power_url}/daily/point", {
         "parameters": "T2M_MIN,T2M_MAX,PRECTOTCORR,GWETTOP",
@@ -36,9 +39,19 @@ def fetch_recent(lat: float, lon: float, client: httpx.Client, today: date | Non
     return parse_recent(data)
 
 
+def _parameters(data: dict) -> dict:
+    props = data.get("properties") if isinstance(data, dict) else None
+    p = props.get("parameter") if isinstance(props, dict) else None
+    if not isinstance(p, dict) or not p:
+        raise ProviderError("NASA POWER respondió con un formato inesperado.")
+    return p
+
+
 def parse_recent(data: dict) -> Block:
-    p = data["properties"]["parameter"]
+    p = _parameters(data)
     tmin, tmax, pr, gw = p.get("T2M_MIN", {}), p.get("T2M_MAX", {}), p.get("PRECTOTCORR", {}), p.get("GWETTOP", {})
+    if not isinstance(tmin, dict) or not tmin:
+        raise ProviderError("NASA POWER no incluyó temperaturas diarias.")
     daily, last_gw = [], None
     for k in sorted(tmin):
         if tmin[k] == FILL:
@@ -49,12 +62,15 @@ def parse_recent(data: dict) -> Block:
     daily = daily[-7:]
     if not daily:
         raise ProviderError("NASA POWER aún no tiene datos de los últimos días.")
+    geometry = data.get("geometry") if isinstance(data.get("geometry"), dict) else {}
+    coords = geometry.get("coordinates")
+    elevation = coords[2] if isinstance(coords, list) and len(coords) > 2 else None
     return Block(
         available=True, source=SOURCE, kind="estimacion",
         fetched_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         daily=daily, soil_moisture=last_gw,
         soil_moisture_unit="índice 0-1 (modelo, capa superficial)" if last_gw is not None else None,
-        extra={"last_date": daily[-1].date, "grid_elevation_m": data.get("geometry", {}).get("coordinates", [None] * 3)[2]},
+        extra={"last_date": daily[-1].date, "grid_elevation_m": elevation},
     )
 
 
@@ -67,12 +83,14 @@ def fetch_climatology(lat: float, lon: float, client: httpx.Client) -> dict:
 
 
 def parse_climatology(data: dict) -> dict:
-    p = data["properties"]["parameter"]
+    p = _parameters(data)
+    header = data.get("header") if isinstance(data.get("header"), dict) else {}
     return {
         "available": True, "source": "NASA POWER (climatología)", "kind": "climatologia",
-        "period": data.get("header", {}).get("range", ""),
-        "frost_days": {m: p.get("FROST_DAYS", {}).get(m) for m in MONTHS},
-        "precip_mm_day": {m: p.get("PRECTOTCORR", {}).get(m) for m in MONTHS},
+        "period": header.get("range", ""),
+        # NASA usa -999 para "sin dato"; no debe llegar a la interfaz como un valor real.
+        "frost_days": {m: _v(p.get("FROST_DAYS", {}).get(m)) for m in MONTHS},
+        "precip_mm_day": {m: _v(p.get("PRECTOTCORR", {}).get(m)) for m in MONTHS},
     }
 
 
