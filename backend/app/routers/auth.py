@@ -57,7 +57,7 @@ def update_me(body: ProfileUpdate, user: User = Depends(current_user), db: Sessi
         user.default_municipality_id = body.default_municipality_id
     if body.whatsapp_opt_in is not None:
         user.whatsapp_opt_in = body.whatsapp_opt_in
-        user.whatsapp_opt_in_at = datetime.now() if body.whatsapp_opt_in else None
+        user.whatsapp_opt_in_at = utcnow() if body.whatsapp_opt_in else None
         log(db, "whatsapp_consentimiento", "alta" if body.whatsapp_opt_in else "baja", user.id)
     db.commit()
     return user
