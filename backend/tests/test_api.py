@@ -287,7 +287,12 @@ def test_webhook_signature_verification(app_client, monkeypatch):
     s = get_settings()
     monkeypatch.setattr(s, "whatsapp_enabled", True)
     monkeypatch.setattr(s, "whatsapp_app_secret", "shh")
-    body = json.dumps({"entry": [{"changes": [{"value": {"messages": [{"from": "59171234567", "type": "text", "text": {"body": "hola"}}]}}]}]}).encode()
+    body = json.dumps({"entry": [{"changes": [{"value": {"messages": [{
+        "from": "59171234567",
+        "timestamp": str(int(datetime.now(timezone.utc).timestamp())),
+        "type": "text",
+        "text": {"body": "hola"},
+    }]}}]}]}).encode()
     bad = app_client.post("/api/whatsapp/webhook", content=body, headers={"X-Hub-Signature-256": "sha256=bad", "Content-Type": "application/json"})
     assert bad.status_code == 401
     malformed = b"{"
