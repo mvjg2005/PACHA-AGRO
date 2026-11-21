@@ -3,6 +3,8 @@ import threading
 import time
 from datetime import date, datetime, timezone
 
+from app.core.time import local_today
+
 import httpx
 
 from app.services.weather import nasa_power, open_meteo
@@ -84,12 +86,13 @@ def get_weather(municipality: dict, mode: str = "real", today: date | None = Non
     else:
         f = _cached("forecast", key, lambda: open_meteo.fetch_forecast(lat, lon, get_client()))
         forecast = f if isinstance(f, Block) else Block(available=False, source=open_meteo.SOURCE, kind="pronostico", error=f["_error"])
-        r = _cached("recent", key, lambda: nasa_power.fetch_recent(lat, lon, get_client(), today))
+        recent_key = (*key, (today or local_today()).isoformat())
+        r = _cached("recent", recent_key, lambda: nasa_power.fetch_recent(lat, lon, get_client(), today))
         recent = r if isinstance(r, Block) else Block(available=False, source=nasa_power.SOURCE, kind="estimacion", error=r["_error"])
         c = _cached("climatology", key, lambda: nasa_power.fetch_climatology(lat, lon, get_client()))
         clim = c if "_error" not in c else {"available": False, "error": c["_error"]}
 
-    month = (today or date.today()).month
+    month = (today or local_today()).month
     return {
         "mode": mode,
         "location": {k: municipality[k] for k in ("id", "name", "department_id", "department_name", "lat", "lon", "elevation", "region")},
