@@ -20,8 +20,9 @@ export function Card({ children, className = '' }: { children: ReactNode; classN
 export function PageTitle({ icon, title, subtitle }: { icon: string; title: string; subtitle?: string }) {
   return (
     <div className="mb-4">
-      <h1 className="flex items-center gap-2 font-display text-[1.7rem] font-bold leading-tight text-bosque">
-        <span aria-hidden="true">{icon}</span>{title}
+      <h1 className="flex min-w-0 items-start gap-2 font-display text-[1.7rem] font-bold leading-tight text-bosque">
+        <span className="shrink-0" aria-hidden="true">{icon}</span>
+        <span className="min-w-0 break-words">{title}</span>
       </h1>
       {subtitle && <p className="mt-1 text-musgo">{subtitle}</p>}
     </div>
