@@ -8,7 +8,7 @@ const ITEMS = [
 
 export function BottomNav({ current, desktop = false }: { current: string; desktop?: boolean }) {
   return (
-    <nav aria-label="Navegación principal" className={desktop ? 'site-nav-desktop' : 'site-nav-mobile fixed inset-x-0 bottom-0 z-20 border-t border-linea bg-papel pb-[env(safe-area-inset-bottom)]'}>
+    <nav aria-label="Navegación principal" className={desktop ? 'site-nav-desktop' : 'site-nav-mobile fixed left-0 right-auto bottom-0 z-20 w-full border-t border-linea bg-papel pb-[env(safe-area-inset-bottom)]'}>
       <ul className="mx-auto grid max-w-xl grid-cols-5">
         {ITEMS.map(it => {
           const active = current === it.path
