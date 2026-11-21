@@ -32,7 +32,7 @@ def status():
 def simulate(body: ChatIn, request: Request, mode: str = Query("real", pattern="^(real|simulado)$"),
              user: User | None = Depends(optional_user), db: Session = Depends(get_db)):
     chat_limiter.check(client_key(request))
-    key = f"user:{user.id}" if user else f"anon:{client_key(request)}:{body.session_id}"
+    key = f"user:{user.id}:{body.session_id}" if user else f"anon:{client_key(request)}:{body.session_id}"
     replies = assistant.handle(db, key, body.text, user, mode)
     return {"channel": "simulador", "connected": False, "replies": replies}
 
