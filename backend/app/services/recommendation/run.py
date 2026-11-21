@@ -26,9 +26,7 @@ def community_reports(db: Session, municipality_id: str, kind: str, days: int = 
             User.is_active.is_(True),
         ))
     if not get_settings().seed_demo:
-        query = (query.join(Community, Observation.community_id == Community.id)
-                 .join(User, Observation.user_id == User.id)
-                 .where(Community.is_demo.is_(False), User.is_demo.is_(False)))
+        query = query.where(Community.is_demo.is_(False), User.is_demo.is_(False))
     return db.scalar(query) or 0
 
 
