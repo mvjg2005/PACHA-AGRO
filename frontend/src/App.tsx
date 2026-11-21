@@ -2,9 +2,7 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { BottomNav } from './components/BottomNav'
 import { SiteFooter, SiteHeader } from './components/SiteChrome'
 import { Loading } from './components/ui'
-import { getToken } from './lib/api'
-import { onboarded } from './lib/prefs'
-import { go, useRoute } from './lib/router'
+import { useRoute } from './lib/router'
 import { useApp } from './lib/store'
 import Home from './pages/Home'
 import Sow from './pages/Sow'
@@ -95,8 +93,6 @@ export default function App() {
   const parts = useRoute()
   const { user } = useApp()
   const section = parts[0] ?? ''
-  // Primera visita sin cuenta: bienvenida en 4 pasos (se puede saltar).
-  useEffect(() => { if (!section && !onboarded() && !getToken()) go('/bienvenida') }, [section])
   // Avisos se abre desde Clima; cobertura y páginas legales no tienen pestaña propia.
   const nav = section === 'escritorio' ? 'sembrar' : section === 'avisos' ? 'clima' : section === 'cultivos' ? 'campo' : section
   const learnList = section === 'aprender' && (!parts[1] || (parts[1] === 'biblioteca' && !parts[2]))

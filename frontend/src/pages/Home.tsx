@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { ArticleGrid } from '../components/ArticleCard'
 import { SprayLine } from '../components/SprayCard'
 import { DiagnoseCta, MyCrops, SenasCta } from '../components/FieldBits'
-import { useMyCrops } from '../lib/prefs'
+import { onboarded, setOnboarded, useMyCrops } from '../lib/prefs'
 import { Icon, type IconName } from '../components/Icon'
 import { MunicipalitySelect } from '../components/SiteChrome'
 import { StatusMark } from '../components/ui'
@@ -65,7 +65,7 @@ export default function Home() {
         <ForecastCard weather={weather} />
       </div>
 
-      <div className="mt-6 rounded-2xl bg-white px-5 py-4 shadow-sm"><MyCrops crops={myCrops} compact /></div>
+      {!user && !onboarded() && myCrops.length === 0 ? <SetupInvite /> : <div className="mt-6 rounded-2xl bg-white px-5 py-4 shadow-sm"><MyCrops crops={myCrops} compact /></div>}
 
       <Indicators weather={weather} />
 
@@ -325,5 +325,26 @@ function Tool({ href, icon, title, text, cta, tone = 'primary' }: { href: string
       </div>
       <span className="inline-flex items-center gap-1 pt-4 text-xs font-semibold" style={{ color }}>{cta} <Icon name="arrowRight" size={14} /></span>
     </a>
+  )
+}
+
+/** Invitación opcional a configurar la app (cultivos, perfil y ubicación). No interrumpe la portada. */
+function SetupInvite() {
+  const [hidden, setHidden] = useState(false)
+  if (hidden) return null
+  return (
+    <section className="mt-6 flex flex-col gap-4 rounded-2xl bg-white px-5 py-4 shadow-sm sm:flex-row sm:items-center sm:justify-between" data-testid="setup-invite">
+      <div className="flex items-start gap-3">
+        <span className="icon-square"><Icon name="leaf" size={22} /></span>
+        <div>
+          <p className="font-semibold">Configure PACHA-AGRO para su campo</p>
+          <p className="text-sm text-[var(--color-on-variant)]">Elija sus cultivos y su municipio en 4 pasos para ver primero lo que le sirve.</p>
+        </div>
+      </div>
+      <div className="flex shrink-0 items-center gap-2">
+        <a href="#/bienvenida" className="btn-primary">Empezar</a>
+        <button type="button" className="min-h-11 px-3 text-sm font-semibold text-[var(--color-on-variant)]" onClick={() => { setOnboarded(); setHidden(true) }}>Ahora no</button>
+      </div>
+    </section>
   )
 }

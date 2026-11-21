@@ -478,9 +478,12 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     assert(await p.evaluate(() => !document.body.innerText.includes('Consulte a su técnico')), 'quedó la advertencia antigua')
   })
 
-  await test('Bienvenida: primera visita en 4 pasos, cultivos y municipio guardados', async () => {
+  await test('Bienvenida: la portada se ve siempre; invitación opcional de 4 pasos', async () => {
     const p = await newPage({ ...phone, fresh: true })
     await p.goto(BASE)
+    await p.getByRole('link', { name: /Consultar condiciones de siembra/ }).first().waitFor()
+    assert(!(await p.getByTestId('onboarding').count()), 'la bienvenida tapa la portada')
+    await p.getByTestId('setup-invite').getByRole('link', { name: 'Empezar' }).click()
     await p.getByTestId('onboarding').waitFor()
     await btn(p, /^Siguiente$/).click()
     await p.getByRole('button', { name: 'Quinua' }).click(); await p.getByRole('button', { name: 'Papa' }).click()
@@ -492,7 +495,7 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     const txt = await p.getByTestId('my-crops').innerText()
     assert(txt.includes('Quinua') && txt.includes('Papa'), 'no muestra los cultivos elegidos')
     await p.reload(); await p.waitForTimeout(500)
-    assert(!(await p.getByTestId('onboarding').count()), 'la bienvenida vuelve a aparecer')
+    assert(!(await p.getByTestId('setup-invite').count()), 'la invitación vuelve a aparecer')
     assert(p.errors.length === 0, p.errors.join(';'))
   })
 
