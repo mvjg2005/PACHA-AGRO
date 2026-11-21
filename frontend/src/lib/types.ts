@@ -18,7 +18,7 @@ export interface Weather {
 export interface Criterion { id: string; label: string; status: Status; explanation: string; data_kind: string; source: string | null; value: string | null; hint?: string | null }
 export interface Recommendation {
   status: Status; headline: string; summary: string; score: number | null; confidence: string
-  crop_name: string; variety: string | null; location: { name: string; department_name: string; region: string }
+  crop: string; crop_name: string; variety: string | null; location: { name: string; department_name: string; region: string }
   scenario_status: 'implemented' | 'demo' | 'no_rules'; scenario_label: string; mode: string; disclaimer: string
   criteria: Criterion[]; actions: string[]; sources: string[]; notes: string[]; variety_note?: string
   key_factor: Criterion | null; main_action: string; missing_data: string[]; confidence_explanation: string
@@ -35,3 +35,7 @@ export interface RegionalNotice {
 }
 export interface LibraryItem { id: string; title: string; summary: string; type: string; crop: string | null; department_id: string | null; reading_minutes: number; body: string; source_note: string }
 export interface Library { source_project: string; note: string; review_status: string; types: Record<string, string>; items: LibraryItem[]; total: number }
+export interface ExpertT { id: number; full_name: string; specialty: string; institution: string; phone: string; email: string; whatsapp_url: string | null; crops: string[]; departments: string[]; verified: boolean; is_demo: boolean }
+export interface ResourceT { id: string; category: string; name: string; url: string; description: string; scope: string; official?: boolean }
+export interface Resources { note: string; categories: Record<string, string>; items: ResourceT[] }
+export interface AdviceT { answer: string; mode: 'ia' | 'basico'; topics: string[]; crop: string | null; experts: ExpertT[]; resources: ResourceT[]; location: string | null; note: string; ai_available: boolean }

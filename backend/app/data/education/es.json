@@ -2,7 +2,7 @@
   "language": "es",
   "language_name": "Español",
   "review_status": "borrador",
-  "review_note": "Contenido educativo general redactado para el prototipo. Debe ser revisado por un ingeniero agrónomo antes de su uso público.",
+  "review_note": "Contenido educativo general en revisión. ¿Tiene dudas? Pregunte en la sección Asesoría.",
   "lessons": [
     {
       "id": "pronostico",
@@ -65,7 +65,7 @@
         "Revise la humedad de su terreno.",
         "Use semilla sana y seleccionada.",
         "Respete la época de siembra de su zona.",
-        "Converse con su comunidad y técnico antes de decidir."
+        "Converse con su comunidad y, si tiene dudas, use la sección Asesoría."
       ],
       "quiz": {"question": "¿Qué debe revisar primero antes de sembrar?",
                "options": ["El color del cielo de hoy", "El pronóstico de heladas y la humedad del suelo"], "answer": 1,

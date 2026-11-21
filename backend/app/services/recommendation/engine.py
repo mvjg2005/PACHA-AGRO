@@ -101,9 +101,9 @@ def evaluate(cfg: dict, municipality: dict, answers: Answers, wx: WeatherView, t
     if scenario == "no_rules" or not crop.get("thresholds"):
         return {**base, "status": GRAY, "headline": HEADLINES[GRAY], "criteria": [], "score": None, "confidence": "ninguna",
                 "summary": f"Todavía no tenemos reglas revisadas para {crop['name'].lower()} en la región de {region}. "
-                           "No damos una recomendación para no confundirle. Consulte a un técnico agrícola de su zona.",
-                "actions": ["Consulte a su técnico o promotor agrícola.", "Revise el pronóstico de heladas en la sección Clima."],
-                "key_factor": None, "main_action": "Consulte a su técnico o promotor agrícola antes de sembrar.",
+                           "No damos una recomendación para no confundirle. En Asesoría encontrará técnicos e instituciones que pueden orientarle.",
+                "actions": ["Pida orientación en la sección Asesoría.", "Revise el pronóstico de heladas en la sección Clima."],
+                "key_factor": None, "main_action": "Pida orientación en Asesoría: ahí encontrará técnicos de su zona.",
                 "missing_data": ["reglas para este cultivo en esta región"],
                 "confidence_explanation": "Sin orientación: no hay reglas cargadas para este cultivo en esta región."}
 
@@ -183,8 +183,8 @@ _ACTION = {
     ("humedad", RED): "Espere una lluvia o riegue antes de sembrar: el suelo está seco.",
     ("humedad", YELLOW): "Revise la humedad con la prueba del puño antes de sembrar.",
     ("humedad", GRAY): "Revise la humedad de su terreno con la mano y vuelva a consultar.",
-    ("calendario", RED): "Consulte a su técnico: estamos fuera de la época habitual de siembra.",
-    ("calendario", GRAY): "Consulte a su técnico: no tenemos el calendario de siembra de su zona.",
+    ("calendario", RED): "Estamos fuera de la época habitual de siembra: pida orientación en Asesoría antes de sembrar.",
+    ("calendario", GRAY): "No tenemos el calendario de siembra de su zona: pida orientación en Asesoría.",
     ("lluvia", RED): "Prepare el terreno y espere una lluvia antes de sembrar.",
     ("lluvia", YELLOW): "Prepare el terreno y siembre cuando haya más humedad.",
     ("tormenta", YELLOW): "Esté atento a tormentas y avise a su comunidad si cae granizo.",
@@ -203,7 +203,7 @@ def main_action(status: str, key: Criterion | None) -> str:
                 else "Si va a sembrar, hágalo pronto: la mejor época ya pasó.")
     if key.id == "lluvia" and key.hint == "lluvia_fuerte":
         return "Evite sembrar justo antes de la lluvia fuerte pronosticada."
-    return _ACTION.get((key.id, key.status), "Faltan datos: vuelva a consultar más tarde o pregunte a su técnico.")
+    return _ACTION.get((key.id, key.status), "Faltan datos: vuelva a consultar más tarde o pregunte en Asesoría.")
 
 
 def _confidence_text(confidence: str, sim: bool, forecast: bool, scenario: str) -> str:
@@ -215,7 +215,7 @@ def _confidence_text(confidence: str, sim: bool, forecast: bool, scenario: str) 
     elif scenario == "demo":
         why = "Media: hay pronóstico, pero las reglas de este cultivo son de demostración."
     else:
-        why = "Media-alta: hay pronóstico real, pero las reglas aún no están validadas por agrónomos."
+        why = "Media-alta: hay pronóstico real; las reglas de siembra están en revisión."
     return f"{why} {base}"
 
 
@@ -362,6 +362,6 @@ def _actions(status, criteria) -> list[str]:
     if ids.get("tormenta") == YELLOW:
         acts.append("Esté atento a tormentas y avise a su comunidad si cae granizo.")
     if ids.get("calendario") == RED:
-        acts.append("Consulte con su técnico si conviene sembrar fuera de época o elegir otro cultivo.")
-    acts.append("Antes de decidir, converse con su comunidad o técnico agrícola.")
+        acts.append("Si piensa sembrar fuera de época, hable con un técnico en la sección Asesoría.")
+    acts.append("Comparta el resultado con su comunidad; si tiene dudas, use Asesoría.")
     return acts

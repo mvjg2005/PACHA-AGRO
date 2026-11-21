@@ -17,7 +17,7 @@ const DOCS = {
     icon: '', title: 'Términos de uso',
     sections: [
       ['Qué es AgroBolivia', 'Un prototipo académico que ofrece orientación sobre clima y siembra, y herramientas para que las comunidades se organicen.'],
-      ['Orientación, no garantía', 'Las orientaciones de siembra usan reglas experimentales, pendientes de validación agronómica. No reemplazan a un técnico agrícola. Usted decide qué hacer en su parcela.'],
+      ['Orientación, no garantía', 'Las orientaciones de siembra usan reglas experimentales, pendientes de validación agronómica. En la sección Asesoría puede contactar a técnicos. Usted decide qué hacer en su parcela.'],
       ['Avisos no oficiales', 'Los avisos de la plataforma y los reportes de la comunidad no son avisos oficiales. Los avisos oficiales de clima los publica el SENAMHI.'],
       ['Datos de demostración', 'Lo marcado como DEMO, SIMULADO o «Caso simulado» es ficticio y solo sirve para mostrar cómo funciona la plataforma.'],
       ['Uso responsable', 'No publique información falsa ni se haga pasar por otra persona. Los representantes y administradores pueden retirar publicaciones y desactivar cuentas que incumplan estas reglas.'],

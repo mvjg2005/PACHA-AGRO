@@ -1,7 +1,7 @@
 {
  "source_project": "Adaptado del proyecto PACHAAGRO (Z0M3I/PACHAAGRO, licencia MIT).",
  "review_status": "borrador",
- "note": "Orientación general. No reemplaza la recomendación de un ingeniero agrónomo ni del servicio técnico local. Pendiente de validación agronómica.",
+ "note": "Orientación general. ¿Tiene dudas sobre su caso? Pregunte en la sección Asesoría.",
  "types": {
   "guia": "Guía",
   "calendario": "Calendario",
@@ -21,7 +21,7 @@
    "department_id": "la-paz",
    "reading_minutes": 5,
    "body": "La papa es un cultivo central en la agricultura familiar del altiplano. Una buena planificación reduce riesgos y mejora el uso de recursos.\n\n## Antes de sembrar\n- Revise la humedad del suelo y el pronóstico disponible.\n- Seleccione semilla sana, de tamaño uniforme y procedencia conocida.\n- Prepare surcos según la pendiente para reducir la erosión.\n\n## Durante la siembra\nMantenga una distancia adecuada entre plantas para facilitar el aporque y la ventilación. Anote la variedad, la fecha y la parcela.\n\n## Después de sembrar\nObserve el desarrollo del cultivo y anote cualquier cambio extraño. Consulte con su técnico local antes de aplicar productos.",
-   "source_note": "Orientación general adaptada de PACHAAGRO. Validar con el servicio técnico municipal o la asociación local."
+   "source_note": "Contenido general adaptado de PACHAAGRO."
   },
   {
    "id": "calendario-valle-cochabambino",
@@ -32,7 +32,7 @@
    "department_id": "cochabamba",
    "reading_minutes": 4,
    "body": "Los calendarios agrícolas son orientativos. La altura, la variedad y las condiciones del año cambian las fechas de siembra y cosecha.\n\n## Temporadas\n- Época de lluvias: planificación de siembra y reserva de agua.\n- Transición: control de malezas y observación de plagas.\n- Época seca: cosecha, almacenamiento y preparación del suelo.\n\nUse este calendario como referencia y compárelo con lo que observa en su parcela y con el pronóstico local.",
-   "source_note": "Orientación general adaptada de PACHAAGRO. Validar con el servicio técnico municipal o la asociación local."
+   "source_note": "Contenido general adaptado de PACHAAGRO."
   },
   {
    "id": "senales-tempranas-maiz",
@@ -43,7 +43,7 @@
    "department_id": null,
    "reading_minutes": 4,
    "body": "Revisar seguido permite ver cambios antes de que afecten la producción.\n\n## Qué revisar\n- Color y forma de las hojas.\n- Insectos o daños en la parte de abajo de las hojas.\n- Estado de la base del tallo.\n- Desarrollo y llenado de la mazorca.\n\n## Cómo observar\nRecorra la parcela en zigzag y revise plantas en distintos puntos. Anote fechas y tome fotos. Si ve un problema, consulte a un técnico antes de aplicar tratamientos.",
-   "source_note": "Orientación general adaptada de PACHAAGRO. Validar con el servicio técnico municipal o la asociación local."
+   "source_note": "Contenido general adaptado de PACHAAGRO."
   },
   {
    "id": "cobertura-suelo-rastrojos",
@@ -54,7 +54,7 @@
    "department_id": null,
    "reading_minutes": 3,
    "body": "Mantener el suelo cubierto reduce el golpe de la lluvia y la pérdida de humedad.\n\n## Pasos generales\n- Deje una parte de los rastrojos en el campo.\n- Repártalos de forma pareja.\n- No los amontone: pueden favorecer problemas sanitarios.\n- Combine la cobertura con rotación de cultivos cuando pueda.\n\nLa cantidad adecuada depende del cultivo, el clima y los restos disponibles. Consulte con su servicio técnico local.",
-   "source_note": "Orientación general adaptada de PACHAAGRO. Validar con el servicio técnico municipal o la asociación local."
+   "source_note": "Contenido general adaptado de PACHAAGRO."
   },
   {
    "id": "manejo-integrado-plagas",
@@ -65,7 +65,7 @@
    "department_id": null,
    "reading_minutes": 4,
    "body": "El manejo integrado de plagas da prioridad a la prevención y la observación.\n\n## Principios\n- Identificar bien la plaga antes de actuar.\n- Revisar la parcela con frecuencia.\n- Favorecer a los enemigos naturales y la diversidad de plantas.\n- Usar productos químicos solo cuando sea necesario, siguiendo la etiqueta y la normativa vigente.\n\nNo improvise mezclas ni dosis. Pida orientación a un profesional autorizado.",
-   "source_note": "Orientación general adaptada de PACHAAGRO. Validar con el servicio técnico municipal o la asociación local."
+   "source_note": "Contenido general adaptado de PACHAAGRO."
   },
   {
    "id": "ficha-cultivo-quinua",
@@ -76,7 +76,7 @@
    "department_id": "oruro",
    "reading_minutes": 3,
    "body": "La quinua se adapta a la altura y a suelos bien drenados.\n\n## Aspectos generales\n- Tolera periodos secos, pero responde al riego oportuno.\n- Prefiere suelos sueltos y con buen drenaje.\n- Es sensible al exceso de humedad en las primeras etapas.\n\n## Qué anotar\nVariedad, fecha de siembra, densidad y eventos de clima (heladas, granizo). Esa información ayuda a decidir mejor en la siguiente campaña.",
-   "source_note": "Orientación general adaptada de PACHAAGRO. Validar con el servicio técnico municipal o la asociación local."
+   "source_note": "Contenido general adaptado de PACHAAGRO."
   },
   {
    "id": "cosecha-poscosecha-cafe",
@@ -87,7 +87,7 @@
    "department_id": "la-paz",
    "reading_minutes": 5,
    "body": "La calidad del café depende de una cosecha oportuna y de un manejo cuidadoso del grano.\n\n## Cosecha\n- Recoja solo frutos maduros.\n- No mezcle frutos verdes o dañados.\n- Mantenga limpios los recipientes y herramientas.\n\n## Poscosecha\n- Clasifique y procese el grano lo antes posible.\n- Seque de forma pareja y protegido de la humedad.\n- Anote fechas y lotes.\n\nConsulte los protocolos de su cooperativa o comprador.",
-   "source_note": "Orientación general adaptada de PACHAAGRO. Validar con el servicio técnico municipal o la asociación local."
+   "source_note": "Contenido general adaptado de PACHAAGRO."
   },
   {
    "id": "riego-eficiente-huertos",
@@ -98,7 +98,7 @@
    "department_id": null,
    "reading_minutes": 3,
    "body": "En huertos familiares, pequeños cambios en la forma de regar ahorran agua y ayudan a las plantas.\n\n## Recomendaciones generales\n- Riegue temprano o al final del día.\n- Moje sobre todo la zona de las raíces.\n- Cubra el suelo para que se evapore menos agua.\n- Revise fugas y ajuste los tiempos de riego.\n\nObserve cómo responden sus cultivos y ajuste según el clima y el tipo de suelo.",
-   "source_note": "Orientación general adaptada de PACHAAGRO. Validar con el servicio técnico municipal o la asociación local."
+   "source_note": "Contenido general adaptado de PACHAAGRO."
   }
  ]
 }

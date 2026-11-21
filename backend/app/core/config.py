@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     whatsapp_template_meeting: str = ""
     whatsapp_template_notice: str = ""
 
+    # Asistente con IA (Claude). Sin ANTHROPIC_API_KEY funciona en modo básico (sin IA), igual de útil para contactos.
+    anthropic_api_key: str = ""
+    assistant_model: str = "claude-opus-5-5"
+
     # Fuente meteorológica oficial con contrato normalizado (p. ej. un servicio de SENAMHI habilitado).
     # No existe una API pública documentada: solo se usa si se configura. Ver docs/FUENTES_DATOS.md.
     official_weather_url: str = ""

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.security import hash_password
-from app.models import Community, Meeting, Membership, Notice, RegionalNotice, User
+from app.models import Community, Expert, Meeting, Membership, Notice, RegionalNotice, User
 
 DEMO_PASSWORD = "demo1234"
 DEMO_USERS = [
@@ -49,6 +49,9 @@ def seed(db: Session) -> None:
     db.add(Notice(community_id=c.id, title="Bienvenidos a la comunidad demo", category="general", author_id=users[0].id,
                   body="Este es un aviso de demostración. Aquí el representante publica información para todos."))
     seed_regional_notices(db, users[0].id)
+    # Técnico FICTICIO solo para la demostración (no se muestra con SEED_DEMO=false).
+    db.add(Expert(full_name="Técnico de ejemplo (DEMO)", specialty="Manejo de quinua y heladas", institution="Cuenta de demostración",
+                  phone="+59170000003", crops="quinua,papa", departments="oruro,potosi,la-paz", consent=True, verified=False, is_demo=True))
     db.commit()
 
 

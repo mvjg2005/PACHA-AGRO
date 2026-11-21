@@ -449,6 +449,31 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     await p.getByText('¿Qué cultivo quiere sembrar?').waitFor()     // y se puede volver a ella
   })
 
+  await test('Asesoría: respuesta, técnicos con WhatsApp y recursos (sin cuenta)', async () => {
+    const p = await newPage()
+    await p.addInitScript(() => localStorage.setItem('agb_municipality', 'or-challapata'))
+    await p.goto(`${BASE}/#/asesoria/quinua`)
+    await p.getByTestId('resource-card').first().waitFor()
+    assert(await p.getByTestId('resource-card').count() >= 12, 'faltan recursos del directorio')
+    await p.locator('textarea').fill('¿Va a caer helada? Quiero sembrar quinua')
+    await btn(p, /^Preguntar$/).click()
+    await p.getByTestId('advice-result').waitFor({ timeout: 60000 })
+    const mode = await p.getByTestId('advice-mode').innerText()
+    assert(/IA|básica/i.test(mode), 'no indica el modo de respuesta')
+    const card = p.getByTestId('expert-card').first()
+    assert((await card.innerText()).includes('Técnico de ejemplo'), 'no recomienda al técnico de la zona')
+    const wa = await card.getByRole('link', { name: /WhatsApp/ }).getAttribute('href')
+    assert(wa.startsWith('https://wa.me/59170000003?text='), 'enlace de WhatsApp incorrecto: ' + wa)
+    const sites = await p.getByTestId('advice-result').getByTestId('resource-card').allInnerTexts()
+    assert(sites.some(t => t.includes('SENAMHI')), 'falta SENAMHI para una consulta de clima')
+    // Desde el resultado de siembra se llega a la Asesoría con el cultivo
+    await p.goto(`${BASE}/#/sembrar`)
+    for (const t of [/^Oruro$/, /Challapata/, /Quinua/, /Pandela/, /Sí, está húmedo/, /Depende de la lluvia/]) await btn(p, t).click()
+    await p.getByTestId('talk-expert').click()
+    await p.waitForURL(/#\/asesoria\/quinua$/)
+    assert(await p.evaluate(() => !document.body.innerText.includes('Consulte a su técnico')), 'quedó la advertencia antigua')
+  })
+
   await browser.close()
   fs.writeFileSync(path.join(OUT, 'resultados.json'), JSON.stringify(results, null, 2))
   const failed = results.filter(r => !r.ok).length

@@ -9,7 +9,7 @@ export function shareText(r: Recommendation): string {
   if (r.key_factor) lines.push(`Lo que más pesa: ${r.key_factor.label}`)
   lines.push(`Qué hacer: ${r.main_action}`)
   if (r.mode === 'simulado') lines.push('Caso simulado: datos de clima ficticios, solo para demostración.')
-  lines.push('Orientación experimental: reglas pendientes de validación agronómica. Consulte a su técnico.')
+  lines.push('Orientación experimental de PACHA-AGRO. Contactos de técnicos en la sección Asesoría.')
   return lines.join('\n')
 }
 

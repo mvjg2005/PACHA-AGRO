@@ -12,6 +12,7 @@ export default function AdminPage() {
       {user.role === 'editor' && <PageTitle title="Publicar avisos" subtitle="Usted es editor de contenido." />}
       <PublishNotices />
       {user.role === 'admin' && <Admin />}
+      {user.role === 'admin' && <ExpertsAdmin />}
     </div>
   )
 }
@@ -188,6 +189,61 @@ function PublishNotices() {
           </div>
         </Card>
       ))}
+    </section>
+  )
+}
+
+
+const DEPTS = [['la-paz', 'La Paz'], ['oruro', 'Oruro'], ['potosi', 'Potosí'], ['cochabamba', 'Cochabamba'], ['santa-cruz', 'Santa Cruz'], ['chuquisaca', 'Chuquisaca'], ['tarija', 'Tarija'], ['beni', 'Beni'], ['pando', 'Pando']] as const
+const CROP_OPTS = [['quinua', 'Quinua'], ['papa', 'Papa'], ['maiz', 'Maíz'], ['haba', 'Haba'], ['cebada', 'Cebada']] as const
+
+/** Directorio de técnicos para la Asesoría. Solo personas reales que aceptaron publicar su contacto. */
+function ExpertsAdmin() {
+  const empty = { full_name: '', specialty: '', institution: '', phone: '', email: '', crops: [] as string[], departments: [] as string[], consent: false, verified: false }
+  const [f, setF] = useState(empty)
+  const [list, setList] = useState<any[] | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+  const [msg, setMsg] = useState<string | null>(null)
+  const load = () => api<any[]>('/api/admin/experts').then(setList).catch(e => setErr(e.message))
+  useEffect(() => { load() }, [])
+  const toggle = (k: 'crops' | 'departments', v: string) => setF({ ...f, [k]: f[k].includes(v) ? f[k].filter(x => x !== v) : [...f[k], v] })
+  const submit = async (e: FormEvent) => {
+    e.preventDefault(); setErr(null); setMsg(null)
+    try { await api('/api/admin/experts', { body: f }); setF(empty); setMsg('Técnico registrado.'); load() } catch (e) { setErr((e as Error).message) }
+  }
+  const retire = async (id: number) => { if (window.confirm('¿Retirar a este técnico del directorio?')) { await api(`/api/admin/experts/${id}/deactivate`, { method: 'POST' }); load() } }
+  const chip = (on: boolean) => `min-h-10 rounded-md border px-3 text-sm font-semibold ${on ? 'border-bosque bg-brote-50 text-bosque-800' : 'border-linea bg-white'}`
+  return (
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold">Directorio de técnicos (Asesoría)</h2>
+      <Notice tone="info">Registre solo a personas reales que <strong>aceptaron</strong> que su contacto se muestre a los productores. Marque «verificado» si comprobó su identidad y profesión.</Notice>
+      <form onSubmit={submit} className="space-y-3 rounded-md border border-linea bg-white p-4" data-testid="expert-form">
+        <Field label="Nombre completo"><input className={inputCls} value={f.full_name} onChange={e => setF({ ...f, full_name: e.target.value })} required minLength={3} /></Field>
+        <Field label="Especialidad"><input className={inputCls} value={f.specialty} onChange={e => setF({ ...f, specialty: e.target.value })} placeholder="Ej. Sanidad vegetal en papa" required minLength={3} /></Field>
+        <Field label="Institución (opcional)"><input className={inputCls} value={f.institution} onChange={e => setF({ ...f, institution: e.target.value })} /></Field>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Celular / WhatsApp"><input className={inputCls} inputMode="tel" value={f.phone} onChange={e => setF({ ...f, phone: e.target.value })} placeholder="71234567" /></Field>
+          <Field label="Correo (opcional)"><input className={inputCls} type="email" value={f.email} onChange={e => setF({ ...f, email: e.target.value })} /></Field>
+        </div>
+        <fieldset><legend className="mb-1.5 text-[.95rem] font-semibold">Cultivos (vacío = todos)</legend>
+          <div className="flex flex-wrap gap-2">{CROP_OPTS.map(([v, l]) => <button type="button" key={v} aria-pressed={f.crops.includes(v)} className={chip(f.crops.includes(v))} onClick={() => toggle('crops', v)}>{l}</button>)}</div></fieldset>
+        <fieldset><legend className="mb-1.5 text-[.95rem] font-semibold">Departamentos (vacío = todo el país)</legend>
+          <div className="flex flex-wrap gap-2">{DEPTS.map(([v, l]) => <button type="button" key={v} aria-pressed={f.departments.includes(v)} className={chip(f.departments.includes(v))} onClick={() => toggle('departments', v)}>{l}</button>)}</div></fieldset>
+        <label className="flex items-start gap-3"><input type="checkbox" className="mt-1 h-5 w-5 accent-[#1e4a2c]" checked={f.consent} onChange={e => setF({ ...f, consent: e.target.checked })} />
+          <span>La persona <strong>aceptó</strong> que su nombre y contacto se muestren en PACHA-AGRO.</span></label>
+        <label className="flex items-start gap-3"><input type="checkbox" className="mt-1 h-5 w-5 accent-[#1e4a2c]" checked={f.verified} onChange={e => setF({ ...f, verified: e.target.checked })} />
+          <span>Verifiqué su identidad y su profesión.</span></label>
+        {err && <p role="alert" className="font-semibold text-rojo">{err}</p>}
+        <Button className="w-full" disabled={!f.consent}>Registrar técnico</Button>
+      </form>
+      {msg && <Notice tone="ok">{msg}</Notice>}
+      {!list ? <Loading /> : list.length === 0 ? <Notice>Todavía no hay técnicos registrados.</Notice> : (
+        <ul className="space-y-2">{list.map(x => (
+          <li key={x.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-linea bg-white p-3">
+            <span><strong>{x.full_name}</strong> <span className="text-sm text-musgo">· {x.specialty}{x.verified ? ' · verificado' : ''}{x.is_demo ? ' · demo' : ''}{!x.active ? ' · retirado' : ''}</span></span>
+            {x.active && <Button variant="ghost" onClick={() => retire(x.id)}>Retirar</Button>}
+          </li>))}</ul>
+      )}
     </section>
   )
 }

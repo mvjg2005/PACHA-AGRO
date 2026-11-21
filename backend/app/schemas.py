@@ -152,3 +152,39 @@ class RecommendationIn(BaseModel):
 class ChatIn(BaseModel):
     text: str = Field(min_length=1, max_length=500)
     session_id: str = Field(default="anon", max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+
+
+class ExpertIn(BaseModel):
+    full_name: str = Field(min_length=3, max_length=120)
+    specialty: str = Field(min_length=3, max_length=160)
+    institution: str = Field(default="", max_length=160)
+    phone: str = Field(default="", max_length=20)
+    email: str = Field(default="", max_length=160)
+    crops: list[str] = Field(default_factory=list, max_length=10)
+    departments: list[str] = Field(default_factory=list, max_length=9)
+    consent: bool
+    verified: bool = False
+
+    @field_validator("phone")
+    @classmethod
+    def check_phone(cls, v):
+        if not v:
+            return v
+        v = normalize_phone(v)
+        if not PHONE_RE.match(v):
+            raise ValueError("Escriba un celular de Bolivia de 8 dígitos (ej. 71234567).")
+        return v
+
+    @field_validator("email")
+    @classmethod
+    def check_email(cls, v):
+        v = v.strip()
+        if v and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", v):
+            raise ValueError("Correo no válido.")
+        return v
+
+
+class AssistantIn(BaseModel):
+    question: str = Field(min_length=3, max_length=500)
+    municipality_id: str | None = Field(default=None, max_length=60)
+    crop: str | None = Field(default=None, max_length=30)

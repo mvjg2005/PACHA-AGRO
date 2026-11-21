@@ -60,6 +60,7 @@ const NAV = [
   { path: 'clima', label: 'Pronóstico y clima' },
   { path: 'comunidad', label: 'Comunidad y avisos' },
   { path: 'aprender', label: 'Biblioteca y guías' },
+  { path: 'asesoria', label: 'Asesoría' },
 ]
 
 export function SiteHeader({ current }: { current: string }) {
@@ -122,10 +123,10 @@ export function SiteFooter() {
           </div>
           <FooterCol title="Zonas agrícolas" links={[['Altiplano', '#/cobertura'], ['Valles interandinos', '#/cobertura'], ['Llanos y Amazonía', '#/cobertura'], ['Cobertura nacional', '#/cobertura']]} />
           <FooterCol title="Módulos" links={[['¿Cuándo sembrar?', '#/sembrar'], ['Pronóstico y heladas', '#/clima'], ['Biblioteca y guías', '#/aprender/biblioteca'], ['Avisos para el campo', '#/avisos']]} />
-          <FooterCol title="Comunidad" links={[['Mi comunidad', '#/comunidad'], ['Asistente de WhatsApp (simulador)', '#/whatsapp'], ['Lecciones (quechua y aimara en preparación)', '#/aprender'], ['Comparar condiciones', '#/sembrar/comparar']]} />
+          <FooterCol title="Comunidad" links={[['Asesoría y técnicos', '#/asesoria'], ['Mi comunidad', '#/comunidad'], ['Asistente de WhatsApp (simulador)', '#/whatsapp'], ['Lecciones (quechua y aimara en preparación)', '#/aprender'], ['Comparar condiciones', '#/sembrar/comparar']]} />
         </div>
         <div className="flex flex-col items-center justify-between gap-4 rounded-xl bg-[var(--color-surface-mid)] px-6 py-4 text-xs text-[var(--color-on-variant)] md:flex-row">
-          <p className="text-center md:text-left">© 2026 PACHA-AGRO (AgroBolivia). Orientación agroclimática complementaria y experimental; para decisiones críticas consulte al SENAMHI, al INIAF y a su técnico local.</p>
+          <p className="text-center md:text-left">© 2026 PACHA-AGRO (AgroBolivia). Orientación agroclimática referencial. Avisos oficiales de clima: SENAMHI.</p>
           <div className="flex shrink-0 items-center gap-4">
             <a className="hover:text-[#161d17] hover:underline" href="#/terminos">Términos de uso</a>
             <a className="hover:text-[#161d17] hover:underline" href="#/privacidad">Privacidad</a>

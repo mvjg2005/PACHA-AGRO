@@ -83,7 +83,7 @@ export default function Home() {
         <h2 className="section-title">Más herramientas</h2>
         <p className="mt-1 text-sm text-[var(--color-on-variant)]">Para consultar en el campo o en la asamblea de su comunidad.</p>
         <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <Tool href="#/sembrar/comparar" icon="compare" title="Comparar condiciones" text="Vea cómo cambia la orientación de siembra si varía la humedad del suelo." cta="Comparar" />
+          <Tool href="#/asesoria" icon="chat" title="Asesoría y técnicos" text="Cuente su problema: le orientamos y le damos contactos de técnicos de su zona y sitios útiles." cta="Preguntar" />
           <Tool href="#/comunidad" icon="users" title="Comunidad y reuniones" text="Convocatorias, asistencia y reportes de helada o granizo de su comunidad." cta="Ir a mi comunidad" tone="secondary" />
           <Tool href="#/aprender" icon="book" title="Lecciones y guías" text="Aprenda a leer el pronóstico y a reducir riesgos con lecciones de 2 minutos." cta="Aprender" />
           <Tool href="#/avisos" icon="megaphone" title="Avisos para el campo" text="Avisos de la plataforma por zona o cultivo. No reemplazan a los avisos oficiales." cta="Ver avisos" tone="tint" />
@@ -104,7 +104,7 @@ export default function Home() {
 
       <div className="mt-6 flex flex-col justify-between gap-3 rounded-xl bg-[var(--color-surface-low)] px-4 py-3 text-xs text-[var(--color-on-variant)] sm:flex-row sm:items-center">
         <p className="flex items-start gap-2"><Icon name="info" size={16} className="text-[var(--color-secondary)]" />
-          <span><strong>Nota:</strong> la orientación de siembra usa reglas experimentales, pendientes de validación agronómica. Consulte con su técnico antes de sembrar.</span></p>
+          <span>La orientación de siembra es referencial y sus reglas están en revisión. ¿Necesita hablar con alguien? En <a className="font-semibold text-[var(--color-primary)] underline" href="#/asesoria">Asesoría</a> encontrará técnicos de su zona.</span></p>
         <div className="flex shrink-0 gap-3 font-semibold">
           <a className="text-[var(--color-primary)] hover:underline" href="#/clima">Fuentes de datos</a>
           <span className="text-[var(--color-outline-variant)]">·</span>

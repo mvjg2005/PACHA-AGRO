@@ -175,7 +175,7 @@ def test_confidence_explanation_says_it_is_not_a_probability():
     for r in (run(wx([3] * 7)), run(wx([3] * 7, mode="simulado"))):
         assert "no es la probabilidad" in r["confidence_explanation"]
     assert "simulados" in run(wx([3] * 7, mode="simulado"))["confidence_explanation"]
-    assert "no están validadas" in run(wx([3] * 7))["confidence_explanation"]
+    assert "en revisión" in run(wx([3] * 7))["confidence_explanation"]
 
 
 def test_no_rules_crop_has_action_and_no_key_factor():

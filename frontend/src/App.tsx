@@ -15,6 +15,7 @@ const WhatsApp = lazy(() => import('./pages/WhatsApp'))
 const Learn = lazy(() => import('./pages/Learn'))
 const Admin = lazy(() => import('./pages/Admin'))
 const Notices = lazy(() => import('./pages/Notices'))
+const Advice = lazy(() => import('./pages/Advice'))
 const Coverage = lazy(() => import('./pages/Coverage'))
 const Legal = lazy(() => import('./pages/Legal'))
 const Auth = lazy(() => import('./pages/Auth').then(m => ({ default: m.Login })))
@@ -41,6 +42,7 @@ function Page({ parts }: { parts: string[] }) {
     case 'whatsapp': return <WhatsApp />
     case 'aprender': return <Learn lessonId={b} itemId={c} />
     case 'avisos': return <Notices />
+    case 'asesoria': return <Advice key={b ?? 'libre'} presetCrop={b} />
     case 'cobertura': return <Coverage />
     case 'privacidad': return <Legal doc="privacidad" />
     case 'terminos': return <Legal doc="terminos" />
@@ -79,7 +81,7 @@ export default function App() {
   // Avisos se abre desde Clima; cobertura y páginas legales no tienen pestaña propia.
   const nav = section === 'escritorio' ? 'sembrar' : section === 'avisos' ? 'clima' : section
   const learnList = section === 'aprender' && (!parts[1] || (parts[1] === 'biblioteca' && !parts[2]))
-  const wide = ['', 'clima', 'escritorio'].includes(section) || parts[1] === 'comparar' || learnList
+  const wide = ['', 'clima', 'escritorio', 'asesoria'].includes(section) || parts[1] === 'comparar' || learnList
   return (
     <div className="min-h-screen pb-nav">
       <a href="#main" onClick={event => { event.preventDefault(); document.getElementById('main')?.focus() }} className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-30 focus:bg-papel focus:p-2">Ir al contenido</a>

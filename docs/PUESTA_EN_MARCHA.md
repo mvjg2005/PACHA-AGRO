@@ -21,7 +21,8 @@ Esta guía separa lo que **ya está resuelto en el código** de lo que **solo el
 3. **Responsable de los datos personales.** Defina quién responde por los datos y un contacto real, y agréguelo a la página de Privacidad (`frontend/src/pages/Legal.tsx`).
 4. **WhatsApp Business.** Cuenta de Meta Business, número verificado, plantillas `recordatorio_reunion` y `aviso_regional` aprobadas, y las variables de `docs/WHATSAPP.md`. Revise las tarifas vigentes para Bolivia.
 5. **Licencia del clima.** Open-Meteo gratuito es para uso no comercial. Si AgroBolivia cobra o lo opera una empresa, contrate el plan y configure `OPEN_METEO_API_KEY`.
-6. **Fuente oficial.** Gestione un convenio con SENAMHI; el adaptador (`OFFICIAL_WEATHER_URL`) ya está listo.
+6. **Directorio de técnicos.** En Administración → Técnicos, registre ingenieros agrónomos reales (INIAF, gobernaciones, universidades, ONG) con su consentimiento escrito. Sin registros, la Asesoría solo muestra sitios recomendados.
+7. **Fuente oficial.** Gestione un convenio con SENAMHI; el adaptador (`OFFICIAL_WEATHER_URL`) ya está listo.
 7. **Más municipios.** Agregue municipios con coordenadas verificadas en `backend/app/data/locations.json` (no requiere cambiar código).
 8. **Piloto con consentimiento.** Pruebe con una comunidad, con consentimiento informado, antes de abrirlo al público. Recién entonces se podrán medir resultados reales.
 
@@ -33,6 +34,7 @@ Esta guía separa lo que **ya está resuelto en el código** de lo que **solo el
 |---|---|---|
 | `ADMIN_PHONE`, `ADMIN_PASSWORD` | Sí | Primera cuenta de administrador (clave de 10+ caracteres) |
 | `OPEN_METEO_API_KEY` | Recomendada | Más consultas y uso comercial |
+| `ANTHROPIC_API_KEY` | Recomendada | Activa la Asesoría con IA (sin ella responde en modo básico) |
 | `WHATSAPP_*` | Para WhatsApp real | Ver `docs/WHATSAPP.md` |
 | `OFFICIAL_WEATHER_URL`, `OFFICIAL_WEATHER_KEY` | Si hay convenio | Fuente oficial de clima |
 

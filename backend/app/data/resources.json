@@ -1,0 +1,221 @@
+{
+ "note": "Recursos externos recomendados por el equipo de PACHA-AGRO. AgroBolivia no está afiliada a estos sitios; algunos tienen planes de pago.",
+ "categories": {
+  "satelite": "Monitoreo de cultivos y clima por satélite",
+  "clima": "Clima y pronósticos especializados",
+  "plagas": "Plagas, enfermedades y cuidado de plantas",
+  "tecnica": "Calendarios de siembra, suelos e información técnica"
+ },
+ "items": [
+  {
+   "id": "onesoil",
+   "category": "satelite",
+   "name": "OneSoil",
+   "url": "https://onesoil.ai/es/",
+   "scope": "global",
+   "description": "Muy intuitiva y con versión gratuita. Permite ver el índice de vegetación (NDVI) de sus campos desde el satélite, seguir el crecimiento y revisar pronósticos.",
+   "topics": [
+    "satelite",
+    "ndvi",
+    "parcela",
+    "crecimiento",
+    "vegetacion",
+    "mapa",
+    "humedad"
+   ]
+  },
+  {
+   "id": "atfarm",
+   "category": "satelite",
+   "name": "Atfarm (Yara)",
+   "url": "https://es.at.farm/",
+   "scope": "global",
+   "description": "Plataforma gratuita para seguir la biomasa del cultivo con imágenes satelitales cada pocos días y recibir alertas meteorológicas por hora.",
+   "topics": [
+    "satelite",
+    "biomasa",
+    "alertas",
+    "fertilizacion",
+    "parcela"
+   ]
+  },
+  {
+   "id": "eosda",
+   "category": "satelite",
+   "name": "EOSDA Crop Monitoring",
+   "url": "https://eos.com/es/products/crop-monitoring/",
+   "scope": "global",
+   "description": "Combina datos satelitales, detección de estrés hídrico, pronóstico a 7 días y alertas de heladas o lluvias extremas.",
+   "topics": [
+    "satelite",
+    "estres hidrico",
+    "sequia",
+    "helada",
+    "lluvia",
+    "parcela"
+   ]
+  },
+  {
+   "id": "windy",
+   "category": "clima",
+   "name": "Windy",
+   "url": "https://www.windy.com/",
+   "scope": "global",
+   "description": "Mapas interactivos de viento, lluvia acumulada, temperatura, humedad del suelo y nubosidad en tiempo real.",
+   "topics": [
+    "clima",
+    "viento",
+    "lluvia",
+    "temperatura",
+    "mapa",
+    "tormenta",
+    "granizo"
+   ]
+  },
+  {
+   "id": "meteoblue",
+   "category": "clima",
+   "name": "Meteoblue",
+   "url": "https://www.meteoblue.com/",
+   "scope": "global",
+   "description": "Pronósticos de alta precisión y meteogramas agrícolas: ventanas para fumigar, evapotranspiración y riesgo de heladas.",
+   "topics": [
+    "clima",
+    "helada",
+    "fumigar",
+    "riego",
+    "evapotranspiracion",
+    "pronostico"
+   ]
+  },
+  {
+   "id": "senamhi",
+   "category": "clima",
+   "name": "SENAMHI Bolivia",
+   "url": "https://senamhi.gob.bo/",
+   "scope": "bolivia",
+   "official": true,
+   "description": "Fuente oficial: avisos meteorológicos, alertas tempranas de heladas, granizadas y sequías, y datos agrometeorológicos de Bolivia.",
+   "topics": [
+    "clima",
+    "helada",
+    "granizo",
+    "sequia",
+    "alerta",
+    "aviso",
+    "oficial",
+    "pronostico",
+    "lluvia"
+   ]
+  },
+  {
+   "id": "croplife",
+   "category": "plagas",
+   "name": "CropLife Latin America — Listado de plagas",
+   "url": "https://croplifela.org/es/plagas/listado-de-plagas",
+   "scope": "global",
+   "description": "Enciclopedia visual de insectos, hongos, malezas y enfermedades por cultivo, con recomendaciones de manejo.",
+   "topics": [
+    "plaga",
+    "plagas",
+    "insecto",
+    "hongo",
+    "maleza",
+    "enfermedad",
+    "gusano",
+    "pulgon"
+   ]
+  },
+  {
+   "id": "agromatica",
+   "category": "plagas",
+   "name": "Agromática",
+   "url": "https://www.agromatica.es/",
+   "scope": "global",
+   "description": "Guías prácticas de riego, fertilización, suelos, podas y control ecológico o químico de plagas por cultivo.",
+   "topics": [
+    "riego",
+    "fertilizacion",
+    "abono",
+    "suelo",
+    "poda",
+    "plaga",
+    "enfermedad",
+    "organico"
+   ]
+  },
+  {
+   "id": "agrologica",
+   "category": "plagas",
+   "name": "Autodiagnóstico Agrológica",
+   "url": "https://autodiagnostico.agrologica.es/",
+   "scope": "global",
+   "description": "Herramienta para identificar insectos y plagas según los síntomas en hojas, tallos o frutos.",
+   "topics": [
+    "plaga",
+    "sintoma",
+    "hoja",
+    "manchas",
+    "diagnostico",
+    "insecto",
+    "enfermedad"
+   ]
+  },
+  {
+   "id": "plantwise",
+   "category": "plagas",
+   "name": "PlantwisePlus Knowledge Bank (CABI)",
+   "url": "https://plantwiseplusknowledgebank.org/",
+   "scope": "global",
+   "description": "Base de datos científica gratuita con fichas técnicas para diagnosticar y tratar problemas fitosanitarios en cientos de cultivos.",
+   "topics": [
+    "plaga",
+    "enfermedad",
+    "diagnostico",
+    "ficha",
+    "fitosanitario",
+    "hongo"
+   ]
+  },
+  {
+   "id": "fao",
+   "category": "tecnica",
+   "name": "FAO — Recursos de información de cultivos (Ecocrop y calendario)",
+   "url": "https://www.fao.org/agriculture/crops/information-resources/es/",
+   "scope": "global",
+   "description": "Busque qué cultivos se adaptan a su clima y suelo, y consulte calendarios agrícolas.",
+   "topics": [
+    "calendario",
+    "siembra",
+    "cultivo",
+    "suelo",
+    "clima",
+    "adaptacion",
+    "variedad"
+   ]
+  },
+  {
+   "id": "iniaf",
+   "category": "tecnica",
+   "name": "INIAF Bolivia",
+   "url": "https://www.iniaf.gob.bo/",
+   "scope": "bolivia",
+   "official": true,
+   "description": "Instituto Nacional de Innovación Agropecuaria y Forestal: manuales técnicos, semilla certificada, manejo de cultivos andinos y tropicales y asistencia técnica en Bolivia.",
+   "topics": [
+    "semilla",
+    "variedad",
+    "siembra",
+    "quinua",
+    "papa",
+    "maiz",
+    "haba",
+    "cebada",
+    "asistencia",
+    "tecnico",
+    "manual",
+    "calendario"
+   ]
+  }
+ ]
+}

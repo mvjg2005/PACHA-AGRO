@@ -189,3 +189,25 @@ class ChatState(Base):
     key: Mapped[str] = mapped_column(String(120), primary_key=True)
     data: Mapped[str] = mapped_column(Text, default="{}")
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class Expert(Base):
+    """Técnico o ingeniero agrónomo del directorio de asesoría.
+
+    Solo se publica si `consent` es verdadero: la persona aceptó que su contacto se muestre.
+    Lo registra un administrador; `verified` indica que el administrador comprobó su identidad."""
+    __tablename__ = "experts"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    full_name: Mapped[str] = mapped_column(String(120))
+    specialty: Mapped[str] = mapped_column(String(160))  # ej. "Sanidad vegetal, quinua"
+    institution: Mapped[str] = mapped_column(String(160), default="")
+    phone: Mapped[str] = mapped_column(String(20), default="")  # WhatsApp/llamadas, formato +591...
+    email: Mapped[str] = mapped_column(String(160), default="")
+    crops: Mapped[str] = mapped_column(String(200), default="")  # separados por coma; vacío = todos
+    departments: Mapped[str] = mapped_column(String(200), default="")  # separados por coma; vacío = todo el país
+    consent: Mapped[bool] = mapped_column(Boolean, default=False)
+    verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)

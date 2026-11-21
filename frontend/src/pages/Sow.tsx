@@ -158,6 +158,7 @@ function Result({ r, onRestart }: { r: Recommendation; onRestart: () => void }) 
 
       <div className="grid gap-2">
         <a className="flex min-h-12 items-center justify-center rounded-md bg-[#1f7a4a] px-5 text-lg font-semibold text-white" href={whatsappShareUrl(r)} target="_blank" rel="noopener noreferrer" data-testid="share-whatsapp">Compartir por WhatsApp</a>
+        <a className="flex min-h-12 items-center justify-center gap-2 rounded-md border border-bosque bg-white px-5 text-lg font-semibold text-bosque" href={`#/asesoria/${r.crop}`} data-testid="talk-expert">Hablar con un técnico</a>
         <details className="rounded-md border border-linea bg-white p-3">
           <summary className="cursor-pointer font-semibold text-bosque">Ver el mensaje que se enviará</summary>
           <p className="mt-2 whitespace-pre-line rounded-lg bg-[#efe9dc] p-3 text-[0.95rem]" data-testid="share-preview">{message}</p>
