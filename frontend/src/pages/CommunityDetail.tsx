@@ -98,7 +98,7 @@ function MeetingForm({ cid, onDone, onCancel }: { cid: number; onDone: () => voi
   const submit = async (e: FormEvent) => {
     e.preventDefault(); setErr(null)
     if (!f.date) { setErr('Elija la fecha.'); return }
-    try { await api(`/api/communities/${cid}/meetings`, { body: { title: f.title, place: f.place, description: f.description, starts_at: `${f.date}T${f.time}:00` } }); onDone() }
+    try { await api(`/api/communities/${cid}/meetings`, { body: { title: f.title, place: f.place, description: f.description, starts_at: `${f.date}T${f.time}:00-04:00` } }); onDone() }
     catch (e) { setErr((e as Error).message) }
   }
   return (
