@@ -321,6 +321,7 @@ def test_webhook_signature_verification(app_client, monkeypatch):
 def test_security_headers(app_client):
     r = app_client.get("/api/health")
     assert r.headers["X-Content-Type-Options"] == "nosniff" and r.headers["X-Frame-Options"] == "DENY"
+    assert r.json() == {"status": "ok", "database": "ok"}
 
 
 
@@ -405,3 +406,64 @@ def test_meeting_with_timezone_offset_is_normalized_to_bolivia(app_client):
     )
     assert response.status_code == 201, response.text
     assert response.json()["starts_at"] == local_expected.isoformat(timespec="minutes") + "-04:00"
+
+
+
+def test_demo_communities_are_hidden_even_when_id_is_known(app_client):
+    from app import db as dbmod
+    from app.models import Community, User
+
+    headers = register(app_client, "79999991", "Persona Demo")
+    with dbmod.SessionLocal() as db:
+        user = db.scalar(select(User).where(User.phone == "+59179999991"))
+        community = Community(
+            name="Comunidad Demo Oculta",
+            department_id="oruro",
+            municipality_id="or-oruro",
+            description="Solo para comprobar visibilidad",
+            status="approved",
+            is_demo=True,
+            created_by=user.id,
+        )
+        db.add(community)
+        db.commit()
+        cid = community.id
+
+    listed = app_client.get("/api/communities").json()
+    assert all(row["id"] != cid for row in listed)
+    assert app_client.get(f"/api/communities/{cid}", headers=headers).status_code == 404
+    assert app_client.post(f"/api/communities/{cid}/join", headers=headers).status_code == 404
+
+
+def test_whatsapp_webhook_ignores_messages_outside_24_hour_window(app_client, monkeypatch):
+    import time
+    from app.core.config import get_settings
+
+    settings = get_settings()
+    monkeypatch.setattr(settings, "whatsapp_enabled", True)
+    monkeypatch.setattr(settings, "whatsapp_app_secret", "shh")
+
+    class FakeChannel:
+        connected = True
+        def __init__(self):
+            self.sent = []
+        def send_text(self, to, text):
+            self.sent.append((to, text))
+            return "simulado"
+
+    channel = FakeChannel()
+    monkeypatch.setattr("app.routers.whatsapp.get_channel", lambda: channel)
+    old_timestamp = str(int(time.time()) - 25 * 60 * 60)
+    body = json.dumps({"entry": [{"changes": [{"value": {"messages": [{
+        "from": "59171234567",
+        "timestamp": old_timestamp,
+        "type": "text",
+        "text": {"body": "hola"},
+    }]}}]}]}).encode()
+    signature = "sha256=" + hmac.new(b"shh", body, hashlib.sha256).hexdigest()
+    response = app_client.post(
+        "/api/whatsapp/webhook", content=body,
+        headers={"X-Hub-Signature-256": signature, "Content-Type": "application/json"},
+    )
+    assert response.status_code == 200
+    assert channel.sent == []
