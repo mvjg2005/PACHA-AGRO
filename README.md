@@ -67,18 +67,6 @@ cd ../frontend && npm ci && npm run build
 cd ../backend && .venv/bin/uvicorn app.main:app --port 8000
 ```
 
-Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). Luego compile el frontend:
-
-```bash
-cd frontend && npm install && npm run build
-```
-
-Y arranque todo en un solo proceso (la API sirve también la web compilada):
-
-```bash
-cd backend && .venv/bin/uvicorn app.main:app --port 8000
-```
-
 Abra <http://localhost:8000>. Documentación interactiva de la API: <http://localhost:8000/docs>.
 
 Para desarrollar con recarga en caliente, deje el backend corriendo y en otra terminal:
