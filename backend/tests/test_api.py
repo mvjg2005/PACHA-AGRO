@@ -332,3 +332,18 @@ def test_health_reports_database_unavailable(app_client):
     finally:
         app.dependency_overrides.pop(dbmod.get_db, None)
     assert response.status_code == 503
+
+
+def test_unsolicited_yes_does_not_confirm_the_next_meeting(app_client):
+    c = app_client
+    cid, rep = make_community(c)
+    farmer = join_and_approve(c, cid, rep)
+    meeting = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Reunión futura", "place": "Sede", "starts_at": FUTURE},
+        headers=rep,
+    ).json()
+    reply = chat(c, "si", farmer)[0]
+    assert "No encontré una reunión vigente" in reply
+    current = c.get(f"/api/communities/{cid}/meetings", headers=farmer).json()[0]
+    assert current["id"] == meeting["id"] and current["my_response"] is None
