@@ -326,7 +326,7 @@ def list_observations(cid: int, user: User = Depends(current_user), db: Session 
     require_member(db, user, cid)
     rows = db.execute(select(Observation, User).join(User, User.id == Observation.user_id).where(Observation.community_id == cid).order_by(Observation.observed_at.desc()).limit(50)).all()
     return [{"id": o.id, "kind": o.kind, "kind_label": KIND_LABEL[o.kind], "description": o.description, "author": u.full_name,
-             "observed_at": o.observed_at.isoformat(timespec="minutes") + "-04:00" + "-04:00", "review_status": o.review_status, "channel": o.channel,
+             "observed_at": o.observed_at.isoformat(timespec="minutes") + "-04:00", "review_status": o.review_status, "channel": o.channel,
              "label": "Observación comunitaria (no es un aviso oficial)"} for o, u in rows]
 
 
