@@ -76,10 +76,30 @@ def init_db() -> None:
 
     # Errores de conexión, esquema y seed deben detener el arranque:
     # una instancia sin datos inicializados no debe anunciarse como saludable.
-    Base.metadata.create_all(engine)
+    from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+
+    try:
+        Base.metadata.create_all(engine)
+    except SQLAlchemyError as exc:
+        original = getattr(exc, "orig", None)
+        code = getattr(original, "sqlstate", None) or getattr(original, "pgcode", None)
+        message = str(original or exc).lower()
+        duplicate_table = code == "42P07" or ("already exists" in message and "table" in message)
+        if not duplicate_table:
+            raise
+
     ensure_columns(engine)
     with SessionLocal() as db:
-        seed(db)
+        try:
+            seed(db)
+        except IntegrityError as exc:
+            original = getattr(exc, "orig", None)
+            code = getattr(original, "sqlstate", None) or getattr(original, "pgcode", None)
+            message = str(original or exc).lower()
+            duplicate_seed = code == "23505" or "unique constraint failed" in message or "duplicate key" in message
+            db.rollback()
+            if not duplicate_seed:
+                raise
 
 
 engine = _make_engine(get_settings().database_url)
