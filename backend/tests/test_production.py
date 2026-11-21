@@ -233,3 +233,13 @@ def test_expired_chat_states_are_pruned_periodically(app_client, monkeypatch):
     with dbmod.SessionLocal() as db:
         assert db.get(ChatState, "expired-audit-state") is None
         assert db.get(ChatState, "fresh-audit-state") is not None
+
+
+
+def test_settings_reject_weak_jwt_secret():
+    from pydantic import ValidationError
+
+    from app.core.config import Settings
+
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, secret_key="too-short")
