@@ -369,3 +369,27 @@ def test_aware_meeting_timestamp_is_converted_to_bolivia_time(app_client):
     )
     assert response.status_code == 201, response.text
     assert response.json()["starts_at"] == expected.isoformat(timespec="minutes")
+
+
+def test_cancelled_pending_meeting_does_not_redirect_yes_to_another_meeting(app_client):
+    c = app_client
+    cid, rep = make_community(c)
+    farmer = join_and_approve(c, cid, rep)
+    first = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Primera reunión", "place": "Sede", "starts_at": FUTURE},
+        headers=rep,
+    ).json()
+    second_time = (datetime.now() + timedelta(days=4)).replace(microsecond=0).isoformat()
+    second = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Segunda reunión", "place": "Sede", "starts_at": second_time},
+        headers=rep,
+    ).json()
+    assert "Primera reunión" in chat(c, "¿Cuándo es la reunión de mi comunidad?", farmer)[0]
+    assert c.post(f"/api/meetings/{first['id']}/cancel", headers=rep).status_code == 200
+    reply = chat(c, "si", farmer)[0]
+    assert "ya no está disponible" in reply
+    meetings = c.get(f"/api/communities/{cid}/meetings", headers=farmer).json()
+    other = next(x for x in meetings if x["id"] == second["id"])
+    assert other["my_response"] is None
