@@ -29,7 +29,7 @@ El archivo `render.yaml` (Blueprint) crea:
    - `ADMIN_PHONE`: su celular con prefijo, ej. `+59171234567`
    - `ADMIN_PASSWORD`: una clave segura
 5. **Apply / Deploy Blueprint**. La primera construcción tarda unos minutos.
-6. Abra la URL `https://agrobolivia-XXXX.onrender.com`. Verifique `…/api/health` → `{"status":"ok","database":true}`.
+6. Abra la URL `https://agrobolivia-XXXX.onrender.com`. Verifique `…/api/health`: debe responder con `status: "ok"` y `database: true`.
 7. Cada `git push` a `main` vuelve a desplegar automáticamente.
 
 ## Plan gratuito: tenga en cuenta
@@ -52,9 +52,8 @@ docker build -t agrobolivia .
 ```
 
 ```bash
-# Genere un valor diferente para cada despliegue:
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-docker run -p 8000:8000 -e SECRET_KEY=PEGUE_AQUI_EL_SECRETO_GENERADO -e ADMIN_PASSWORD=SU_CLAVE_SEGURA agrobolivia
+export SECRET_KEY="$(python -c "import secrets; print(secrets.token_urlsafe(48))")"
+docker run -p 8000:8000 -e SECRET_KEY="$SECRET_KEY" -e ADMIN_PASSWORD="SU_CLAVE_SEGURA" agrobolivia
 ```
 
 Luego abra <http://localhost:8000>.
@@ -94,7 +93,7 @@ Configuración ya incluida en el repositorio: `vercel.json`, `api/index.py`, `re
 6. Agregue la base de datos: en el proyecto → **Storage** → **Create Database** → **Neon (Postgres)** → conéctela al proyecto. Vercel crea la variable `DATABASE_URL` automáticamente.
    *Si su integración crea la variable con otro nombre (p. ej. `POSTGRES_URL`), agregue manualmente `DATABASE_URL` con el mismo valor.*
 7. **Deployments → … → Redeploy** para que tome `DATABASE_URL`. Las tablas y los datos de demostración se crean solos en la primera petición.
-8. Verifique: `https://<su-proyecto>.vercel.app/api/health` debe responder `{"status":"ok","database":true,...}`.
+8. Verifique: `https://<su-proyecto>.vercel.app/api/health` debe responder `status: "ok"` y `database: true`.
 
 ## Rama de producción
 
