@@ -96,7 +96,13 @@ async def receive(request: Request, db: Session = Depends(get_db)):
                 phone = "+" + msg["from"]
                 user = db.scalar(select(User).where(User.phone == phone, User.is_active.is_(True)))
                 for reply in assistant.handle(db, f"wa:{phone}", msg["text"]["body"], user):
-                    channel.send_text(phone, reply)
+                    result = channel.send_text(phone, reply)
+                    if result.get("status") == "fallido":
+                        # El estado de conversación y el ID se pudieron guardar antes del envío.
+                        # Quitar el ID para que Meta pueda reintentar el webhook.
+                        db.delete(db.get(InboundMessage, message_id))
+                        db.commit()
+                        raise HTTPException(502, "No se pudo entregar la respuesta de WhatsApp; se permite reintentar.")
                 handled["messages"] += 1
     db.commit()
     return {"ok": True, **handled}
