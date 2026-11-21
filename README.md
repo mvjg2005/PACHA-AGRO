@@ -130,10 +130,10 @@ cd frontend && npm test
 # Desde la raíz del repositorio: instala Playwright (una sola vez)
 npm install
 npx playwright install chromium
-node e2e/run.cjs http://localhost:8000
+npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **121/121** backend, **12/12** unitarias frontend, **33/33** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Últimos resultados registrados por el proyecto antes de la auditoría: **121/121** backend, **12/12** unitarias frontend y **33/33** extremo a extremo (también se documenta una ejecución contra PostgreSQL actualizado). Durante la auditoría se añadió una prueba de regresión para datos meteorológicos faltantes; aún debe ejecutarse junto con la suite completa en un entorno limpio. GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Auditoría y presentación
 
