@@ -2,6 +2,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -10,7 +11,7 @@ from app.core.security import create_token, hash_password, verify_password
 from app.data.catalog import crops_config, get_municipality
 from app.db import get_db
 from app.deps import current_user
-from app.models import User
+from app.models import User, utcnow
 from app.schemas import LoginIn, ProfileUpdate, RegisterIn, UserOut
 from app.services.activity import log
 
@@ -25,10 +26,14 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db)):
     if body.default_municipality_id and not get_municipality(body.default_municipality_id):
         raise HTTPException(422, "Municipio no válido.")
     user = User(full_name=body.full_name, phone=body.phone, password_hash=hash_password(body.password),
-                whatsapp_opt_in=body.whatsapp_opt_in, whatsapp_opt_in_at=datetime.now() if body.whatsapp_opt_in else None,
+                whatsapp_opt_in=body.whatsapp_opt_in, whatsapp_opt_in_at=utcnow() if body.whatsapp_opt_in else None,
                 default_municipality_id=body.default_municipality_id)
     db.add(user)
-    db.flush()
+    try:
+        db.flush()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(409, "Ya existe una cuenta con ese número.")
     log(db, "registro", "Nueva cuenta de agricultor", user.id)
     db.commit()
     return {"token": create_token(user.id), "user": UserOut.model_validate(user)}
@@ -63,7 +68,7 @@ def update_me(body: ProfileUpdate, user: User = Depends(current_user), db: Sessi
         user.crop_interests = ",".join(dict.fromkeys(body.crops))
     if body.whatsapp_opt_in is not None:
         user.whatsapp_opt_in = body.whatsapp_opt_in
-        user.whatsapp_opt_in_at = datetime.now() if body.whatsapp_opt_in else None
+        user.whatsapp_opt_in_at = utcnow() if body.whatsapp_opt_in else None
         log(db, "whatsapp_consentimiento", "alta" if body.whatsapp_opt_in else "baja", user.id)
     db.commit()
     return user
