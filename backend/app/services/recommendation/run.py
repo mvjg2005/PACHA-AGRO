@@ -1,4 +1,6 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
+
+from app.core.time import local_now, local_today
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -12,10 +14,10 @@ from app.services.weather.service import get_weather
 
 
 def community_reports(db: Session, municipality_id: str, kind: str, days: int = 7) -> int:
-    since = datetime.now() - timedelta(days=days)
+    since = local_now() - timedelta(days=days)
     query = select(func.count(Observation.id)).where(
         Observation.municipality_id == municipality_id, Observation.kind == kind,
-        Observation.review_status != "descartada", Observation.observed_at >= since)
+        Observation.review_status == "confirmada", Observation.observed_at >= since)
     if not get_settings().seed_demo:
         query = (query.join(Community, Observation.community_id == Community.id)
                  .join(User, Observation.user_id == User.id)
@@ -24,7 +26,7 @@ def community_reports(db: Session, municipality_id: str, kind: str, days: int = 
 
 
 def recommend(db: Session, municipality: dict, answers: Answers, mode: str = "real", today: date | None = None) -> dict:
-    today = today or date.today()
+    today = today or local_today()
     wx = get_weather(municipality, mode, today)
     view = weather_view(wx, community_reports(db, municipality["id"], "granizo"), community_reports(db, municipality["id"], "helada"))
     result = evaluate(crops_config(), municipality, answers, view, today)
