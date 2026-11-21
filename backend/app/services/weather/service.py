@@ -21,9 +21,9 @@ OFFICIAL_ALERTS = {
                "Consulte los avisos oficiales en senamhi.gob.bo o en sus canales oficiales.",
 }
 
-_TTL = {"official": 900, "forecast": 3600, "recent": 6 * 3600, "climatology": 30 * 86400, "error": 300}
+_TTL = {"season": 86400, "official": 900, "forecast": 3600, "recent": 6 * 3600, "climatology": 30 * 86400, "error": 300}
 # Antigüedad máxima de un dato guardado que se puede mostrar cuando el proveedor falla (indicando su hora).
-_STALE_MAX = {"official": 12 * 3600, "forecast": 12 * 3600, "recent": 3 * 86400, "climatology": 365 * 86400}
+_STALE_MAX = {"season": 30 * 86400, "official": 12 * 3600, "forecast": 12 * 3600, "recent": 3 * 86400, "climatology": 365 * 86400}
 logger = logging.getLogger("agrobolivia.weather")
 
 
@@ -129,7 +129,7 @@ def _cached(kind: str, key: tuple, fn):
     hit = cache.get(ck)
     if hit is not None:
         return hit
-    dbkey = f"{kind}:{key[0]:.2f},{key[1]:.2f}"
+    dbkey = f"{kind}:{key[0]:.2f},{key[1]:.2f}" + "".join(f":{k}" for k in key[2:])
     stored = _db_get(dbkey)
     if stored and stored[2] > _now():
         cache.set(ck, stored[0], max(1, int((stored[2] - _now()).total_seconds())))
@@ -248,3 +248,12 @@ def storm_risk(forecast: Block) -> dict:
         "note": "Los modelos indican tormentas eléctricas; el granizo es posible pero no se pronostica de forma fiable en Bolivia."
         if days else "No se pronostican tormentas. El granizo puede ocurrir igual de forma local.",
     }
+
+
+def get_history(municipality: dict, today: date | None = None) -> dict:
+    """Serie diaria de lluvia y mínima desde 2001 (NASA POWER) para un municipio. Una sola consulta,
+    con caché persistente de un día: sirve para el Pachagrama y para evaluar las señas."""
+    lat, lon = municipality["lat"], municipality["lon"]
+    end = (today or date.today()) - timedelta(days=5)
+    return _cached("season", (round(lat, 2), round(lon, 2), "historia"),
+                   lambda: nasa_power.fetch_range(lat, lon, date(2001, 1, 1), end, get_client()))

@@ -57,3 +57,17 @@ export interface PlotT {
   summary: { costs_bs: number; income_bs: number; balance_bs: number; harvest_kg: number; yield_kg_ha: number | null; days_since_sowing: number | null; records: number }
   records?: FieldRecordT[]
 }
+export interface SenaReading { id: string; label: string; predicts: Record<string, string[]>; meaning: string }
+export interface SenaT { id: string; name: string; type: string; when: string; months: number[]; how: string; readings: SenaReading[]; science: string | null; source: string }
+export interface SenasCatalog { intro: string; method: string; outcomes: Record<string, { label: string; values: Record<string, string> }>; senas: SenaT[]; current_campaign: number; current_campaign_label: string }
+export interface OutcomeT { status: 'pendiente' | 'evaluado' | 'sin_datos'; available_after?: string; value?: string; label?: string; observed?: number; normal?: number; low?: number; high?: number; unit?: string; years?: number; window?: string; source?: string }
+export interface SenaObsT { id: number; sena_id: string; sena_name: string; reading: string; reading_label: string; predicts: Record<string, string[]>; observed_on: string; campaign: number; municipality_id: string; notes: string; is_demo: boolean; mine: boolean }
+export interface SenaZoneT {
+  campaign: number; campaign_label: string; municipality: { id: string; name: string; department_name: string }
+  outcome: Record<string, OutcomeT>; mine: SenaObsT[]; recent: SenaObsT[]
+  local: { n: number; votes: Record<string, Record<string, number>> }
+  department: { n: number; votes: Record<string, Record<string, number>> }
+}
+export interface ReliabilityRow { id: string; sena_id: string; name: string; observations: number; demo: number; evaluated: number; hits: number; rate: number | null; chance: number | null; campaigns: string[]; enough: boolean }
+export interface PachaWeek { start: string; end: string; rain_mm: number | null; normal_mm: number | null; frost_days: number | null; tmin: number | null; future: boolean; reports: Record<string, number>; senas: string[] }
+export interface PachagramaT { municipality: { name: string; department_name: string }; campaign: number; campaign_label: string; months: string[]; weeks: PachaWeek[]; data_available: boolean; outcome: Record<string, OutcomeT>; source: string; note: string }

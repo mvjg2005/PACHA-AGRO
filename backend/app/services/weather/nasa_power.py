@@ -76,5 +76,28 @@ def parse_climatology(data: dict) -> dict:
     }
 
 
+def fetch_range(lat: float, lon: float, start: date, end: date, client: httpx.Client) -> dict:
+    """Lluvia y temperatura mínima diarias de un periodo (para evaluar una campaña agrícola)."""
+    data = _get(client, f"{get_settings().nasa_power_url}/daily/point", {
+        "parameters": "T2M_MIN,PRECTOTCORR", "community": "AG", "latitude": lat, "longitude": lon,
+        "start": start.strftime("%Y%m%d"), "end": end.strftime("%Y%m%d"), "format": "JSON",
+    })
+    return parse_range(data)
+
+
+def parse_range(data: dict) -> dict:
+    p = data["properties"]["parameter"]
+    tmin, pr = p.get("T2M_MIN", {}), p.get("PRECTOTCORR", {})
+    out = {}
+    for k in sorted(tmin):
+        t, r = _v(tmin.get(k)), _v(pr.get(k))
+        if t is None and r is None:
+            continue
+        out[f"{k[:4]}-{k[4:6]}-{k[6:]}"] = [t, r]
+    if not out:
+        raise ProviderError("NASA POWER no tiene datos para ese periodo.")
+    return {"source": SOURCE, "daily": out}
+
+
 def _v(x):
     return None if x is None or x == FILL else x

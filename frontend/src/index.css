@@ -131,7 +131,7 @@ body { background: var(--color-surface); color: var(--color-tinta); font-family:
 @media (min-width: 56rem) {
   .home-grid { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
 }
-@media (min-width: 72rem) {
+@media (min-width: 80rem) {
   .site-nav-mobile { display: none; }
   .site-nav-desktop { display: block; }
   .pb-nav { padding-bottom: 0; }

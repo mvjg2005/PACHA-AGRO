@@ -4,9 +4,9 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 
 | Suite | Comando | Resultado |
 |---|---|---|
-| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **116/116** aprobadas |
+| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **121/121** aprobadas |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **12/12** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `node e2e/run.cjs http://localhost:8000` | **32/32** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `node e2e/run.cjs http://localhost:8000` | **33/33** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
 
 ## Casos de prueba por área
@@ -31,6 +31,7 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 | Mi campo: calculadoras | Conversión de quintal (46 kg) y arroba (11,5 kg); ganancia, rendimiento requerido, precio sin pérdida, presupuesto y mezcla por mochila; datos imposibles rechazados; área GPS de un cuadrado de 100 m ≈ 1 ha | Sí | `calc.test.ts`, e2e |
 | Mi campo: fumigación | Viento fuerte, lluvia en 2 h o calor = no recomendado; sin viento o aire seco = moderado; mejor ventana de día; la serie por hora no se expone | Sí | `test_field` |
 | Mi campo: parcelas | Crear, editar, anotar, borrar; resumen de gastos, ventas, balance, cosecha y rendimiento; otra cuenta no ve ni modifica; al eliminar la cuenta se borran parcelas y cuaderno | Sí | `test_field`, e2e |
+| Señas que se miden | Terciles con serie diaria desde 2001 (El Niño 2015 = seco); campaña actual pendiente con fecha; validación (seña, lectura, fecha futura, duplicados, nombre en «otra»); notas privadas; acierto frente al azar; Pachagrama de 52 semanas con señas; solo se borra lo propio | Sí | `test_senas`, e2e |
 | Bienvenida | 4 pasos, se guarda y no vuelve a aparecer | Sí | e2e |
 | Asesoría | Respuesta (IA o básica), técnicos por cultivo/departamento solo con consentimiento, recursos por tema; la IA no recibe teléfonos; admin requiere consentimiento | Sí | `test_advice`, e2e |
 | Avisos regionales | Segmentación por alcance (9 casos), validación de jerarquía, vigencia, retiro, filtros públicos y «mis avisos» | Correctos | `test_ported` |

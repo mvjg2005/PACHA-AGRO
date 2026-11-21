@@ -245,3 +245,21 @@ class FieldRecord(Base):
     cost_bs: Mapped[float | None] = mapped_column(nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     plot: Mapped[Plot] = relationship(back_populates="records")
+
+
+class SenaObservation(Base):
+    """Seña (bioindicador andino) observada por una persona. Es un pronóstico local que la plataforma
+    evalúa al terminar la temporada con datos satelitales; nunca se presenta como pronóstico oficial."""
+    __tablename__ = "sena_observations"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    sena_id: Mapped[str] = mapped_column(String(30))
+    custom_name: Mapped[str] = mapped_column(String(80), default="")
+    reading: Mapped[str] = mapped_column(String(30))
+    municipality_id: Mapped[str] = mapped_column(String(60), index=True)
+    department_id: Mapped[str] = mapped_column(String(40), index=True)
+    campaign: Mapped[int] = mapped_column(Integer, index=True)  # año de inicio: 2026 = campaña 2026-2027
+    observed_on: Mapped[str] = mapped_column(String(10))
+    notes: Mapped[str] = mapped_column(String(300), default="")
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)

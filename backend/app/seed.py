@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.security import hash_password
-from app.models import Community, Expert, Meeting, Membership, Notice, RegionalNotice, User
+from app.models import Community, Expert, Meeting, Membership, Notice, RegionalNotice, SenaObservation, User
 
 DEMO_PASSWORD = "demo1234"
 DEMO_USERS = [
@@ -27,6 +27,9 @@ def seed(db: Session) -> None:
         # Base creada con una versión anterior: agrega solo lo nuevo (avisos regionales DEMO).
         if not db.scalar(select(RegionalNotice).where(RegionalNotice.is_demo.is_(True))):
             seed_regional_notices(db, existing.id)
+            db.commit()
+        if not db.scalar(select(SenaObservation).where(SenaObservation.is_demo.is_(True))):
+            seed_senas(db, [u.id for u in db.scalars(select(User).where(User.is_demo.is_(True)).order_by(User.id))])
             db.commit()
         return
     users = []
@@ -52,7 +55,30 @@ def seed(db: Session) -> None:
     # Técnico FICTICIO solo para la demostración (no se muestra con SEED_DEMO=false).
     db.add(Expert(full_name="Técnico de ejemplo (DEMO)", specialty="Manejo de quinua y heladas", institution="Cuenta de demostración",
                   phone="+59170000003", crops="quinua,papa", departments="oruro,potosi,la-paz", consent=True, verified=False, is_demo=True))
+    seed_senas(db, [u.id for u in users])
     db.commit()
+
+
+# Señas FICTICIAS de demostración (Challapata). Lo que pasó en cada campaña NO es ficticio: lo calcula
+# la plataforma con datos de NASA POWER. Solo se cargan con SEED_DEMO=true.
+DEMO_SENAS = [
+    (2023, "qutu", "brillante", "2023-06-24"), (2023, "atoq", "claro", "2023-08-10"), (2023, "leque", "bajo", "2023-09-15"),
+    (2024, "qutu", "opaca", "2024-06-24"), (2024, "leque", "alto", "2024-09-20"), (2024, "floracion", "abundante", "2024-10-02"),
+    (2024, "jampatu", "callados", "2024-10-05"),
+    (2025, "qutu", "opaca", "2025-06-24"), (2025, "atoq", "ronco", "2025-08-12"), (2025, "floracion", "escasa", "2025-09-30"),
+    (2025, "leque", "alto", "2025-09-18"),
+    (2026, "qutu", "brillante", "2026-06-24"), (2026, "leque", "alto", "2026-09-14"), (2026, "atoq", "claro", "2026-08-05"),
+]
+
+
+def seed_senas(db: Session, user_ids: list[int]) -> None:
+    from datetime import date
+    for i, (campaign, sena_id, reading, day) in enumerate(DEMO_SENAS):
+        if date.fromisoformat(day) > date.today():
+            continue
+        db.add(SenaObservation(user_id=user_ids[i % len(user_ids)], sena_id=sena_id, reading=reading, municipality_id="or-challapata",
+                               department_id="oruro", campaign=campaign, observed_on=day,
+                               notes="Registro de demostración", is_demo=True))
 
 
 def seed_regional_notices(db: Session, author_id: int) -> None:

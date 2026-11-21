@@ -58,9 +58,10 @@ const NAV = [
   { path: '', label: 'Inicio' },
   { path: 'sembrar', label: '¿Cuándo sembrar?' },
   { path: 'campo', label: 'Mi campo' },
-  { path: 'clima', label: 'Pronóstico y clima' },
-  { path: 'comunidad', label: 'Comunidad y avisos' },
-  { path: 'aprender', label: 'Biblioteca y guías' },
+  { path: 'senas', label: 'Señas' },
+  { path: 'clima', label: 'Clima' },
+  { path: 'comunidad', label: 'Comunidad' },
+  { path: 'aprender', label: 'Aprender' },
   { path: 'asesoria', label: 'Asesoría' },
 ]
 
@@ -70,7 +71,7 @@ export function SiteHeader({ current }: { current: string }) {
     <header className="site-header">
       <AlertBar />
       <div className="site-header-inner">
-        <div className="flex min-w-0 items-center gap-6">
+        <div className="flex min-w-0 items-center gap-4">
           <a href="#/" className="flex shrink-0 items-center gap-2.5" aria-label="PACHA-AGRO, inicio">
             <LogoMark size={34} />
             <span className="flex flex-col leading-none">
@@ -85,7 +86,7 @@ export function SiteHeader({ current }: { current: string }) {
                 return (
                   <li key={it.label}>
                     <a href={`#/${it.path}`} aria-current={active ? 'page' : undefined}
-                      className={`block rounded-lg px-3 py-2 text-sm transition-colors ${active ? 'bg-[var(--color-primary)] font-semibold text-white' : 'text-[var(--color-on-variant)] hover:bg-[var(--color-surface-high)] hover:text-[#161d17]'}`}>
+                      className={`block whitespace-nowrap rounded-lg px-2.5 py-2 text-sm transition-colors ${active ? 'bg-[var(--color-primary)] font-semibold text-white' : 'text-[var(--color-on-variant)] hover:bg-[var(--color-surface-high)] hover:text-[#161d17]'}`}>
                       {it.label}
                     </a>
                   </li>
@@ -100,8 +101,8 @@ export function SiteHeader({ current }: { current: string }) {
             <MunicipalitySelect compact className="max-w-[11rem]" />
           </label>
           <a href={user ? '#/perfil' : '#/ingresar'}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[var(--color-primary)] px-4 text-xs font-semibold uppercase tracking-wider text-white hover:bg-[var(--color-primary-container)]">
-            {user ? <><Icon name="user" size={16} />{user.full_name.split(' ')[0]}</> : <>Ingresar<span className="hidden sm:inline">&nbsp;/ Registrarse</span></>}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-lg bg-[var(--color-primary)] px-4 text-xs font-semibold uppercase tracking-wider text-white hover:bg-[var(--color-primary-container)]">
+            {user ? <><Icon name="user" size={16} />{user.full_name.split(' ')[0]}</> : <>Ingresar<span className="hidden sm:inline min-[72rem]:hidden min-[92rem]:inline">&nbsp;/ Registrarse</span></>}
           </a>
         </div>
       </div>
@@ -124,7 +125,7 @@ export function SiteFooter() {
           </div>
           <FooterCol title="Zonas agrícolas" links={[['Altiplano', '#/cobertura'], ['Valles interandinos', '#/cobertura'], ['Llanos y Amazonía', '#/cobertura'], ['Cobertura nacional', '#/cobertura']]} />
           <FooterCol title="Módulos" links={[['¿Cuándo sembrar?', '#/sembrar'], ['Revisar una planta con foto', '#/campo/diagnostico'], ['Calculadoras y parcelas', '#/campo'], ['Pronóstico y heladas', '#/clima'], ['Biblioteca y guías', '#/aprender/biblioteca'], ['Avisos para el campo', '#/avisos']]} />
-          <FooterCol title="Comunidad" links={[['Asesoría y técnicos', '#/asesoria'], ['Mi comunidad', '#/comunidad'], ['Asistente de WhatsApp (simulador)', '#/whatsapp'], ['Lecciones (quechua y aimara en preparación)', '#/aprender'], ['Comparar condiciones', '#/sembrar/comparar']]} />
+          <FooterCol title="Comunidad" links={[['Señas andinas y Pachagrama', '#/senas'], ['Asesoría y técnicos', '#/asesoria'], ['Mi comunidad', '#/comunidad'], ['Asistente de WhatsApp (simulador)', '#/whatsapp'], ['Lecciones (quechua y aimara en preparación)', '#/aprender'], ['Comparar condiciones', '#/sembrar/comparar']]} />
         </div>
         <div className="flex flex-col items-center justify-between gap-4 rounded-xl bg-[var(--color-surface-mid)] px-6 py-4 text-xs text-[var(--color-on-variant)] md:flex-row">
           <p className="text-center md:text-left">© 2026 PACHA-AGRO (AgroBolivia). Orientación agroclimática referencial. Avisos oficiales de clima: SENAMHI.</p>

@@ -14,6 +14,25 @@ Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea 
 |---|---|---|---|
 | ![](docs/img/inicio.png) | ![](docs/img/asistente-siembra.png) | ![](docs/img/resultado-siembra.png) | ![](docs/img/clima.png) |
 
+## Lo nuevo: «Señas que se miden»
+
+Las comunidades andinas anticipan el año con **señas** (bioindicadores): las Pléyades (*Qutu*) en la madrugada de San Juan, el nido del *leque leque*, el aullido del zorro, la floración de la t'ola. Las apps agrícolas las ignoran y los programas tradicionales las anotan en papel. **PACHA-AGRO las registra y, al terminar cada temporada, mide si acertaron** con la lluvia y las heladas medidas por satélite en ese mismo municipio. No conocemos otra herramienta que lo haga de forma abierta y comunitaria.
+
+- **Dos saberes lado a lado.** Lo que anuncian las señas de la comunidad (votos por año seco, normal o lluvioso) junto a lo que realmente pasó, medido con NASA POWER.
+- **Medición rigurosa.** La temporada se ubica por **terciles** frente a todas las temporadas desde 2001, el método usual de los pronósticos estacionales. Por construcción, adivinar al azar acierta 1 de cada 3 veces, y cada seña se compara contra esa vara. Con datos reales, Challapata da: 2015–16 (El Niño) **seca**, 2023–24 **normal**, 2024–25 **lluviosa** y 2025–26 **seca**.
+- **Respaldo científico donde existe.** La visibilidad de las Pléyades en junio se relaciona con El Niño (Orlove, Chiang y Cane, *Nature* 403, 2000). Para las demás señas, la plataforma no opina: mide.
+- **Pachagrama digital.** El calendario vivo de la campaña semana a semana: lluvia, promedio desde 2001, heladas, reportes de la comunidad y señas registradas. Está inspirado en el Pachagrama en papel de los *Yapuchiris* del Altiplano.
+- **Evidencia que crece cada año.** Cada registro nuevo mejora la tabla de aciertos de su departamento. El saber local se vuelve un dato que la comunidad puede defender ante técnicos, municipios y financiadores.
+
+![Señas que se miden: saber local frente a datos satelitales en Challapata, campaña 2024–2025](docs/img/senas.png)
+
+### Cómo responde a los criterios del jurado
+| Criterio | Qué aporta PACHA-AGRO |
+|---|---|
+| **Innovación (40)** | Mide el acierto de los bioindicadores andinos con datos satelitales, con la vara del azar. Se suman la revisión de plantas por foto con IA y la asesoría con técnicos reales. |
+| **Viabilidad técnica (30)** | Todo funciona con datos reales y gratuitos (Open-Meteo y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 121 pruebas de backend, 12 de frontend y 33 en navegador de celular. Desplegable en Render con un archivo. |
+| **Impacto (30)** | Productoras y productores del Altiplano, valles y llanos: decidir cuándo sembrar, revisar plantas, hacer cuentas, organizarse en comunidad y valorar su propio saber. Funciona en celulares sencillos, con poca señal, lectura en voz alta y sin registrarse para lo esencial. |
+
 ## Qué funciona hoy
 
 | Función | Estado |
@@ -34,6 +53,7 @@ Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea 
 | Cobertura nacional (mapa de municipios y qué hay en cada departamento), privacidad y términos | Sí |
 | **Mi campo** (inspirado en apps como Plantix y FieldMargin): revisar una planta con una **foto** (posibles causas, qué verificar, primeras medidas sin químicos y técnicos de la zona), **calculadoras** (ganancia, rendimiento requerido, precio sin pérdida, presupuesto de insumos, mezcla según la etiqueta; con quintales y arrobas), **condiciones para fumigar** hora por hora, **fichas de cultivo con lectura en voz alta** y **parcelas con cuaderno de campo** (superficie medida caminando con GPS, gastos, cosecha, ventas, balance y rendimiento) | Sí. La revisión por foto usa IA con `ANTHROPIC_API_KEY`; sin ella ofrece una guía por síntomas. La foto no se guarda. Nunca se indican productos ni dosis |
 | Bienvenida en la primera visita (cultivos, perfil y ubicación) | Sí; se puede saltar |
+| **Señas que se miden** y **Pachagrama digital**: registro de bioindicadores andinos, comparación con lluvia y heladas medidas por satélite (terciles desde 2001), tabla de aciertos frente al azar por departamento | Sí, con datos reales de NASA POWER. Los registros de ejemplo solo aparecen con `SEED_DEMO=true` y están marcados |
 | **Asesoría con IA**: responde preguntas del campo y recomienda técnicos/ingenieros agrónomos (WhatsApp, llamada, correo) y sitios especializados (SENAMHI, INIAF, FAO Ecocrop, PlantwisePlus, EOSDA, OneSoil, Windy, Meteoblue…) | Sí: con `ANTHROPIC_API_KEY` usa IA; sin ella, respuesta automática básica. Los contactos los elige el servidor del directorio (solo técnicos con consentimiento, cargados por el administrador); la IA nunca inventa teléfonos ni enlaces |
 | Adaptador para fuente meteorológica oficial con contrato normalizado | Sí: listo; se activa con `OFFICIAL_WEATHER_URL` |
 | Avisos oficiales SENAMHI | No: no integrados (ver [docs/FUENTES_DATOS.md](docs/FUENTES_DATOS.md)); se enlaza al sitio oficial |
@@ -84,6 +104,8 @@ cd frontend && npm run dev
 3. **Comunidad** (representante 70000001): convocar reunión → "Recordar" (genera recordatorios *simulados* solo para quienes aceptaron WhatsApp).
 4. **WhatsApp** (agricultora 70000002): "¿Cuándo es la reunión de mi comunidad?" → "SI" → la asistencia se registra. "Quiero avisar que cayó granizo en mi zona." → queda como *observación comunitaria*.
 5. **Aprender**: lección "¿Qué es una helada?" con pregunta.
+6. **Señas** (Challapata, campaña 2015–2016 y luego 2024–2025): lo que anunciaron las señas frente a lo que midió el satélite, el Pachagrama de la campaña y la tabla «¿Las señas aciertan?» con la marca del azar.
+7. **Mi campo**: foto de una planta, calculadora de ganancia en quintales y cuaderno de una parcela.
 
 ## Desplegar
 
@@ -108,7 +130,7 @@ cd frontend && npm test
 node e2e/run.cjs http://localhost:8000
 ```
 
-Resultados actuales: **116/116** backend, **12/12** unitarias frontend, **32/32** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **121/121** backend, **12/12** unitarias frontend, **33/33** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 

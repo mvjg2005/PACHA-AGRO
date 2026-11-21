@@ -1,0 +1,264 @@
+{
+  "intro": "Las señas (bioindicadores) son saberes que las comunidades andinas usan desde hace generaciones para anticipar cómo será el año. PACHA-AGRO no afirma si aciertan o no: las registra y, al terminar la temporada, las compara con la lluvia y las heladas medidas por satélite. Así cada comunidad construye su propia evidencia.",
+  "method": "Se usa el método de los pronósticos estacionales: terciles. La lluvia total de noviembre a marzo de la temporada se ordena junto a la de todas las temporadas desde 2001 en el mismo lugar (NASA POWER). Si cae en el tercio más bajo es «año seco», en el del medio «normal» y en el más alto «lluvioso». Las heladas tempranas (días con mínima bajo 0 °C de septiembre a noviembre) se clasifican igual. Así, adivinar al azar acierta 1 de cada 3 veces: esa es la vara para medir cada seña. Los datos satelitales tienen unos 50 km de resolución: no reemplazan una estación en la comunidad.",
+  "outcomes": {
+    "lluvia": {
+      "label": "Lluvia de la temporada",
+      "values": {
+        "lluvioso": "Año lluvioso",
+        "normal": "Lluvia normal",
+        "seco": "Año seco"
+      }
+    },
+    "helada": {
+      "label": "Heladas tempranas",
+      "values": {
+        "muchas": "Muchas heladas tempranas",
+        "normal": "Heladas como siempre",
+        "pocas": "Pocas heladas tempranas"
+      }
+    }
+  },
+  "senas": [
+    {
+      "id": "qutu",
+      "name": "Las Pléyades (Qutu, Cabrillas)",
+      "type": "estrellas",
+      "when": "Madrugada del 24 de junio, aproximadamente",
+      "months": [
+        6
+      ],
+      "how": "Antes del amanecer, mire hacia el noreste. Observe si el grupo de estrellas se ve grande y brillante, o pequeño y opaco.",
+      "readings": [
+        {
+          "id": "brillante",
+          "label": "Grandes y brillantes",
+          "predicts": {
+            "lluvia": [
+              "normal",
+              "lluvioso"
+            ]
+          },
+          "meaning": "Según el saber local: buen año, la siembra puede ir a tiempo."
+        },
+        {
+          "id": "opaca",
+          "label": "Pequeñas u opacas",
+          "predicts": {
+            "lluvia": [
+              "seco"
+            ]
+          },
+          "meaning": "Según el saber local: lluvias tardías o escasas; conviene sembrar más tarde."
+        }
+      ],
+      "science": "Un estudio publicado en la revista Nature (Orlove, Chiang y Cane, 2000) encontró que en años de El Niño hay nubes altas y delgadas que hacen ver las Pléyades más opacas en junio, y que esos años suelen ser más secos en el Altiplano sur. Es una de las señas andinas con respaldo científico.",
+      "source": "Orlove, B. S., Chiang, J. C. H. y Cane, M. A. (2000). Forecasting Andean rainfall and crop yield from the influence of El Niño on Pleiades visibility. Nature, 403, 68–71."
+    },
+    {
+      "id": "leque",
+      "name": "Nido del leque leque",
+      "type": "animales",
+      "when": "Agosto a octubre",
+      "months": [
+        8,
+        9,
+        10
+      ],
+      "how": "Observe dónde pone sus huevos el leque leque (ave de los bofedales y pampas).",
+      "readings": [
+        {
+          "id": "alto",
+          "label": "Nido en lugar alto",
+          "predicts": {
+            "lluvia": [
+              "lluvioso"
+            ]
+          },
+          "meaning": "Según el saber local: habrá mucha lluvia y posibles inundaciones."
+        },
+        {
+          "id": "bajo",
+          "label": "Nido en lugar bajo o en la orilla",
+          "predicts": {
+            "lluvia": [
+              "seco"
+            ]
+          },
+          "meaning": "Según el saber local: año seco."
+        }
+      ],
+      "science": null,
+      "source": "Seña citada en estudios de saberes locales del Altiplano boliviano. La plataforma mide su acierto con datos."
+    },
+    {
+      "id": "atoq",
+      "name": "Aullido del zorro (atoq, qamaqi)",
+      "type": "animales",
+      "when": "Julio y agosto",
+      "months": [
+        7,
+        8
+      ],
+      "how": "Escuche al zorro en las noches de invierno: si su aullido es claro y largo, o ronco y entrecortado.",
+      "readings": [
+        {
+          "id": "claro",
+          "label": "Aullido claro y largo",
+          "predicts": {
+            "lluvia": [
+              "normal",
+              "lluvioso"
+            ]
+          },
+          "meaning": "Según el saber local: buen año."
+        },
+        {
+          "id": "ronco",
+          "label": "Aullido ronco o entrecortado",
+          "predicts": {
+            "lluvia": [
+              "seco"
+            ]
+          },
+          "meaning": "Según el saber local: año malo o seco."
+        }
+      ],
+      "science": null,
+      "source": "Seña citada en estudios de saberes locales andinos. La plataforma mide su acierto con datos."
+    },
+    {
+      "id": "floracion",
+      "name": "Floración de plantas silvestres",
+      "type": "plantas",
+      "when": "Agosto a octubre",
+      "months": [
+        8,
+        9,
+        10
+      ],
+      "how": "Observe cómo florecen las plantas silvestres de su zona (por ejemplo t'ola o sank'ayu): mucho y parejo, o poco.",
+      "readings": [
+        {
+          "id": "abundante",
+          "label": "Florecen mucho y parejo",
+          "predicts": {
+            "lluvia": [
+              "lluvioso"
+            ]
+          },
+          "meaning": "Según el saber local: buen año de lluvias y producción."
+        },
+        {
+          "id": "escasa",
+          "label": "Florecen poco",
+          "predicts": {
+            "lluvia": [
+              "seco"
+            ]
+          },
+          "meaning": "Según el saber local: año seco."
+        }
+      ],
+      "science": null,
+      "source": "Seña citada en estudios de saberes locales del Altiplano. La plataforma mide su acierto con datos."
+    },
+    {
+      "id": "jampatu",
+      "name": "Canto del sapo (jamp'atu)",
+      "type": "animales",
+      "when": "Septiembre y octubre",
+      "months": [
+        9,
+        10
+      ],
+      "how": "Escuche a los sapos al anochecer cerca del agua.",
+      "readings": [
+        {
+          "id": "fuerte",
+          "label": "Cantan mucho y fuerte",
+          "predicts": {
+            "lluvia": [
+              "lluvioso"
+            ]
+          },
+          "meaning": "Según el saber local: lluvias abundantes."
+        },
+        {
+          "id": "callados",
+          "label": "Casi no cantan",
+          "predicts": {
+            "lluvia": [
+              "seco"
+            ]
+          },
+          "meaning": "Según el saber local: lluvias escasas."
+        }
+      ],
+      "science": null,
+      "source": "Seña citada en estudios de saberes locales andinos. La plataforma mide su acierto con datos."
+    },
+    {
+      "id": "otra",
+      "name": "Otra seña de mi comunidad",
+      "type": "otra",
+      "when": "Cuando corresponda",
+      "months": [],
+      "how": "Escriba el nombre de la seña que usan en su comunidad y qué anuncia.",
+      "readings": [
+        {
+          "id": "lluvioso",
+          "label": "Anuncia año lluvioso",
+          "predicts": {
+            "lluvia": [
+              "lluvioso"
+            ]
+          },
+          "meaning": ""
+        },
+        {
+          "id": "normal",
+          "label": "Anuncia lluvia normal",
+          "predicts": {
+            "lluvia": [
+              "normal"
+            ]
+          },
+          "meaning": ""
+        },
+        {
+          "id": "seco",
+          "label": "Anuncia año seco",
+          "predicts": {
+            "lluvia": [
+              "seco"
+            ]
+          },
+          "meaning": ""
+        },
+        {
+          "id": "muchas_heladas",
+          "label": "Anuncia muchas heladas tempranas",
+          "predicts": {
+            "helada": [
+              "muchas"
+            ]
+          },
+          "meaning": ""
+        },
+        {
+          "id": "pocas_heladas",
+          "label": "Anuncia pocas heladas tempranas",
+          "predicts": {
+            "helada": [
+              "pocas"
+            ]
+          },
+          "meaning": ""
+        }
+      ],
+      "science": null,
+      "source": "Saber registrado por la comunidad."
+    }
+  ]
+}

@@ -25,6 +25,7 @@ const Calculator = lazy(() => import('./pages/Calculator'))
 const Plots = lazy(() => import('./pages/Plots'))
 const CropSheet = lazy(() => import('./pages/CropSheet'))
 const Onboarding = lazy(() => import('./pages/Onboarding'))
+const Senas = lazy(() => import('./pages/Senas'))
 const Legal = lazy(() => import('./pages/Legal'))
 const Auth = lazy(() => import('./pages/Auth').then(m => ({ default: m.Login })))
 const Register = lazy(() => import('./pages/Auth').then(m => ({ default: m.Register })))
@@ -57,6 +58,7 @@ function Page({ parts }: { parts: string[] }) {
       if (b === 'parcelas') return <Plots key={c ?? 'lista'} id={c} />
       return <Field />
     case 'cultivos': return b ? <CropSheet id={b} /> : <Field />
+    case 'senas': return <Senas />
     case 'bienvenida': return <Onboarding key={b ?? 'inicio'} step={b} />
     case 'cobertura': return <Coverage />
     case 'privacidad': return <Legal doc="privacidad" />
@@ -98,7 +100,7 @@ export default function App() {
   // Avisos se abre desde Clima; cobertura y páginas legales no tienen pestaña propia.
   const nav = section === 'escritorio' ? 'sembrar' : section === 'avisos' ? 'clima' : section === 'cultivos' ? 'campo' : section
   const learnList = section === 'aprender' && (!parts[1] || (parts[1] === 'biblioteca' && !parts[2]))
-  const wide = ['', 'clima', 'escritorio', 'asesoria'].includes(section) || (section === 'campo' && !parts[1]) || parts[1] === 'comparar' || learnList
+  const wide = ['', 'clima', 'escritorio', 'asesoria', 'senas'].includes(section) || (section === 'campo' && !parts[1]) || parts[1] === 'comparar' || learnList
   return (
     <div className="min-h-screen pb-nav">
       <a href="#main" onClick={event => { event.preventDefault(); document.getElementById('main')?.focus() }} className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-30 focus:bg-papel focus:p-2">Ir al contenido</a>

@@ -19,6 +19,7 @@
 13. **Fichas de cultivo**: rangos generales de literatura agronómica; no reemplazan recomendaciones por variedad de INIAF.
 14. **Condiciones para fumigar**: criterios generales (viento, lluvia, temperatura, humedad) sobre el pronóstico del modelo; la etiqueta del producto manda.
 15. **Medición de parcelas con GPS**: el GPS del celular tiene un margen de varios metros; en parcelas pequeñas el error relativo es alto.
+16. **Señas que se miden**: la evaluación usa datos satelitales de unos 50 km de resolución, no una estación en la comunidad. Con pocos registros, el porcentaje de acierto todavía no permite concluir (se indica en pantalla). El catálogo de señas es un punto de partida: debe revisarse con las comunidades y con organizaciones como PROSUCO.
 
 ## Próximos pasos sugeridos
 

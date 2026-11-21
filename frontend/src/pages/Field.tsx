@@ -1,7 +1,7 @@
 import { Icon, type IconName } from '../components/Icon'
 import { PageTitle } from '../components/ui'
 import { CALCS } from './Calculator'
-import { CropMark, DiagnoseCta, MyCrops } from '../components/FieldBits'
+import { CropMark, DiagnoseCta, MyCrops, SenasCta } from '../components/FieldBits'
 import { CROP_LIST, useMyCrops } from '../lib/prefs'
 import { useApp } from '../lib/store'
 
@@ -15,6 +15,7 @@ export default function Field() {
 
       <MyCrops crops={mine} />
       <DiagnoseCta />
+      <SenasCta />
 
       <section aria-labelledby="calc-title">
         <p className="eyebrow">Herramientas</p>

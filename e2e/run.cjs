@@ -571,6 +571,36 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     assert(p.errors.length === 0, p.errors.join(';'))
   })
 
+  await test('Señas que se miden: saber local vs satélite, Pachagrama, confiabilidad y registro', async () => {
+    const p = await newPage()
+    await p.addInitScript(() => localStorage.setItem('agb_municipality', 'or-challapata'))
+    await p.goto(`${BASE}/#/senas`)
+    await p.getByTestId('two-knowledges').waitFor({ timeout: 90000 })
+    await p.getByLabel('Campaña').selectOption('2015')   // El Niño 2015–2016
+    await p.getByTestId('outcome-lluvia').waitFor({ timeout: 90000 })
+    const rain = await p.getByTestId('outcome-lluvia').innerText()
+    assert(/Año seco|Lluvia normal|Año lluvioso/.test(rain) && rain.includes('NASA POWER'), 'sin resultado medido: ' + rain)
+    await p.getByTestId('pachagrama').locator('svg rect').first().waitFor({ timeout: 90000 })
+    assert(await p.getByTestId('reliability').isVisible(), 'falta la sección de confiabilidad')
+    assert(await p.getByTestId('sena-card').count() >= 6, 'faltan señas en el catálogo')
+    // Registrar una seña de una campaña pasada
+    const num = '6' + String(Math.floor(Math.random() * 1e7)).padStart(7, '0')
+    await p.goto(`${BASE}/#/registro`)
+    await p.fill('input[autocomplete=name]', 'Prueba Señas'); await p.fill('input[autocomplete=tel]', num); await p.fill('input[type=password]', 'clave1234')
+    await btn(p, /Crear cuenta/).click(); await p.waitForURL(/comunidad/)
+    await p.goto(`${BASE}/#/senas`); await p.getByTestId('two-knowledges').waitFor({ timeout: 90000 })
+    await p.getByTestId('sena-card').first().getByRole('button', { name: /Registré esta seña/ }).click()
+    await p.getByTestId('sena-form').getByText('Pequeñas u opacas').click()
+    await p.getByTestId('sena-form').locator('input[type=date]').fill('2026-06-24')
+    await btn(p, /Guardar seña/).click()
+    await p.getByText('Seña registrada').waitFor()
+    await p.getByLabel('Campaña').selectOption('2025')
+    await p.getByTestId('my-senas').waitFor({ timeout: 60000 })
+    assert((await p.getByTestId('my-senas').innerText()).includes('Pequeñas u opacas'), 'no aparece la seña registrada')
+    assert(await p.evaluate(() => document.documentElement.scrollWidth) <= 360, 'desborde horizontal')
+    assert(p.errors.length === 0, p.errors.join(';'))
+  })
+
   await browser.close()
   fs.writeFileSync(path.join(OUT, 'resultados.json'), JSON.stringify(results, null, 2))
   const failed = results.filter(r => !r.ok).length

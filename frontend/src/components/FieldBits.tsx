@@ -53,3 +53,22 @@ export function DiagnoseCta() {
   )
 }
 
+
+/** Señas andinas medidas con datos: la innovación central, visible en la portada y en Mi campo. */
+export function SenasCta() {
+  return (
+    <section className="grid items-center gap-6 rounded-2xl bg-[var(--color-surface-mid)] p-6 sm:p-8 lg:grid-cols-[1.3fr_1fr]" data-testid="senas-cta">
+      <div>
+        <p className="eyebrow">Saber andino + satélite</p>
+        <h2 className="section-title">Señas que se miden</h2>
+        <p className="mt-2 max-w-2xl text-[var(--color-on-variant)]">Las Pléyades en San Juan, el nido del leque leque, el aullido del zorro: registre las señas de su comunidad. Al terminar la temporada, PACHA-AGRO las compara con la lluvia y las heladas medidas por satélite y muestra cuántas veces acertó cada una. Evidencia propia, construida por la comunidad.</p>
+        <a href="#/senas" className="btn-primary mt-5"><Icon name="sun" size={18} />Ver señas y Pachagrama</a>
+      </div>
+      <svg viewBox="0 0 240 120" className="w-full" role="img" aria-label="Ejemplo de comparación entre señas y datos satelitales">
+        {[22, 30, 18, 44, 60, 72, 58, 40, 20, 12, 8, 6].map((v, i) => <rect key={i} x={10 + i * 19} y={95 - v} width={13} height={v} rx={2} fill="#6f93b8" />)}
+        <polyline points="16,80 35,70 54,76 73,58 92,45 111,36 130,48 149,60 168,78 187,84 206,88 225,90" fill="none" stroke="#8a5a2b" strokeWidth={2} strokeDasharray="4 3" />
+        {[1, 4, 7].map(i => <path key={i} d={`M${16 + i * 19} 102 l5 9 h-10 z`} fill="#b07a12" />)}
+      </svg>
+    </section>
+  )
+}

@@ -252,3 +252,25 @@ class RecordIn(BaseModel):
         if not d:
             raise ValueError("Indique la fecha.")
         return d
+
+
+class SenaIn(BaseModel):
+    sena_id: str = Field(min_length=2, max_length=30)
+    reading: str = Field(min_length=2, max_length=30)
+    municipality_id: str = Field(min_length=2, max_length=60)
+    observed_on: str
+    custom_name: str = Field(default="", max_length=80)
+    notes: str = Field(default="", max_length=300)
+
+    @field_validator("observed_on")
+    @classmethod
+    def date_ok(cls, v):
+        d = _check_date(v)
+        if not d:
+            raise ValueError("Indique la fecha.")
+        return d
+
+    @field_validator("custom_name", "notes")
+    @classmethod
+    def strip(cls, v: str) -> str:
+        return v.strip()
