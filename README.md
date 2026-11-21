@@ -30,7 +30,7 @@ Nada se presenta como algo que no es: los datos **simulados**, las **observacion
 
 ## Ejecutar (5 minutos)
 
-Requisitos: Python 3.11+ y Node.js 18+.
+Requisitos: Python 3.11+ y Node.js 18+ para la aplicación. Las pruebas E2E requieren Node.js 22+ y Chromium.
 
 ```bash
 cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && cp .env.example .env
@@ -92,11 +92,16 @@ cd backend && .venv/bin/python -m pytest
 cd frontend && npm test
 ```
 
+Las pruebas E2E se instalan por separado:
+
 ```bash
-node e2e/run.cjs http://localhost:8000
+cd e2e
+npm install
+npx playwright install chromium
+npm test -- http://localhost:8000
 ```
 
-Resultados actuales: **61/61** backend, **7/7** unitarias frontend, **14/14** extremo a extremo. Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados registrados en `main` antes de esta auditoría: **61/61** backend, **7/7** unitarias frontend y **14/14** E2E. La rama de auditoría añade correcciones y pruebas de regresión; sus resultados deben volver a ejecutarse antes de fusionarla. Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 
