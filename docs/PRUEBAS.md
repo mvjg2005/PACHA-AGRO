@@ -1,12 +1,12 @@
 # Pruebas y validación
 
-Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el servidor local y consulta las fuentes meteorológicas disponibles.
+Los resultados numéricos de la tabla son los registrados antes de esta auditoría (21-11-2026); no describen una nueva ejecución de esta rama. El backend usa fixtures. La suite de navegador usa el servidor local y consulta las fuentes meteorológicas disponibles. Playwright ahora está declarado en e2e/package.json (Node.js 22+). Ejecución local: iniciar la API con SEED_DEMO=true y base SQLite desechable; luego ejecutar cd e2e, npm install, npx playwright install chromium y npm test -- http://localhost:8000. GitHub Actions ahora incluye E2E en los pull requests con base temporal.
 
 | Suite | Comando | Resultado |
 |---|---|---|
 | Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **85/85** aprobadas |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **7/7** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `node e2e/run.cjs http://localhost:8000` | **19/19** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `cd e2e && npm install && npx playwright install chromium && npm test -- http://localhost:8000` | **19/19** registradas antes de esta auditoría; repetir tras los cambios |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
 
 ## Casos de prueba por área
@@ -57,12 +57,19 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 | WhatsApp | Webhook sin credenciales 503; firma inválida 401; firma válida 200 | Sí | `test_api` |
 | Validación | Municipio inexistente, cultivo desconocido, variedad `<script>`, valor fuera de lista | 404 / 422 | `test_api` |
 | Seguridad | Encabezados `nosniff`, `X-Frame-Options` | Presentes | `test_api` |
+| Seguridad | Clave JWT ausente o menor de 32 caracteres | La configuración no permite iniciar con una clave débil | `config.py` / CI |
+| Persistencia | La base de datos no responde | `/api/health` devuelve 503 | `test_api` |
+| WhatsApp | Meta reintenta el mismo `wamid` | El webhook procesa el mensaje una sola vez | `test_api` |
+| Comunidades | Decisión repetida de una solicitud resuelta | 409 Conflict | `test_api` |
+| Recomendación | Lluvia diaria faltante (`null`) | El criterio queda gris, nunca se interpreta como 0 mm | `test_engine` |
+| Recomendación | Reporte de helada confirmado | Añade cautela comunitaria sin presentarse como aviso oficial | `test_engine` |
+| NASA POWER | Climatología con `-999` | Se normaliza como dato ausente | `test_weather` |
 | Educación | ≥7 lecciones con fuentes; quechua/aimara "pendiente"; `lang` no permitido | 422 | `test_api`, e2e #11 |
 | Rendimiento | Red emulada ≈400 kbps + 400 ms latencia | Acciones de inicio visibles en **≈2.1 s** | e2e #13 |
 | Rendimiento | Peso de la primera carga | ≈62 KB comprimidos (JS 56 KB + CSS 5 KB); mapa (44 KB) solo bajo demanda | `npm run build` |
 | Accesibilidad | Contraste de todos los pares texto/fondo de la paleta | ≥ 4.95:1 (WCAG AA) | cálculo en revisión |
 
-> Nota: los límites de seguridad (8 inicios de sesión cada 5 min por cuenta e IP, 5 reportes por hora) viven en memoria. Si se ejecuta la suite e2e varias veces seguidas contra el mismo servidor, las pruebas que inician sesión pueden recibir `429`: reinicie el servidor antes de cada ejecución.
+> Nota: GitHub Actions ejecuta ahora la suite E2E en pull requests con SQLite temporal y datos demo aislados. Los límites de seguridad (8 inicios de sesión cada 5 min por cuenta e IP, 5 reportes por hora) viven en memoria. Si se ejecuta la suite e2e varias veces seguidas contra el mismo servidor, las pruebas que inician sesión pueden recibir `429`: reinicie el servidor antes de cada ejecución.
 
 ## Lo que NO se ha validado
 
