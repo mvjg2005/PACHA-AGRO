@@ -26,10 +26,21 @@ _TTL = 30 * 60
 
 
 def _state(key: str) -> dict:
+    now = time.time()
+    if len(_STATE) >= 5_000:
+        expired = [k for k, value in _STATE.items() if now - value.get("_t", 0) > _TTL]
+        for expired_key in expired:
+            _STATE.pop(expired_key, None)
+        # Evicta las sesiones más antiguas si muchas siguen activas.
+        overflow = len(_STATE) - 4_999
+        if overflow > 0:
+            oldest = sorted(_STATE, key=lambda k: _STATE[k].get("_t", 0))[:overflow]
+            for old_key in oldest:
+                _STATE.pop(old_key, None)
     st = _STATE.get(key)
-    if not st or time.time() - st.get("_t", 0) > _TTL:
+    if not st or now - st.get("_t", 0) > _TTL:
         st = {}
-    st["_t"] = time.time()
+    st["_t"] = now
     _STATE[key] = st
     return st
 
