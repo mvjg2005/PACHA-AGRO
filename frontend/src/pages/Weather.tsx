@@ -45,6 +45,9 @@ export default function Weather() {
           {wx.forecast.extra?.stale && (
             <Notice tone="warn" ><span data-testid="stale-forecast"><strong>No pudimos actualizar el pronóstico ahora.</strong> Mostramos el último que obtuvimos ({updatedAt(wx.forecast.extra.stale_fetched_at)}). Vuelva a consultar más tarde.</span></Notice>
           )}
+          {wx.forecast.available && wx.forecast.extra?.fallback_from?.length > 0 && (
+            <Notice tone="info"><strong>Pronóstico de respaldo.</strong> Open-Meteo no respondió; mostramos los datos de MET Norway.</Notice>
+          )}
           <FrostCard wx={wx} />
 
           {wx.forecast.available ? (

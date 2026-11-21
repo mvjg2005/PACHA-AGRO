@@ -168,7 +168,7 @@ const FROST: Record<string, { status: Status; text: string }> = {
 }
 
 function sourceShort(wx: Weather) {
-  if (wx.forecast.available) return wx.forecast.extra?.official ? wx.forecast.source : 'Open-Meteo'
+  if (wx.forecast.available) return wx.forecast.extra?.official ? wx.forecast.source : wx.forecast.source.split(' (')[0]
   if (wx.recent.available) return 'NASA POWER'
   return 'Sin datos'
 }
