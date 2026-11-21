@@ -1,13 +1,22 @@
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
 
-export function dayLabel(iso: string, today = new Date()): string {
+export function dayLabel(iso: string, today?: Date): string {
   const [y, m, d] = iso.split('-').map(Number)
-  const date = new Date(y, m - 1, d)
-  const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate())
-  const diff = Math.round((date.getTime() - t0.getTime()) / 86400000)
+  const target = Date.UTC(y, m - 1, d)
+  let currentDate: number
+  if (today) {
+    currentDate = Date.UTC(today.getFullYear(), today.getMonth(), today.getDate())
+  } else {
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'America/La_Paz', year: 'numeric', month: '2-digit', day: '2-digit',
+    }).formatToParts(new Date())
+    const part = (type: string) => Number(parts.find(p => p.type === type)?.value ?? 0)
+    currentDate = Date.UTC(part('year'), part('month') - 1, part('day'))
+  }
+  const diff = Math.round((target - currentDate) / 86400000)
   if (diff === 0) return 'Hoy'
   if (diff === 1) return 'Mañana'
-  return `${DIAS[date.getDay()]} ${d}`
+  return `${DIAS[new Date(target).getUTCDay()]} ${d}`
 }
 
 export function dateLong(iso: string): string {
