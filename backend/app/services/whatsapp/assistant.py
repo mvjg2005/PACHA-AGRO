@@ -2,11 +2,13 @@
 Respuestas cortas, en español sencillo, siempre indicando la fuente de los datos."""
 from datetime import date, datetime, timedelta
 
+from app.core.time import local_now
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.data.catalog import find_municipality_by_name, get_municipality
-from app.models import Community, Meeting, Membership, OutboundMessage, User
+from app.models import Community, Meeting, Membership, OutboundMessage, User, utcnow
 from app.services.recommendation.engine import Answers
 from app.services.recommendation.run import recommend
 from app.services.whatsapp.intents import detect
@@ -122,13 +124,13 @@ def _handle(db: Session, st: dict, text: str, user: User | None, mode: str, toda
     if intent == "opt_in":
         if not user:
             return ["Para recibir avisos necesita registrarse en AgroBolivia con este número."]
-        user.whatsapp_opt_in, user.whatsapp_opt_in_at = True, datetime.now()
+        user.whatsapp_opt_in, user.whatsapp_opt_in_at = True, utcnow()
         db.commit()
         return ["✅ Aceptó recibir recordatorios y avisos de su comunidad. Escriba BAJA cuando quiera dejar de recibirlos."]
     if intent in ("yes", "no"):
-        return [_attendance(db, user, intent)]
+        return [_attendance(db, user, intent, st)]
     if intent == "meeting":
-        return [_next_meeting(db, user)]
+        return [_next_meeting(db, user, st)]
     if intent == "report":
         return _start_report(db, user, it.get("kind"), text, st)
     if intent == "library":
@@ -185,37 +187,68 @@ def _sowing(db, loc, crop, mode, today) -> list[str]:
     return ["\n".join(lines)]
 
 
-def _next_meeting(db, user) -> str:
+def _next_meeting(db, user, st: dict) -> str:
     if not user:
         return "Para ver reuniones necesita registrarse en AgroBolivia y unirse a su comunidad."
     comms = _user_communities(db, user)
     if not comms:
         return "Aún no es miembro aprobado de ninguna comunidad."
     mt = db.scalar(select(Meeting).where(Meeting.community_id.in_([c.id for c in comms]), Meeting.cancelled.is_(False),
-                                         Meeting.starts_at >= datetime.now() - timedelta(hours=2)).order_by(Meeting.starts_at))
+                                         Meeting.starts_at >= local_now() - timedelta(hours=2)).order_by(Meeting.starts_at))
     if not mt:
         return "No hay reuniones programadas en su comunidad."
+    st["pending_meeting_id"] = mt.id
     c = db.get(Community, mt.community_id)
     return (f"📅 Próxima reunión — {c.name}\n{mt.title}\nDía: {mt.starts_at:%d/%m/%Y} a las {mt.starts_at:%H:%M}\n"
             f"Lugar: {mt.place}\n¿Va a asistir? Responda SI o NO.")
 
 
-def _attendance(db, user, intent) -> str:
+def _attendance(db, user, intent, st: dict | None = None) -> str:
     from app.routers.communities import set_attendance
 
     if not user:
         return "Para confirmar asistencia necesita una cuenta en AgroBolivia."
+    st = st or {}
     comms = _user_communities(db, user)
-    last = db.scalar(select(OutboundMessage).where(OutboundMessage.user_id == user.id, OutboundMessage.meeting_id.is_not(None)).order_by(OutboundMessage.id.desc()))
-    mt = db.get(Meeting, last.meeting_id) if last else None
-    if mt is None and comms:
-        mt = db.scalar(select(Meeting).where(Meeting.community_id.in_([c.id for c in comms]), Meeting.cancelled.is_(False),
-                                             Meeting.starts_at >= datetime.now()).order_by(Meeting.starts_at))
-    if mt is None or mt.community_id not in [c.id for c in comms]:
-        return "No encontré una reunión para confirmar."
-    set_attendance(db, mt, user, "si" if intent == "yes" else "no", channel="whatsapp_sim")
+    community_ids = [c.id for c in comms]
+    now = local_now()
+    pending_meeting_id = st.get("pending_meeting_id")
+    mt = db.get(Meeting, pending_meeting_id) if pending_meeting_id else None
+
+    # Una respuesta a la pregunta de asistencia solo puede confirmar esa reunión.
+    if pending_meeting_id:
+        if (mt is None or mt.cancelled or mt.community_id not in community_ids
+                or mt.starts_at < now - timedelta(hours=6)):
+            st.pop("pending_meeting_id", None)
+            return "La reunión que consultó ya no está disponible. Vuelva a preguntar por la próxima reunión."
+    else:
+        # Tras un reinicio o vencimiento del estado, solo se acepta una respuesta
+        # asociada a un recordatorio persistido para una reunión vigente.
+        last = None
+        if community_ids:
+            last = db.scalar(
+                select(OutboundMessage)
+                .join(Meeting, OutboundMessage.meeting_id == Meeting.id)
+                .where(
+                    OutboundMessage.user_id == user.id,
+                    OutboundMessage.status.in_(("simulado", "enviado", "entregado", "leido")),
+                    Meeting.community_id.in_(community_ids),
+                    Meeting.cancelled.is_(False),
+                    Meeting.starts_at >= now - timedelta(hours=6),
+                )
+                .order_by(OutboundMessage.id.desc())
+            )
+        mt = db.get(Meeting, last.meeting_id) if last else None
+
+    if (mt is None or mt.cancelled or mt.community_id not in community_ids
+            or mt.starts_at < now - timedelta(hours=6)):
+        st.pop("pending_meeting_id", None)
+        return "No encontré una reunión vigente para confirmar."
+    set_attendance(db, mt, user, "si" if intent == "yes" else "no", channel="whatsapp")
     db.commit()
-    return f"✅ Gracias. Registramos que {'SÍ' if intent == 'yes' else 'NO'} asistirá a: {mt.title} ({mt.starts_at:%d/%m %H:%M})."
+    st.pop("pending_meeting_id", None)
+    choice = "SÍ" if intent == "yes" else "NO"
+    return f"✅ Gracias. Registramos que {choice} asistirá a: {mt.title} ({mt.starts_at:%d/%m %H:%M})."
 
 
 def _start_report(db, user, kind, text, st) -> list[str]:
