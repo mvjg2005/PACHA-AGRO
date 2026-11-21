@@ -134,7 +134,18 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
   await test('Reuniones: el representante convoca una reunión y envía recordatorio (simulado)', async () => {
     const p = await newPage()
     await login(p, '70000001')
-    await p.click('text=Comunidad Demo Challapata'); await btn(p, /Convocar reunión/).click()
+    await p.click('text=Comunidad Demo Challapata')
+    await p.waitForSelector('text=Usted es representante verificado de esta comunidad.', { timeout: 7000 }).catch(async () => {
+      const details = await p.evaluate(async () => {
+        const token = localStorage.getItem('agb_token')
+        const me = await fetch('/api/me/communities', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()).catch(e => String(e))
+        return { url: location.href, body: document.body.innerText.slice(0, 1200), communities: me }
+      })
+      throw new Error('La cuenta demo no aparece como representante aprobado: ' + JSON.stringify(details))
+    })
+    const callMeeting = btn(p, /Convocar reunión/)
+    await callMeeting.waitFor({ state: 'visible', timeout: 7000 })
+    await callMeeting.click()
     const d = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10)
     await p.fill('input[placeholder^="Ej. Planificar"]', 'Prueba e2e de reunión'); await p.fill('input[type=date]', d)
     await p.fill('input[placeholder^="Ej. Sede"]', 'Cancha comunal'); await btn(p, /Guardar/).click()
