@@ -1,13 +1,26 @@
 # Pruebas y validación
 
-Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el servidor local y consulta las fuentes meteorológicas disponibles.
+Última ejecución registrada en `main` el 21-11-2026. Los resultados de la tabla son una referencia histórica del commit principal anterior a esta rama de auditoría; no representan una ejecución de las modificaciones actuales. El backend usa fixtures. La suite de navegador usa el servidor local.
 
 | Suite | Comando | Resultado |
 |---|---|---|
 | Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **61/61** aprobadas |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **7/7** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `node e2e/run.cjs http://localhost:8000` | **14/14** aprobadas (servidor recién iniciado) |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `cd e2e && npm install && npx playwright install chromium && npm test -- http://localhost:8000` | **14/14** aprobadas (servidor recién iniciado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
+
+## Repetir la validación E2E
+
+Requisitos: Node.js 22 o superior. Con el backend y el frontend compilado en ejecución en `http://localhost:8000`:
+
+```bash
+cd e2e
+npm install
+npx playwright install chromium
+npm test -- http://localhost:8000
+```
+
+La dependencia Playwright está fijada en `e2e/package.json`. Estas herramientas no forman parte de las dependencias del frontend.
 
 ## Casos de prueba por área
 
@@ -63,3 +76,8 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 - El tiempo "menos de un minuto" se midió en número de toques (7) y no con personas.
 - No se probó en dispositivos físicos de gama baja, solo emulación en Chromium.
 - No se realizó una auditoría de seguridad profesional ni pruebas de carga.
+
+
+## Pruebas añadidas por la auditoría
+
+La rama incorpora regresiones para: límite de inicio de sesión por IP, configuración productiva, rechazo de nombres en blanco, fechas con offset, confirmación de asistencia ligada a una reunión, JSON malformado en el webhook, precipitación faltante, reportes comunitarios de helada y valores centinela de NASA POWER. Estas pruebas aún deben ejecutarse sobre esta rama antes de considerar validada la corrección.
