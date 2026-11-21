@@ -1,4 +1,4 @@
-# AgroBolivia 🌱
+# AgroBolivia
 
 **Plataforma inteligente de asistencia agroclimática y comunicación comunitaria para agricultores de Bolivia.**
 
@@ -6,69 +6,55 @@
 
 Prototipo funcional para hackatón universitaria. Integra los tracks **Comunicación** (comunidades, reuniones, avisos, reportes y WhatsApp) y **Educación** (lecciones breves para interpretar el clima y reducir riesgos).
 
-Portada en escritorio (estilo revista: artículos recomendados con ilustraciones propias):
+Portada en escritorio (diseño editorial sobrio, sin emoticones: tipografía serif, íconos de línea y artículos con ilustraciones propias):
 
 ![Portada en escritorio](docs/img/inicio-escritorio.png)
 
-| Inicio | Asistente de siembra | Resultado explicable | Clima (demostración) |
+| Inicio | Asistente de siembra | Resultado explicable | Clima |
 |---|---|---|---|
-| ![](docs/img/inicio.png) | ![](docs/img/asistente-siembra.png) | ![](docs/img/resultado-siembra.png) | ![](docs/img/clima-demo.png) |
+| ![](docs/img/inicio.png) | ![](docs/img/asistente-siembra.png) | ![](docs/img/resultado-siembra.png) | ![](docs/img/clima.png) |
 
 ## Qué funciona hoy
 
 | Función | Estado |
 |---|---|
-| Página principal con navegación que se adapta a móvil, tableta y escritorio | ✅ |
-| Selección de departamento → municipio → cultivo (9 departamentos, 32 municipios) | ✅ |
-| Clima: pronóstico **Open-Meteo**, historial y climatología **NASA POWER**, riesgo de helada, tormentas | ✅ datos reales (con caché y respaldo) |
-| Recomendación de siembra con factor decisivo, acción principal y fuentes | ✅ **Quinua en el Altiplano** (Oruro, Potosí, La Paz) · 🧪 Papa y Maíz en modo *demostración* · ⚪ Haba y Cebada sin reglas |
-| Registro e inicio de sesión de agricultores (celular + clave) | ✅ |
-| Comunidades con aprobación del administrador; solicitudes de unión aprobadas por el representante | ✅ |
-| Reuniones, confirmación de asistencia, avisos, reportes de helada/granizo, historial | ✅ |
-| Panel de administración: comunidades, permisos, usuarios, reportes | ✅ |
-| Asistente de WhatsApp | 🧪 **SIMULADOR** (no conectado). Arquitectura y webhook oficial listos para credenciales |
-| Módulo educativo "Aprendamos sobre nuestro campo" (7 lecciones con preguntas y fuentes) | ✅ español · quechua/aimara pendientes de revisión lingüística |
-| Avisos regionales segmentados (nacional, departamento, municipio o cultivo), publicados por administradores o editores, con vigencia y etiqueta *no oficial* | ✅ |
-| Cultivos de interés en el perfil (filtran los avisos que recibe cada persona) | ✅ |
-| Biblioteca filtrable por cultivo, tipo y departamento (8 guías con nota de fuente) | ✅ |
-| Cobertura nacional (mapa de municipios y qué hay en cada departamento), privacidad y términos | ✅ |
-| Adaptador para fuente meteorológica oficial con contrato normalizado | ✅ listo; se activa con `OFFICIAL_WEATHER_URL` |
-| Avisos oficiales SENAMHI | ❌ no integrados (ver [docs/FUENTES_DATOS.md](docs/FUENTES_DATOS.md)); se enlaza al sitio oficial |
+| Página principal con navegación que se adapta a móvil, tableta y escritorio | Sí |
+| Selección de departamento → municipio → cultivo (9 departamentos, 32 municipios) | Sí |
+| Clima: pronóstico **Open-Meteo**, historial y climatología **NASA POWER**, riesgo de helada, tormentas | Sí: datos reales (con caché y respaldo) |
+| Recomendación de siembra con factor decisivo, acción principal y fuentes | Sí: **Quinua en el Altiplano** (Oruro, Potosí, La Paz) · Papa y Maíz en modo *demostración* · Haba y Cebada sin reglas |
+| Registro e inicio de sesión de agricultores (celular + clave) | Sí |
+| Comunidades con aprobación del administrador; solicitudes de unión aprobadas por el representante | Sí |
+| Reuniones, confirmación de asistencia, avisos, reportes de helada/granizo, historial | Sí |
+| Panel de administración: comunidades, permisos, usuarios, reportes | Sí |
+| Asistente de WhatsApp | **SIMULADOR** (no conectado). Arquitectura y webhook oficial listos para credenciales |
+| Módulo educativo "Aprendamos sobre nuestro campo" (7 lecciones con preguntas y fuentes) | Sí: español · quechua/aimara pendientes de revisión lingüística |
+| Avisos regionales segmentados (nacional, departamento, municipio o cultivo), publicados por administradores o editores, con vigencia y etiqueta *no oficial* | Sí |
+| Cultivos de interés en el perfil (filtran los avisos que recibe cada persona) | Sí |
+| Biblioteca filtrable por cultivo, tipo y departamento (8 guías con nota de fuente) | Sí |
+| Cobertura nacional (mapa de municipios y qué hay en cada departamento), privacidad y términos | Sí |
+| Adaptador para fuente meteorológica oficial con contrato normalizado | Sí: listo; se activa con `OFFICIAL_WEATHER_URL` |
+| Avisos oficiales SENAMHI | No: no integrados (ver [docs/FUENTES_DATOS.md](docs/FUENTES_DATOS.md)); se enlaza al sitio oficial |
 
 Nada se presenta como algo que no es: los datos **simulados**, las **observaciones comunitarias**, los **datos ingresados por el agricultor** y los **pronósticos** llevan etiquetas distintas en la interfaz y en la API.
 
 ## Ejecutar (5 minutos)
 
-Requisitos: Python 3.11+ y Node.js 18+ para la aplicación. Para ejecutar la suite Playwright se requiere Node.js 22+.
-
-### Windows PowerShell
-
-```powershell
-cd backend
-py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
-Copy-Item .env.example .env
-# Genere una clave y copie el valor en SECRET_KEY dentro de backend/.env:
-py -c "import secrets; print(secrets.token_urlsafe(48))"
-# Edite backend/.env y establezca ADMIN_PASSWORD.
-cd ..\frontend
-npm ci
-npm run build
-cd ..\backend
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000
-```
-
-### Linux / macOS
+Requisitos: Python 3.11+ y Node.js 18+ para la aplicación. Las pruebas E2E requieren Node.js 22+.
 
 ```bash
-cd backend
-python -m venv .venv
-.venv/bin/pip install -r requirements-dev.txt
-cp .env.example .env
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-# Copie el secreto generado a SECRET_KEY y establezca ADMIN_PASSWORD en backend/.env.
-cd ../frontend && npm ci && npm run build
-cd ../backend && .venv/bin/uvicorn app.main:app --port 8000
+cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && cp .env.example .env
+```
+
+Edite `backend/.env` y establezca `SECRET_KEY` (aleatoria, mínimo 32 caracteres) y `ADMIN_PASSWORD`. Genere una clave con `python -c "import secrets; print(secrets.token_urlsafe(48))"`. Luego compile el frontend:
+
+```bash
+cd frontend && npm install && npm run build
+```
+
+Y arranque todo en un solo proceso (la API sirve también la web compilada):
+
+```bash
+cd backend && .venv/bin/uvicorn app.main:app --port 8000
 ```
 
 Abra <http://localhost:8000>. Documentación interactiva de la API: <http://localhost:8000/docs>.
@@ -81,9 +67,7 @@ cd frontend && npm run dev
 
 (Vite en <http://localhost:5173> redirige `/api` al backend.)
 
-Use `SEED_DEMO=false` para el funcionamiento normal y en producción. El archivo de ejemplo ya trae ese valor. Para ver las siguientes cuentas ficticias, cambie temporalmente a `SEED_DEMO=true` y utilice una base local desechable; no habilite los datos demo en producción.
-
-### Cuentas ficticias para pruebas locales (`SEED_DEMO=true`)
+Use `SEED_DEMO=false` para el funcionamiento normal y en producción. Active `SEED_DEMO=true` únicamente en una base local desechable para las pruebas E2E; no habilite las cuentas demo en producción.\n\n### Cuentas ficticias para pruebas locales (`SEED_DEMO=true`)
 
 | Rol | Celular | Clave |
 |---|---|---|
@@ -118,13 +102,8 @@ cd frontend && npm test
 ```
 
 ```bash
-cd e2e
-npm install
-npx playwright install chromium
-npm test -- http://localhost:8000
+node e2e/run.cjs http://localhost:8000
 ```
-
-Para las pruebas E2E, arranque el backend con `SEED_DEMO=true`, `DATABASE_URL` apuntando a una base local desechable, una `SECRET_KEY` aleatoria de al menos 32 caracteres y las credenciales del administrador que usará el runner.
 
 Los resultados **98/98** backend, **7/7** frontend y **26/26** E2E corresponden a la ejecución registrada en `main` antes de esta auditoría. Esta rama añade pruebas de regresión que deben validarse en su pull request; no se consideran aprobadas hasta que CI termine. GitHub Actions ejecuta backend, frontend, compilación y E2E en los pull requests. Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
