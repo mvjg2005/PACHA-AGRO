@@ -56,27 +56,30 @@ def ensure_columns(eng=None) -> list[str]:
             with eng.begin() as conn:
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}"))
             added.append(f"{table}.{column}")
-        except SQLAlchemyError:
-            pass  # otra instancia la agregó al mismo tiempo
+        except SQLAlchemyError as exc:
+            original = getattr(exc, "orig", None)
+            code = getattr(original, "sqlstate", None) or getattr(original, "pgcode", None)
+            message = str(original or exc).lower()
+            duplicate_column = (
+                code == "42701"
+                or "duplicate column" in message
+                or "column already exists" in message
+            )
+            if not duplicate_column:
+                raise
     return added
 
 
 def init_db() -> None:
     """Crea tablas y datos iniciales. Seguro de llamar varias veces y desde instancias en paralelo."""
-    from sqlalchemy.exc import SQLAlchemyError
-
     from app.seed import seed
 
-    try:
-        Base.metadata.create_all(engine)
-    except SQLAlchemyError:
-        pass  # otra instancia la creó al mismo tiempo
+    # Errores de conexión, esquema y seed deben detener el arranque:
+    # una instancia sin datos inicializados no debe anunciarse como saludable.
+    Base.metadata.create_all(engine)
     ensure_columns(engine)
     with SessionLocal() as db:
-        try:
-            seed(db)
-        except SQLAlchemyError:
-            db.rollback()  # otra instancia sembró los datos al mismo tiempo
+        seed(db)
 
 
 engine = _make_engine(get_settings().database_url)
