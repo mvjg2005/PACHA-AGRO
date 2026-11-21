@@ -258,9 +258,11 @@ def _frost(th, wx: WeatherView, fk) -> Criterion:
                 ex += f" Además, hay {wx.community_frost_reports} reporte(s) comunitario(s) de helada confirmados en los últimos 7 días."
             return Criterion("helada", label, st, ex, fk, wx.forecast_source, f"{t} °C")
     if wx.frost_days_month is not None:
-        return Criterion("helada", label, YELLOW,
-                         f"No hay pronóstico disponible. En este mes suele haber unos {wx.frost_days_month:.0f} días con helada (promedio histórico). "
-                         "Sin pronóstico no podemos descartar heladas.", "climatologia", "NASA POWER (climatología)",
+        explanation = (f"No hay pronóstico disponible. En este mes suele haber unos {wx.frost_days_month:.0f} días con helada (promedio histórico). "
+                       "Sin pronóstico no podemos descartar heladas.")
+        if wx.community_frost_reports:
+            explanation += f" Además, hay {wx.community_frost_reports} reporte(s) comunitario(s) de helada confirmados en los últimos 7 días."
+        return Criterion("helada", label, YELLOW, explanation, "climatologia", "NASA POWER (climatología)",
                          f"{wx.frost_days_month} días/mes")
     if wx.community_frost_reports:
         return Criterion("helada", label, YELLOW,
