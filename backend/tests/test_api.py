@@ -285,14 +285,50 @@ def test_webhook_signature_verification(app_client, monkeypatch):
     s = get_settings()
     monkeypatch.setattr(s, "whatsapp_enabled", True)
     monkeypatch.setattr(s, "whatsapp_app_secret", "shh")
-    body = json.dumps({"entry": [{"changes": [{"value": {"messages": [{"from": "59171234567", "type": "text", "text": {"body": "hola"}}]}}]}]}).encode()
+    body = json.dumps({"entry": [{"changes": [{"value": {"messages": [{"id": "wamid.audit-test-001", "from": "59171234567", "type": "text", "text": {"body": "hola"}}]}}]}]}).encode()
     bad = app_client.post("/api/whatsapp/webhook", content=body, headers={"X-Hub-Signature-256": "sha256=bad", "Content-Type": "application/json"})
     assert bad.status_code == 401
     sig = "sha256=" + hmac.new(b"shh", body, hashlib.sha256).hexdigest()
     ok = app_client.post("/api/whatsapp/webhook", content=body, headers={"X-Hub-Signature-256": sig, "Content-Type": "application/json"})
     assert ok.status_code == 200  # canal = simulador (sin token), no se envía nada real
+    assert ok.json()["messages"] == 1
+    duplicate = app_client.post("/api/whatsapp/webhook", content=body, headers={"X-Hub-Signature-256": sig, "Content-Type": "application/json"})
+    assert duplicate.status_code == 200 and duplicate.json()["messages"] == 0
 
 
 def test_security_headers(app_client):
     r = app_client.get("/api/health")
     assert r.headers["X-Content-Type-Options"] == "nosniff" and r.headers["X-Frame-Options"] == "DENY"
+
+
+
+def test_membership_decision_can_only_be_applied_once(app_client):
+    c = app_client
+    cid, rep = make_community(c)
+    applicant = register(c, "78888888", "Solicitante Prueba")
+    assert c.post(f"/api/communities/{cid}/join", headers=applicant).status_code == 201
+    request = c.get(f"/api/communities/{cid}/requests", headers=rep).json()[0]
+    path = f"/api/memberships/{request['id']}/approve"
+    assert c.post(path, headers=rep).status_code == 200
+    assert c.post(path, headers=rep).status_code == 409
+
+
+def test_health_reports_database_unavailable(app_client):
+    from app import db as dbmod
+    from app.main import app
+    from sqlalchemy.exc import SQLAlchemyError
+
+    def unavailable_db():
+        class BrokenSession:
+            def execute(self, statement):
+                raise SQLAlchemyError("database unavailable")
+            def close(self):
+                pass
+        yield BrokenSession()
+
+    app.dependency_overrides[dbmod.get_db] = unavailable_db
+    try:
+        response = app_client.get("/api/health")
+    finally:
+        app.dependency_overrides.pop(dbmod.get_db, None)
+    assert response.status_code == 503
