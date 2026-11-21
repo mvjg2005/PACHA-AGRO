@@ -39,13 +39,13 @@ Nada se presenta como algo que no es: los datos **simulados**, las **observacion
 
 ## Ejecutar (5 minutos)
 
-Requisitos: Python 3.11+ y Node.js 18+.
+Requisitos: Python 3.11+ y Node.js 18+ para la aplicación. Las pruebas E2E requieren Node.js 22+.
 
 ```bash
 cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && cp .env.example .env
 ```
 
-Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). Luego compile el frontend:
+Edite `backend/.env` y establezca `SECRET_KEY` (aleatoria, mínimo 32 caracteres) y `ADMIN_PASSWORD`. Genere una clave con `python -c "import secrets; print(secrets.token_urlsafe(48))"`. Luego compile el frontend:
 
 ```bash
 cd frontend && npm install && npm run build
@@ -67,7 +67,7 @@ cd frontend && npm run dev
 
 (Vite en <http://localhost:5173> redirige `/api` al backend.)
 
-### Cuentas ficticias para pruebas locales (`SEED_DEMO=true`)
+Use `SEED_DEMO=false` para el funcionamiento normal y en producción. Active `SEED_DEMO=true` únicamente en una base local desechable para las pruebas E2E; no habilite las cuentas demo en producción.\n\n### Cuentas ficticias para pruebas locales (`SEED_DEMO=true`)
 
 | Rol | Celular | Clave |
 |---|---|---|
@@ -105,7 +105,7 @@ cd frontend && npm test
 node e2e/run.cjs http://localhost:8000
 ```
 
-Resultados actuales: **98/98** backend, **7/7** unitarias frontend, **26/26** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Los resultados **98/98** backend, **7/7** frontend y **26/26** E2E corresponden a la ejecución registrada en `main` antes de esta auditoría. Esta rama añade pruebas de regresión que deben validarse en su pull request; no se consideran aprobadas hasta que CI termine. GitHub Actions ejecuta backend, frontend, compilación y E2E en los pull requests. Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 

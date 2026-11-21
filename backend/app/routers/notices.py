@@ -13,6 +13,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.data.catalog import crops_config, department_ids, get_municipality, locations
+from app.core.time import as_local_naive, local_now
 from app.db import get_db
 from app.deps import current_user, optional_user
 from app.models import OutboundMessage, RegionalNotice, User
@@ -62,7 +63,7 @@ def notice_out(n: RegionalNotice, author: User | None) -> dict:
 
 
 def active_query():
-    now = datetime.now()
+    now = local_now()
     q = select(RegionalNotice).where(RegionalNotice.archived.is_(False),
                                      or_(RegionalNotice.expires_at.is_(None), RegionalNotice.expires_at > now))
     # Igual que cuentas y comunidades DEMO: sin SEED_DEMO los ejemplos no se muestran (p. ej. en producción).
@@ -121,8 +122,8 @@ def _validate_scope(body: RegionalNoticeIn) -> dict:
 @router.post("", status_code=201)
 def create_notice(body: RegionalNoticeIn, user: User = Depends(require_publisher), db: Session = Depends(get_db)):
     f = _validate_scope(body)
-    expires = body.expires_at.replace(tzinfo=None) if body.expires_at else None
-    if expires and expires <= datetime.now():
+    expires = as_local_naive(body.expires_at) if body.expires_at else None
+    if expires and expires <= local_now():
         raise HTTPException(422, "La fecha de vigencia ya pasó.")
     n = RegionalNotice(title=body.title, summary=body.summary, body=body.body, kind=body.kind, scope=body.scope,
                        expires_at=expires, author_id=user.id, **f)
@@ -156,7 +157,10 @@ def notify(nid: int, user: User = Depends(require_publisher), db: Session = Depe
     channel = get_channel()
     tpl = regional_notice_template(n.title, n.summary, scope_label(n))
     sent = 0
-    for u in db.scalars(select(User).where(User.whatsapp_opt_in.is_(True), User.is_active.is_(True))):
+    recipient_query = select(User).where(User.whatsapp_opt_in.is_(True), User.is_active.is_(True))
+    if not get_settings().seed_demo:
+        recipient_query = recipient_query.where(User.is_demo.is_(False))
+    for u in db.scalars(recipient_query):
         if not notice_matches(n.scope, n.department_id, n.municipality_id, n.crop_id, context_for(u.default_municipality_id, u.crops)):
             continue
         res = channel.send_template(u.phone, tpl["name"], tpl["parameters"])

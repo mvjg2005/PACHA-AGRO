@@ -157,8 +157,10 @@ def test_admin_temporary_password_must_be_changed(app_client):
 
 def test_production_problems_detected():
     from app.core.config import Settings, production_problems
-    bad = Settings(environment="production", secret_key="corta", cors_origins="*", database_url="sqlite:///x.db",
+    bad = Settings(environment="production", secret_key="x" * 32, cors_origins="*", database_url="sqlite:///x.db",
+                   
                    whatsapp_enabled=True, admin_password="123", seed_demo=True)
+    bad.secret_key = "corta"  # simula una configuración recibida desde una variable débil
     errors, warnings = production_problems(bad)
     assert len(errors) == 4 and len(warnings) == 2
     good = Settings(environment="production", secret_key="x" * 40, cors_origins="https://agro.example",
@@ -169,6 +171,7 @@ def test_production_problems_detected():
 def test_check_production_refuses_to_start(monkeypatch):
     from app.core import config
     monkeypatch.setattr(config.get_settings(), "environment", "production")
+    monkeypatch.setattr(config.get_settings(), "secret_key", "corta")
     with pytest.raises(RuntimeError, match="SECRET_KEY"):
         config.check_production()
     monkeypatch.setattr(config.get_settings(), "environment", "development")
@@ -193,3 +196,64 @@ def test_chat_state_is_stored_in_database(app_client):
     with dbmod.SessionLocal() as s:
         assert "pending" in s.query(ChatState).one().data
     assert "Oruro" in c.post("/api/whatsapp/simulate", json={"text": "Oruro", "session_id": "s1"}).json()["replies"][0]
+
+
+
+def test_expired_weather_cache_records_are_pruned(app_client, monkeypatch):
+    from datetime import datetime, timedelta
+
+    from app import db as dbmod
+    from app.models import WeatherCache
+    from app.services.weather import service
+
+    old = datetime.utcnow() - timedelta(days=10)
+    with dbmod.SessionLocal() as db:
+        db.add(WeatherCache(key="expired-audit-entry", payload="{}", fetched_at=old, expires_at=old))
+        db.commit()
+    monkeypatch.setattr(service, "_DB_CACHE_WRITES", 99)
+    service._db_set("fresh-audit-entry", {"ok": True}, 60)
+    with dbmod.SessionLocal() as db:
+        assert db.get(WeatherCache, "expired-audit-entry") is None
+        assert db.get(WeatherCache, "fresh-audit-entry") is not None
+
+
+def test_expired_chat_states_are_pruned_periodically(app_client, monkeypatch):
+    from datetime import timedelta
+
+    from app import db as dbmod
+    from app.models import ChatState, utcnow
+    from app.services.whatsapp import assistant
+
+    with dbmod.SessionLocal() as db:
+        db.add(ChatState(key="expired-audit-state", data="{}", updated_at=utcnow() - timedelta(days=2)))
+        db.commit()
+    monkeypatch.setattr(assistant, "_STATE_SAVE_COUNT", 99)
+    with dbmod.SessionLocal() as db:
+        assistant._save_state(db, "fresh-audit-state", {"pending": None})
+    with dbmod.SessionLocal() as db:
+        assert db.get(ChatState, "expired-audit-state") is None
+        assert db.get(ChatState, "fresh-audit-state") is not None
+
+
+
+def test_settings_reject_weak_jwt_secret():
+    from pydantic import ValidationError
+
+    from app.core.config import Settings
+
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None, secret_key="too-short")
+
+
+
+def test_init_db_does_not_hide_unexpected_schema_errors(monkeypatch):
+    from sqlalchemy.exc import SQLAlchemyError
+
+    from app import db as dbmod
+
+    def fail(*args, **kwargs):
+        raise SQLAlchemyError("unexpected schema failure")
+
+    monkeypatch.setattr(dbmod.Base.metadata, "create_all", fail)
+    with pytest.raises(SQLAlchemyError, match="unexpected schema failure"):
+        dbmod.init_db()

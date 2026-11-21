@@ -48,3 +48,52 @@ jobs:
         run: npm test
       - name: Compilación (TypeScript + Vite)
         run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Instalar backend
+        run: pip install -r backend/requirements-dev.txt
+      - name: Instalar y compilar frontend
+        working-directory: frontend
+        run: npm ci && npm run build
+      - name: Instalar Playwright
+        working-directory: e2e
+        run: npm install --no-audit --no-fund
+      - name: Instalar Chromium
+        working-directory: e2e
+        run: npx playwright install --with-deps chromium
+      - name: Iniciar API con SQLite temporal y datos demo
+        env:
+          DATABASE_URL: sqlite:///./agrobolivia-e2e.db
+          SECRET_KEY: ci-e2e-secret-key-with-more-than-32-characters
+          ADMIN_PHONE: "+59170000000"
+          ADMIN_PASSWORD: admin12345
+          SEED_DEMO: "true"
+        run: |
+          cd backend
+          nohup python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 >/tmp/pacha-e2e-api.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8000/api/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/pacha-e2e-api.log
+          exit 1
+      - name: Pruebas E2E
+        working-directory: e2e
+        env:
+          ADMIN_PHONE: "+59170000000"
+          ADMIN_PASSWORD: admin12345
+        run: npm test -- http://127.0.0.1:8000

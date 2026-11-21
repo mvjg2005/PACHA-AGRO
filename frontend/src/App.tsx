@@ -80,6 +80,14 @@ export default function App() {
   const nav = section === 'escritorio' ? 'sembrar' : section === 'avisos' ? 'clima' : section
   const learnList = section === 'aprender' && (!parts[1] || (parts[1] === 'biblioteca' && !parts[2]))
   const wide = ['', 'clima', 'escritorio'].includes(section) || parts[1] === 'comparar' || learnList
+  const [layoutWidth, setLayoutWidth] = useState(() => document.documentElement.clientWidth)
+  useEffect(() => {
+    const update = () => setLayoutWidth(document.documentElement.clientWidth)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+  const scrollbarGutter = Math.max(0, window.innerWidth - layoutWidth)
   return (
     <div className="min-h-screen pb-nav">
       <a href="#main" onClick={event => { event.preventDefault(); document.getElementById('main')?.focus() }} className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-30 focus:bg-papel focus:p-2">Ir al contenido</a>
@@ -88,8 +96,8 @@ export default function App() {
           <a href="#/" className="flex items-center gap-2" aria-label="AgroBolivia, inicio">
             <LogoMark size={36} /><span className="site-brand">AgroBolivia</span>
           </a>
-          <BottomNav current={nav} desktop />
-          <a href={user ? '#/perfil' : '#/ingresar'} className="flex min-h-12 items-center rounded-full border-2 border-linea px-3 font-semibold text-bosque">
+          <BottomNav current={nav} desktop viewportWidth={layoutWidth} />
+          <a href={user ? '#/perfil' : '#/ingresar'} style={{ marginRight: scrollbarGutter }} className="flex min-h-12 items-center rounded-full border-2 border-linea px-3 font-semibold text-bosque">
             {user ? `${user.full_name.split(' ')[0]}` : 'Ingresar'}
           </a>
         </div>
@@ -98,7 +106,7 @@ export default function App() {
       <main id="main" tabIndex={-1} className={`site-main ${wide ? 'site-main-wide' : ''}`}>
         <Suspense fallback={<Loading />}>{user?.must_change_password ? <ForcedPassword /> : <Page parts={parts} />}</Suspense>
       </main>
-      <BottomNav current={nav} />
+      <BottomNav current={nav} viewportWidth={layoutWidth} />
     </div>
   )
 }

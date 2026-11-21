@@ -57,8 +57,17 @@ def ensure_columns(eng=None) -> list[str]:
             with eng.begin() as conn:
                 conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}"))
             added.append(f"{table}.{column}")
-        except SQLAlchemyError:
-            pass  # otra instancia la agregó al mismo tiempo
+        except SQLAlchemyError as exc:
+            original = getattr(exc, "orig", None)
+            code = getattr(original, "sqlstate", None) or getattr(original, "pgcode", None)
+            message = str(original or exc).lower()
+            duplicate_column = (
+                code == "42701"
+                or "duplicate column" in message
+                or "column already exists" in message
+            )
+            if not duplicate_column:
+                raise
     return added
 
 
@@ -70,14 +79,29 @@ def init_db() -> None:
 
     try:
         Base.metadata.create_all(engine)
-    except SQLAlchemyError:
-        pass  # otra instancia la creó al mismo tiempo
+    except SQLAlchemyError as exc:
+        original = getattr(exc, "orig", None)
+        code = getattr(original, "sqlstate", None) or getattr(original, "pgcode", None)
+        message = str(original or exc).lower()
+        duplicate_table = code == "42P07" or ("already exists" in message and "table" in message)
+        if not duplicate_table:
+            raise
     ensure_columns(engine)
     with SessionLocal() as db:
         try:
             seed(db)
-        except SQLAlchemyError:
-            db.rollback()  # otra instancia sembró los datos al mismo tiempo
+        except Exception as exc:
+            from sqlalchemy.exc import IntegrityError
+
+            if not isinstance(exc, IntegrityError):
+                raise
+            original = getattr(exc, "orig", None)
+            code = getattr(original, "sqlstate", None) or getattr(original, "pgcode", None)
+            message = str(original or exc).lower()
+            duplicate_seed = code == "23505" or "unique constraint failed" in message or "duplicate key" in message
+            db.rollback()
+            if not duplicate_seed:
+                raise
 
 
 engine = _make_engine(get_settings().database_url)

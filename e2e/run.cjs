@@ -134,7 +134,18 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
   await test('Reuniones: el representante convoca una reunión y envía recordatorio (simulado)', async () => {
     const p = await newPage()
     await login(p, '70000001')
-    await p.click('text=Comunidad Demo Challapata'); await btn(p, /Convocar reunión/).click()
+    await p.click('text=Comunidad Demo Challapata')
+    await p.waitForSelector('text=Usted es representante verificado de esta comunidad.', { timeout: 7000 }).catch(async () => {
+      const details = await p.evaluate(async () => {
+        const token = localStorage.getItem('agb_token')
+        const communities = await fetch('/api/me/communities', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()).catch(e => String(e))
+        return { url: location.href, body: document.body.innerText.slice(0, 1000), communities }
+      })
+      throw new Error('La cuenta demo no aparece como representante aprobado: ' + JSON.stringify(details))
+    })
+    const callMeeting = btn(p, /Convocar reunión/)
+    await callMeeting.waitFor({ state: 'visible', timeout: 7000 })
+    await callMeeting.click()
     const d = new Date(Date.now() + 5 * 86400000).toISOString().slice(0, 10)
     await p.fill('input[placeholder^="Ej. Planificar"]', 'Prueba e2e de reunión'); await p.fill('input[type=date]', d)
     await p.fill('input[placeholder^="Ej. Sede"]', 'Cancha comunal'); await btn(p, /Guardar/).click()
@@ -174,8 +185,19 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     const bad = []
     for (const r of ['', 'sembrar', 'sembrar/comparar', 'clima', 'comunidad', 'whatsapp', 'aprender', 'aprender/granizo', 'aprender/biblioteca', 'aprender/biblioteca/ficha-cultivo-quinua', 'avisos', 'cobertura', 'privacidad', 'terminos', 'ingresar', 'registro']) {
       await p.goto(`${BASE}/#/${r}`); await p.waitForTimeout(600)
-      const w = await p.evaluate(() => document.documentElement.scrollWidth)
-      if (w > 320) bad.push(`${r || 'inicio'}:${w}`)
+      const metrics = await p.evaluate(() => {
+        const root = document.documentElement
+        const limit = root.clientWidth
+        const nodes = [...document.querySelectorAll('body *')].map(el => {
+          const b = el.getBoundingClientRect()
+          const style = getComputedStyle(el)
+          return { tag: el.tagName.toLowerCase(), cls: String(el.className || '').slice(0, 80),
+            left: Math.round(b.left * 10) / 10, right: Math.round(b.right * 10) / 10,
+            width: Math.round(b.width * 10) / 10, overflow: style.overflowX }
+        }).filter(x => x.right > limit + 0.5 || x.left < -0.5).sort((a, b) => b.right - a.right).slice(0, 8)
+        return { scrollWidth: root.scrollWidth, clientWidth: limit, innerWidth, nodes }
+      })
+      if (metrics.scrollWidth > metrics.clientWidth + 1) bad.push(`${r || 'inicio'}:${JSON.stringify(metrics)}`)
     }
     assert(bad.length === 0, `desborde en ${bad.join(', ')}`)
   })
