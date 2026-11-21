@@ -5,7 +5,7 @@ import { useApp } from '../lib/store'
 
 type Msg = { from: 'user' | 'bot' | 'system'; text: string; time: string }
 const SUGGESTIONS = ['¿Cuándo puedo sembrar quinua en Challapata?', '¿Hay riesgo de helada mañana?', '¿Cuándo es la reunión de mi comunidad?', 'Quiero avisar que cayó granizo en mi zona.']
-const now = () => new Date().toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })
+const now = () => new Date().toLocaleTimeString('es-BO', { timeZone: 'America/La_Paz', hour: '2-digit', minute: '2-digit' })
 const SESSION = Math.random().toString(36).slice(2, 12)
 
 export default function WhatsApp() {
@@ -20,7 +20,7 @@ export default function WhatsApp() {
     const intro: Msg[] = [{ from: 'bot', time: now(), text: '👋 Hola, soy el asistente de AgroBolivia. Pregúnteme sobre siembra, heladas o su comunidad.' }]
     if (!user) { setMsgs(intro); return }
     api<any[]>('/api/whatsapp/inbox').then(inbox => {
-      const received = inbox.slice(0, 3).reverse().map(m => ({ from: 'bot' as const, time: m.created_at.slice(11), text: `${m.body}\n\n(mensaje simulado · plantilla "${m.template}")` }))
+      const received = inbox.slice(0, 3).reverse().map(m => ({ from: 'bot' as const, time: new Date(m.created_at).toLocaleTimeString('es-BO', { timeZone: 'America/La_Paz', hour: '2-digit', minute: '2-digit' }), text: `${m.body}\n\n(mensaje simulado · plantilla "${m.template}")` }))
       setMsgs([...received, ...intro])
     }).catch(() => setMsgs(intro))
   }, [user])
