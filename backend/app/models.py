@@ -149,6 +149,13 @@ class OutboundMessage(Base):
     updated_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
 
 
+class InboundMessage(Base):
+    """IDs de mensajes entrantes de Meta para ignorar reintentos del webhook."""
+    __tablename__ = "inbound_messages"
+    wa_message_id: Mapped[str] = mapped_column(String(128), primary_key=True)
+    received_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+
 class RegionalNotice(Base):
     """Aviso regional segmentado por alcance (adaptado del proyecto PACHAAGRO).
 
