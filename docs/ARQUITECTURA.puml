@@ -81,16 +81,28 @@ cloud "WhatsApp Cloud API\nrequiere credenciales y plantillas" as Meta
 Producer --> App
 Rep --> App
 Admin --> App
-App --> Pages
-App --> Shared
-Pages --> Components
-Pages --> Store
-Pages --> ApiClient
-Router ..> App
-SW ..> App : archivos estáticos\ny GET públicos cacheables
+App --> Home
+App --> Sow
+App --> Weather
+App --> Community
+App --> LearnNotices
+App --> AuthAdmin
+App --> WhatsAppUI
+App --> Components
+App --> Store
+App --> Router
+Pages ..> ApiClient
 ApiClient --> Main : HTTPS /api\nJSON + Bearer JWT
+SW ..> App : archivos estáticos\ny GET públicos cacheables
 
-Main --> Routers : registra
+Main --> RAuth : registra routers
+Main --> RCatalog
+Main --> RRecommend
+Main --> RCommunities
+Main --> RAdmin
+Main --> REduNotices
+Main --> RWhatsApp
+
 RAuth --> DbAccess
 RCatalog --> WeatherSvc
 RRecommend --> RecommendationRun
@@ -105,7 +117,6 @@ RecommendationRun --> WeatherSvc
 RecommendationRun --> WeatherBuilder
 RecommendationRun --> Engine
 RecommendationRun --> DbAccess : observaciones revisadas
-WeatherBuilder --> WeatherSvc
 Engine --> CatalogData : pesos, umbrales, calendarios
 WeatherSvc --> OpenMeteoAdapter
 WeatherSvc --> NasaAdapter
@@ -120,7 +131,6 @@ Assistant --> RecommendationRun
 Assistant --> WeatherSvc
 Assistant --> DbAccess : estado de chat y mensajes
 Channels --> Meta : solo con WhatsApp habilitado
-Channels ..> Assistant : canal simulador
 
 DbAccess --> ModelsSchemas
 DbAccess --> DB
