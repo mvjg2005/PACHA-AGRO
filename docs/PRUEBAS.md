@@ -1,12 +1,12 @@
 # Pruebas y validación
 
-Los resultados numéricos de la tabla (**98/98**, **7/7**, **25/25**) corresponden a la ejecución registrada en `main` antes de esta auditoría (21-11-2026); no son el resultado de los cambios de esta rama. Las pruebas de regresión añadidas aquí deben ejecutarse en el pull request. El backend usa fixtures. La suite de navegador usa el servidor local.
+Los resultados numéricos de la tabla (**98/98**, **7/7**, **26/26**) corresponden a la ejecución registrada en `main` antes de esta auditoría (21-11-2026); no son el resultado de los cambios de esta rama. Las pruebas de regresión añadidas aquí deben ejecutarse en el pull request. El backend usa fixtures. La suite de navegador usa el servidor local.
 
 | Suite | Comando | Resultado |
 |---|---|---|
 | Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **98/98** históricas de `main`; esta rama incorpora pruebas adicionales pendientes de ejecutar |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **7/7** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `cd e2e && npm install && npx playwright install chromium && npm test -- http://localhost:8000` | **25/25** históricas de `main`; volver a validar en CI tras instalar Playwright desde `e2e/package.json` |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `cd e2e && npm install && npx playwright install chromium && npm test -- http://localhost:8000` | **26/26** históricas de `main`; volver a validar en CI tras instalar Playwright desde `e2e/package.json` |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
 
 ## Casos de prueba por área
@@ -19,6 +19,7 @@ Los resultados numéricos de la tabla (**98/98**, **7/7**, **25/25**) correspond
 | Comparador | Consulta real en 360, 768 y 1440 px | Resultados apilados en móvil y en columnas en pantallas amplias | e2e #13 |
 | Recomendación | La acción principal aparece antes de los criterios | Sí | e2e #2 |
 | Compartir | Mensaje con cultivo, municipio, resultado, «Orientación experimental» y, si aplica, «Caso simulado»; vista previa = mensaje enviado | Ambos modos verificados | `share.test.ts` (ambos modos), e2e (modo real) |
+| Portada | 6 artículos recomendados con franja de categoría; 1 columna en 360 px y 3 en 1280 px; sin desborde; el enlace abre el artículo; colores con contraste ≥ 4,5:1 | Sí | e2e |
 | Clima en la nube | Caché persistente sobrevive a reinicios; si el proveedor falla se muestra el último pronóstico (≤12 h) marcado con su hora; datos viejos no se usan; clave de Open-Meteo pagado | Sí | `test_production`, e2e |
 | GPS | Municipio más cercano, fuera de Bolivia 422, aviso si está a >60 km; clima y recomendación con coordenadas; elegir municipio borra el GPS; sin permiso se explica | Sí | `test_production`, e2e |
 | Sin conexión | La app abre sin internet y muestra el último clima guardado con aviso y fecha | Sí (Chromium) | e2e |
