@@ -6,6 +6,10 @@
 
 Prototipo funcional para hackatón universitaria. Integra los tracks **Comunicación** (comunidades, reuniones, avisos, reportes y WhatsApp) y **Educación** (lecciones breves para interpretar el clima y reducir riesgos).
 
+Portada en escritorio (estilo revista: artículos recomendados con ilustraciones propias):
+
+![Portada en escritorio](docs/img/inicio-escritorio.png)
+
 | Inicio | Asistente de siembra | Resultado explicable | Clima (demostración) |
 |---|---|---|---|
 | ![](docs/img/inicio.png) | ![](docs/img/asistente-siembra.png) | ![](docs/img/resultado-siembra.png) | ![](docs/img/clima-demo.png) |
@@ -122,7 +126,7 @@ npm test -- http://localhost:8000
 
 Para las pruebas E2E, arranque el backend con `SEED_DEMO=true`, `DATABASE_URL` apuntando a una base local desechable, una `SECRET_KEY` aleatoria de al menos 32 caracteres y las credenciales del administrador que usará el runner.
 
-Los resultados **98/98** backend, **7/7** frontend y **25/25** E2E corresponden a la ejecución registrada en `main` antes de esta auditoría. Esta rama añade pruebas de regresión que deben validarse en su pull request; no se consideran aprobadas hasta que CI termine. GitHub Actions ejecuta backend, frontend, compilación y E2E en los pull requests. Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Los resultados **98/98** backend, **7/7** frontend y **26/26** E2E corresponden a la ejecución registrada en `main` antes de esta auditoría. Esta rama añade pruebas de regresión que deben validarse en su pull request; no se consideran aprobadas hasta que CI termine. GitHub Actions ejecuta backend, frontend, compilación y E2E en los pull requests. Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 
