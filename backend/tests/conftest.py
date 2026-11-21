@@ -47,7 +47,7 @@ def mock_transport(open_meteo="ok", nasa="ok"):
 @pytest.fixture
 def app_client():
     from app import db as dbmod
-    from app.core.ratelimit import chat_limiter, login_limiter, register_limiter
+    from app.core.ratelimit import chat_limiter, login_ip_limiter, login_limiter, register_limiter
     from app.main import app
     from app.services.weather import service
     from app.services.whatsapp import assistant
@@ -56,7 +56,7 @@ def app_client():
     dbmod.engine = engine
     dbmod.SessionLocal.configure(bind=engine)
     service.set_client(httpx.Client(transport=mock_transport()))
-    for lim in (login_limiter, register_limiter, chat_limiter):
+    for lim in (login_ip_limiter, login_limiter, register_limiter, chat_limiter):
         lim.reset()
     assistant.reset_state()
     with TestClient(app) as c:
