@@ -252,7 +252,20 @@ def _frost(th, wx: WeatherView, fk) -> Criterion:
                 st, ex = YELLOW, f"Se pronostica una mínima de {t:.0f} °C el {_day(tmin_day['date'])}. Puede haber helada leve; a ras del suelo puede hacer más frío."
             else:
                 st, ex = GREEN, f"La mínima pronosticada es {t:.0f} °C. No se espera helada en los próximos días."
+            if wx.community_frost_reports and st != RED:
+                st = YELLOW
+                ex += (f" Además, la comunidad confirmó {wx.community_frost_reports} reporte(s) de helada "
+                       "en los últimos 7 días (observación comunitaria, no aviso oficial).")
+                return Criterion("helada", label, st, ex, "comunidad",
+                                 f"{wx.forecast_source} + observaciones comunitarias",
+                                 f"{t} °C; {wx.community_frost_reports} reporte(s)")
             return Criterion("helada", label, st, ex, fk, wx.forecast_source, f"{t} °C")
+    if wx.community_frost_reports:
+        return Criterion("helada", label, YELLOW,
+                         f"La comunidad confirmó {wx.community_frost_reports} reporte(s) de helada en los últimos 7 días. "
+                         "Es una observación comunitaria, no un aviso oficial.", "comunidad",
+                         "Observaciones comunitarias confirmadas de AgroBolivia",
+                         f"{wx.community_frost_reports} reporte(s)")
     if wx.frost_days_month is not None:
         return Criterion("helada", label, YELLOW,
                          f"No hay pronóstico disponible. En este mes suele haber unos {wx.frost_days_month:.0f} días con helada (promedio histórico). "
@@ -295,7 +308,12 @@ def _rain(th, a: Answers, wx: WeatherView, fk) -> Criterion:
     label = "Lluvia próxima (7 días)"
     if not (wx.forecast_available and wx.daily):
         return Criterion("lluvia", label, GRAY, "No hay pronóstico de lluvia disponible.", "sin_datos")
-    vals = [d.get("precip_mm") or 0.0 for d in wx.daily]
+    raw_values = [d.get("precip_mm") for d in wx.daily]
+    if not raw_values or any(value is None for value in raw_values):
+        return Criterion("lluvia", label, GRAY,
+                         "El pronóstico no incluye lluvia para todos los días. No podemos calcular un acumulado fiable.",
+                         "sin_datos")
+    vals = [float(value) for value in raw_values]
     total, peak = sum(vals), max(vals)
     if peak >= th["heavy_rain_day_mm"]:
         return Criterion("lluvia", label, YELLOW, f"Se pronostica un día con lluvia fuerte ({peak:.0f} mm). Puede endurecer el suelo o arrastrar la semilla.", fk, wx.forecast_source, f"{total:.0f} mm", "lluvia_fuerte")
