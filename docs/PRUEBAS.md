@@ -9,6 +9,18 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 | Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `node e2e/run.cjs http://localhost:8000` | **33/33** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
 
+## Preparación de la suite E2E
+
+La suite de navegador necesita la dependencia Playwright declarada en el `package.json` de la raíz. Desde un clon limpio:
+
+```bash
+npm install
+npx playwright install chromium
+node e2e/run.cjs http://localhost:8000
+```
+
+El servidor debe estar iniciado con el frontend compilado y `SEED_DEMO=true`, como describe el README. El workflow CI actual no ejecuta E2E: sus verificaciones son backend, pruebas unitarias frontend y compilación. La suite E2E debe ejecutarse explícitamente antes de una presentación o despliegue.
+
 ## Casos de prueba por área
 
 | Área | Caso | Resultado esperado | Prueba |
