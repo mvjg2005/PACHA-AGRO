@@ -180,9 +180,13 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
           const style = getComputedStyle(el)
           return { tag: el.tagName.toLowerCase(), cls: String(el.className || '').slice(0, 80), id: el.id, left: Math.round(b.left * 10) / 10, right: Math.round(b.right * 10) / 10, width: Math.round(b.width * 10) / 10, overflow: style.overflowX }
         }).filter(x => x.right > innerWidth + 0.5 || x.left < -0.5).sort((a, b) => b.right - a.right).slice(0, 5)
-        return { width: document.documentElement.scrollWidth, nodes }
+        const root = document.documentElement
+        const body = document.body
+        const rr = root.getBoundingClientRect()
+        const br = body.getBoundingClientRect()
+        return { width: root.scrollWidth, innerWidth, clientWidth: root.clientWidth, bodyWidth: body.scrollWidth, bodyClientWidth: body.clientWidth, rootRect: { left: rr.left, right: rr.right, width: rr.width }, bodyRect: { left: br.left, right: br.right, width: br.width }, scrollX, nodes }
       })
-      if (metrics.width > 320) bad.push(`${r || 'inicio'}:${metrics.width}:${JSON.stringify(metrics.nodes)}`)
+      if (metrics.width > 320) bad.push(`${r || 'inicio'}:${JSON.stringify(metrics)}`)
     }
     assert(bad.length === 0, `desborde en ${bad.join(', ')}`)
   })
