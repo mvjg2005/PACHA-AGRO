@@ -243,3 +243,17 @@ def test_settings_reject_weak_jwt_secret():
 
     with pytest.raises(ValidationError):
         Settings(_env_file=None, secret_key="too-short")
+
+
+
+def test_init_db_does_not_hide_unexpected_schema_errors(monkeypatch):
+    from sqlalchemy.exc import SQLAlchemyError
+
+    from app import db as dbmod
+
+    def fail(*args, **kwargs):
+        raise SQLAlchemyError("unexpected schema failure")
+
+    monkeypatch.setattr(dbmod.Base.metadata, "create_all", fail)
+    with pytest.raises(SQLAlchemyError, match="unexpected schema failure"):
+        dbmod.init_db()
