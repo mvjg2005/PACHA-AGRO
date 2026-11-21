@@ -3,13 +3,14 @@ import hashlib
 import random
 from datetime import date, datetime, timedelta, timezone
 
+from app.core.time import local_today
 from app.services.weather.base import Block, DailyValue
 
 SOURCE = "SIMULACIÓN de AgroBolivia (datos ficticios para demostración)"
 
 
 def simulated_forecast(municipality: dict, today: date | None = None) -> Block:
-    today = today or date.today()
+    today = today or local_today()
     seed = int(hashlib.sha256(f"{municipality['id']}{today.isoformat()}".encode()).hexdigest()[:8], 16)
     rnd = random.Random(seed)
     elev = municipality.get("elevation", 3800)
