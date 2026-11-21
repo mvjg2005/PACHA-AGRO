@@ -10,6 +10,7 @@ import httpx
 
 from app.services.weather import nasa_power, official, open_meteo
 from app.services.weather.base import Block, DailyValue, ProviderError
+from app.core.time import local_today
 from app.services.weather.simulated import simulated_forecast
 
 OFFICIAL_ALERTS = {
@@ -30,17 +31,30 @@ class _Cache:
     def __init__(self):
         self._data: dict = {}
         self._lock = threading.Lock()
+        self._writes = 0
+        self._max_entries = 512
 
     def get(self, key):
         with self._lock:
             item = self._data.get(key)
             if item and item[0] > time.monotonic():
                 return item[1]
+            if item:
+                self._data.pop(key, None)
             return None
 
     def set(self, key, value, ttl):
+        now = time.monotonic()
         with self._lock:
-            self._data[key] = (time.monotonic() + ttl, value)
+            self._writes += 1
+            if self._writes % 100 == 0 or len(self._data) >= self._max_entries:
+                for old_key, item in list(self._data.items()):
+                    if item[0] <= now:
+                        self._data.pop(old_key, None)
+            if len(self._data) >= self._max_entries and key not in self._data:
+                oldest = min(self._data, key=lambda k: self._data[k][0])
+                self._data.pop(oldest, None)
+            self._data[key] = (now + ttl, value)
 
     def clear(self):
         with self._lock:
@@ -128,7 +142,8 @@ def _cached(kind: str, key: tuple, fn):
     hit = cache.get(ck)
     if hit is not None:
         return hit
-    dbkey = f"{kind}:{key[0]:.2f},{key[1]:.2f}"
+    extra_key = ":".join(str(value) for value in key[2:])
+    dbkey = f"{kind}:{key[0]:.2f},{key[1]:.2f}" + (f":{extra_key}" if extra_key else "")
     stored = _db_get(dbkey)
     if stored and stored[2] > _now():
         cache.set(ck, stored[0], max(1, int((stored[2] - _now()).total_seconds())))
@@ -161,7 +176,7 @@ def _forecast(lat: float, lon: float, key: tuple) -> Block:
         errors.append(o["_error"])
     f = _cached("forecast", key, lambda: open_meteo.fetch_forecast(lat, lon, get_client()))
     if isinstance(f, Block) and f.extra.get("stale"):
-        today = date.today().isoformat()
+        today = local_today().isoformat()
         f = replace(f, daily=[d for d in f.daily if d.date >= today])
         if not f.daily:
             return Block(available=False, source=open_meteo.SOURCE, kind="pronostico", error=f.extra["error_now"])
@@ -174,6 +189,7 @@ def _forecast(lat: float, lon: float, key: tuple) -> Block:
 
 
 def get_weather(municipality: dict, mode: str = "real", today: date | None = None) -> dict:
+    today = today or local_today()
     lat, lon = municipality["lat"], municipality["lon"]
     key = (round(lat, 2), round(lon, 2))
 
@@ -183,12 +199,12 @@ def get_weather(municipality: dict, mode: str = "real", today: date | None = Non
         clim = {"available": False}
     else:
         forecast = _forecast(lat, lon, key)
-        r = _cached("recent", key, lambda: nasa_power.fetch_recent(lat, lon, get_client(), today))
+        r = _cached("recent", (*key, today.isoformat()), lambda: nasa_power.fetch_recent(lat, lon, get_client(), today))
         recent = r if isinstance(r, Block) else Block(available=False, source=nasa_power.SOURCE, kind="estimacion", error=r["_error"])
         c = _cached("climatology", key, lambda: nasa_power.fetch_climatology(lat, lon, get_client()))
         clim = c if "_error" not in c else {"available": False, "error": c["_error"]}
 
-    month = (today or date.today()).month
+    month = today.month
     return {
         "mode": mode,
         "location": {**{k: municipality[k] for k in ("id", "name", "department_id", "department_name", "lat", "lon", "elevation", "region")},
