@@ -79,7 +79,8 @@ def test_pending_community_not_listed_until_admin_approves(app_client):
     assert c.get("/api/communities").json() == []
     # El solicitante aún no puede crear reuniones
     assert c.post(f"/api/communities/{cid}/meetings", json={"title": "X reunión", "place": "Sede", "starts_at": FUTURE}, headers=rep).status_code == 404
-    c.post(f"/api/admin/communities/{cid}/approve", headers=admin_headers(c))
+    assert c.post(f"/api/admin/communities/{cid}/approve", headers=admin_headers(c)).status_code == 200
+    assert c.post(f"/api/admin/communities/{cid}/approve", headers=admin_headers(c)).status_code == 409
     lst = c.get("/api/communities?department_id=oruro").json()
     assert len(lst) == 1 and lst[0]["representatives"] == ["Rosa Quispe"]
 
@@ -178,7 +179,11 @@ def test_observations_are_labeled_community_not_official(app_client):
     obs = c.get(f"/api/communities/{cid}/observations", headers=farmer).json()
     assert obs[0]["label"].startswith("Observación comunitaria") and obs[0]["review_status"] == "sin_revisar"
     assert c.post(f"/api/observations/{obs[0]['id']}/review", json={"status": "confirmada"}, headers=farmer).status_code == 403
+    before_review = c.post("/api/recommendations", json={"municipality_id": "or-challapata", "crop": "quinua", "soil_moisture": "si", "irrigation": "secano"}).json()
+    before_storm = next(x for x in before_review["criteria"] if x["id"] == "tormenta")
+    assert before_storm["data_kind"] != "comunidad"
     assert c.post(f"/api/observations/{obs[0]['id']}/review", json={"status": "confirmada"}, headers=rep).status_code == 200
+    assert c.post(f"/api/observations/{obs[0]['id']}/review", json={"status": "confirmada"}, headers=rep).status_code == 409
     # El reporte de granizo aparece en la recomendación como dato comunitario
     rec = c.post("/api/recommendations", json={"municipality_id": "or-challapata", "crop": "quinua", "soil_moisture": "si", "irrigation": "secano"}).json()
     storm = next(x for x in rec["criteria"] if x["id"] == "tormenta")
@@ -285,14 +290,106 @@ def test_webhook_signature_verification(app_client, monkeypatch):
     s = get_settings()
     monkeypatch.setattr(s, "whatsapp_enabled", True)
     monkeypatch.setattr(s, "whatsapp_app_secret", "shh")
-    body = json.dumps({"entry": [{"changes": [{"value": {"messages": [{"from": "59171234567", "type": "text", "text": {"body": "hola"}}]}}]}]}).encode()
+    body = json.dumps({"entry": [{"changes": [{"value": {"messages": [{"id": "wamid.audit-test-001", "from": "59171234567", "type": "text", "text": {"body": "hola"}}]}}]}]}).encode()
     bad = app_client.post("/api/whatsapp/webhook", content=body, headers={"X-Hub-Signature-256": "sha256=bad", "Content-Type": "application/json"})
     assert bad.status_code == 401
     sig = "sha256=" + hmac.new(b"shh", body, hashlib.sha256).hexdigest()
     ok = app_client.post("/api/whatsapp/webhook", content=body, headers={"X-Hub-Signature-256": sig, "Content-Type": "application/json"})
     assert ok.status_code == 200  # canal = simulador (sin token), no se envía nada real
+    assert ok.json()["messages"] == 1
+    duplicate = app_client.post("/api/whatsapp/webhook", content=body, headers={"X-Hub-Signature-256": sig, "Content-Type": "application/json"})
+    assert duplicate.status_code == 200 and duplicate.json()["messages"] == 0
 
 
 def test_security_headers(app_client):
     r = app_client.get("/api/health")
     assert r.headers["X-Content-Type-Options"] == "nosniff" and r.headers["X-Frame-Options"] == "DENY"
+
+
+
+def test_membership_decision_can_only_be_applied_once(app_client):
+    c = app_client
+    cid, rep = make_community(c)
+    applicant = register(c, "78888888", "Solicitante Prueba")
+    assert c.post(f"/api/communities/{cid}/join", headers=applicant).status_code == 201
+    request = c.get(f"/api/communities/{cid}/requests", headers=rep).json()[0]
+    path = f"/api/memberships/{request['id']}/approve"
+    assert c.post(path, headers=rep).status_code == 200
+    assert c.post(path, headers=rep).status_code == 409
+
+
+def test_health_reports_database_unavailable(app_client):
+    from app import db as dbmod
+    from app.main import app
+    from sqlalchemy.exc import SQLAlchemyError
+
+    def unavailable_db():
+        class BrokenSession:
+            def execute(self, statement):
+                raise SQLAlchemyError("database unavailable")
+            def close(self):
+                pass
+        yield BrokenSession()
+
+    app.dependency_overrides[dbmod.get_db] = unavailable_db
+    try:
+        response = app_client.get("/api/health")
+    finally:
+        app.dependency_overrides.pop(dbmod.get_db, None)
+    assert response.status_code == 503
+
+
+def test_unsolicited_yes_does_not_confirm_the_next_meeting(app_client):
+    c = app_client
+    cid, rep = make_community(c)
+    farmer = join_and_approve(c, cid, rep)
+    meeting = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Reunión futura", "place": "Sede", "starts_at": FUTURE},
+        headers=rep,
+    ).json()
+    reply = chat(c, "si", farmer)[0]
+    assert "No encontré una reunión vigente" in reply
+    current = c.get(f"/api/communities/{cid}/meetings", headers=farmer).json()[0]
+    assert current["id"] == meeting["id"] and current["my_response"] is None
+
+
+def test_aware_meeting_timestamp_is_converted_to_bolivia_time(app_client):
+    from datetime import timezone
+    from zoneinfo import ZoneInfo
+
+    c = app_client
+    cid, rep = make_community(c)
+    aware = datetime.now(timezone.utc).replace(microsecond=0) + timedelta(days=3)
+    expected = aware.astimezone(ZoneInfo("America/La_Paz")).replace(tzinfo=None)
+    response = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Hora con zona", "place": "Sede", "starts_at": aware.isoformat()},
+        headers=rep,
+    )
+    assert response.status_code == 201, response.text
+    assert response.json()["starts_at"] == expected.isoformat(timespec="minutes")
+
+
+def test_cancelled_pending_meeting_does_not_redirect_yes_to_another_meeting(app_client):
+    c = app_client
+    cid, rep = make_community(c)
+    farmer = join_and_approve(c, cid, rep)
+    first = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Primera reunión", "place": "Sede", "starts_at": FUTURE},
+        headers=rep,
+    ).json()
+    second_time = (datetime.now() + timedelta(days=4)).replace(microsecond=0).isoformat()
+    second = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Segunda reunión", "place": "Sede", "starts_at": second_time},
+        headers=rep,
+    ).json()
+    assert "Primera reunión" in chat(c, "¿Cuándo es la reunión de mi comunidad?", farmer)[0]
+    assert c.post(f"/api/meetings/{first['id']}/cancel", headers=rep).status_code == 200
+    reply = chat(c, "si", farmer)[0]
+    assert "ya no está disponible" in reply
+    meetings = c.get(f"/api/communities/{cid}/meetings", headers=farmer).json()
+    other = next(x for x in meetings if x["id"] == second["id"])
+    assert other["my_response"] is None
