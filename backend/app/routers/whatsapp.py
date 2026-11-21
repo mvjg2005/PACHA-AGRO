@@ -2,9 +2,10 @@ import hashlib
 import hmac
 import json
 import logging
+from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -12,7 +13,7 @@ from app.core.config import get_settings
 from app.core.ratelimit import chat_limiter, client_key
 from app.db import get_db
 from app.deps import current_user, optional_user
-from app.models import InboundMessage, OutboundMessage, User
+from app.models import InboundMessage, OutboundMessage, User, utcnow
 from app.schemas import ChatIn
 from app.services.whatsapp import assistant
 from app.services.whatsapp.channels import get_channel
@@ -74,6 +75,8 @@ async def receive(request: Request, db: Session = Depends(get_db)):
     if not hmac.compare_digest(expected, request.headers.get("X-Hub-Signature-256", "")):
         raise HTTPException(401, "Firma inválida.")
     payload = json.loads(raw)
+    # Conserva la ventana de deduplicación de Meta, pero evita crecimiento indefinido.
+    db.execute(delete(InboundMessage).where(InboundMessage.received_at < utcnow() - timedelta(days=30)))
     channel = get_channel()
     handled = {"messages": 0, "statuses": 0}
     for entry in payload.get("entry", []):
