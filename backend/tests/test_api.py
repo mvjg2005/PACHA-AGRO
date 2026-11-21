@@ -385,3 +385,35 @@ def test_cancelled_pending_meeting_does_not_redirect_yes_to_another_meeting(app_
     meetings = c.get(f"/api/communities/{cid}/meetings", headers=farmer).json()
     other = next(x for x in meetings if x["id"] == second["id"])
     assert other["my_response"] is None
+
+
+
+def test_failed_whatsapp_reply_removes_inbound_dedup_record_for_retry(app_client, monkeypatch):
+    from app import db as dbmod
+    from app.core.config import get_settings
+    from app.models import InboundMessage
+    from app.routers import whatsapp as whatsapp_router
+
+    settings = get_settings()
+    monkeypatch.setattr(settings, "whatsapp_enabled", True)
+    monkeypatch.setattr(settings, "whatsapp_app_secret", "retry-secret")
+
+    class FailedChannel:
+        def send_text(self, to, body):
+            return {"status": "fallido", "id": None}
+
+    monkeypatch.setattr(whatsapp_router, "get_channel", lambda: FailedChannel())
+    body = json.dumps({
+        "entry": [{"changes": [{"value": {"messages": [{
+            "id": "wamid.retry-test-001", "from": "59171234567",
+            "type": "text", "text": {"body": "hola"},
+        }]}}]}]
+    }).encode()
+    sig = "sha256=" + hmac.new(b"retry-secret", body, hashlib.sha256).hexdigest()
+    response = app_client.post(
+        "/api/whatsapp/webhook", content=body,
+        headers={"X-Hub-Signature-256": sig, "Content-Type": "application/json"},
+    )
+    assert response.status_code == 502
+    with dbmod.SessionLocal() as db:
+        assert db.get(InboundMessage, "wamid.retry-test-001") is None
