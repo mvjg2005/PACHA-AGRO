@@ -2,6 +2,7 @@ import hashlib
 import hmac
 import json
 import logging
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from sqlalchemy import select
@@ -101,6 +102,15 @@ async def receive(request: Request, db: Session = Depends(get_db)):
                 body = text_payload.get("body") if isinstance(text_payload, dict) else None
                 if not isinstance(sender, str) or not sender.isdigit() or not isinstance(body, str) or not body.strip():
                     logger.warning("Mensaje de WhatsApp omitido por estructura inválida")
+                    continue
+                try:
+                    received_at = datetime.fromtimestamp(int(msg.get("timestamp")), timezone.utc)
+                except (TypeError, ValueError, OSError):
+                    logger.warning("Mensaje de WhatsApp omitido por timestamp inválido")
+                    continue
+                age = datetime.now(timezone.utc) - received_at
+                if age > timedelta(hours=24) or age < timedelta(minutes=-5):
+                    logger.warning("Mensaje de WhatsApp omitido fuera de la ventana de 24 horas")
                     continue
                 phone = "+" + sender
                 user = db.scalar(select(User).where(User.phone == phone, User.is_active.is_(True)))
