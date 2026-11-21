@@ -80,6 +80,15 @@ export default function App() {
   const nav = section === 'escritorio' ? 'sembrar' : section === 'avisos' ? 'clima' : section
   const learnList = section === 'aprender' && (!parts[1] || (parts[1] === 'biblioteca' && !parts[2]))
   const wide = ['', 'clima', 'escritorio'].includes(section) || parts[1] === 'comparar' || learnList
+  useEffect(() => {
+    const updateViewportGutter = () => {
+      const gutter = Math.max(0, window.innerWidth - document.documentElement.clientWidth)
+      document.documentElement.style.setProperty('--viewport-scrollbar-width', `${gutter}px`)
+    }
+    updateViewportGutter()
+    window.addEventListener('resize', updateViewportGutter)
+    return () => window.removeEventListener('resize', updateViewportGutter)
+  }, [])
   return (
     <div className="min-h-screen pb-nav">
       <a href="#main" onClick={event => { event.preventDefault(); document.getElementById('main')?.focus() }} className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-30 focus:bg-papel focus:p-2">Ir al contenido</a>
