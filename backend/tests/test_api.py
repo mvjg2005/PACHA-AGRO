@@ -318,25 +318,17 @@ def test_membership_decision_can_only_be_applied_once(app_client):
     assert c.post(path, headers=rep).status_code == 409
 
 
-def test_health_reports_database_unavailable(app_client):
+def test_health_reports_database_unavailable(app_client, monkeypatch):
     from app import db as dbmod
-    from app.main import app
     from sqlalchemy.exc import SQLAlchemyError
 
-    def unavailable_db():
-        class BrokenSession:
-            def execute(self, statement):
-                raise SQLAlchemyError("database unavailable")
-            def close(self):
-                pass
-        yield BrokenSession()
+    def unavailable(*args, **kwargs):
+        raise SQLAlchemyError("database unavailable")
 
-    app.dependency_overrides[dbmod.get_db] = unavailable_db
-    try:
-        response = app_client.get("/api/health")
-    finally:
-        app.dependency_overrides.pop(dbmod.get_db, None)
+    monkeypatch.setattr(dbmod.engine, "connect", unavailable)
+    response = app_client.get("/api/health")
     assert response.status_code == 503
+    assert response.json()["database"] is False
 
 
 def test_unsolicited_yes_does_not_confirm_the_next_meeting(app_client):
