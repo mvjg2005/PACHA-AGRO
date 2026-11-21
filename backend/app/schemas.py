@@ -64,7 +64,7 @@ class UserOut(BaseModel):
 
 class ProfileUpdate(BaseModel):
     whatsapp_opt_in: bool | None = None
-    default_municipality_id: str | None = None
+    default_municipality_id: str | None = Field(default=None, max_length=60)
 
 
 class CommunityIn(BaseModel):
@@ -87,12 +87,20 @@ class MeetingIn(BaseModel):
     place: str = Field(min_length=2, max_length=160)
     starts_at: datetime
 
-    @field_validator("title", "place")
+    @field_validator("title")
     @classmethod
-    def clean_meeting_text(cls, v):
+    def clean_meeting_title(cls, v):
+        cleaned = " ".join(v.split())
+        if len(cleaned) < 3:
+            raise ValueError("El título debe tener al menos 3 caracteres.")
+        return cleaned
+
+    @field_validator("place")
+    @classmethod
+    def clean_meeting_place(cls, v):
         cleaned = " ".join(v.split())
         if len(cleaned) < 2:
-            raise ValueError("El texto no puede estar vacío.")
+            raise ValueError("El lugar debe tener al menos 2 caracteres.")
         return cleaned
 
 
