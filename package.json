@@ -1,0 +1,12 @@
+{
+  "name": "pacha-agro-e2e",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Herramientas para ejecutar las pruebas de extremo a extremo de PACHA-AGRO",
+  "scripts": {
+    "test:e2e": "node e2e/run.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  }
+}
