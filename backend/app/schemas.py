@@ -21,7 +21,7 @@ class RegisterIn(BaseModel):
     phone: str
     password: str = Field(min_length=6, max_length=128)
     whatsapp_opt_in: bool = False
-    default_municipality_id: str | None = None
+    default_municipality_id: str | None = Field(default=None, max_length=60)
 
     @field_validator("full_name")
     @classmethod
@@ -41,7 +41,7 @@ class RegisterIn(BaseModel):
 
 
 class LoginIn(BaseModel):
-    phone: str
+    phone: str = Field(max_length=32)
     password: str = Field(min_length=1, max_length=128)
 
     @field_validator("phone")
@@ -75,7 +75,10 @@ class CommunityIn(BaseModel):
     @field_validator("name")
     @classmethod
     def clean(cls, v):
-        return " ".join(v.split())
+        cleaned = " ".join(v.split())
+        if len(cleaned) < 3:
+            raise ValueError("El nombre de la comunidad debe tener al menos 3 caracteres.")
+        return cleaned
 
 
 class MeetingIn(BaseModel):
@@ -83,6 +86,14 @@ class MeetingIn(BaseModel):
     description: str = Field(default="", max_length=1000)
     place: str = Field(min_length=2, max_length=160)
     starts_at: datetime
+
+    @field_validator("title", "place")
+    @classmethod
+    def clean_meeting_text(cls, v):
+        cleaned = " ".join(v.split())
+        if len(cleaned) < 2:
+            raise ValueError("El texto no puede estar vacío.")
+        return cleaned
 
 
 class AttendanceIn(BaseModel):
@@ -93,6 +104,14 @@ class NoticeIn(BaseModel):
     title: str = Field(min_length=3, max_length=120)
     body: str = Field(min_length=3, max_length=1500)
     category: Literal["general", "clima", "reunion", "siembra"] = "general"
+
+    @field_validator("title", "body")
+    @classmethod
+    def clean_notice_text(cls, v):
+        cleaned = " ".join(v.split())
+        if len(cleaned) < 3:
+            raise ValueError("El texto debe tener al menos 3 caracteres.")
+        return cleaned
 
 
 class ObservationIn(BaseModel):
@@ -121,3 +140,11 @@ class RecommendationIn(BaseModel):
 class ChatIn(BaseModel):
     text: str = Field(min_length=1, max_length=500)
     session_id: str = Field(default="anon", max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
+
+    @field_validator("text")
+    @classmethod
+    def clean_chat_text(cls, v):
+        cleaned = v.strip()
+        if not cleaned:
+            raise ValueError("Escriba un mensaje.")
+        return cleaned
