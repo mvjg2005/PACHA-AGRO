@@ -188,3 +188,67 @@ class AssistantIn(BaseModel):
     question: str = Field(min_length=3, max_length=500)
     municipality_id: str | None = Field(default=None, max_length=60)
     crop: str | None = Field(default=None, max_length=30)
+
+
+class DiagnosisIn(BaseModel):
+    image: str = Field(min_length=100, max_length=2_200_000)  # base64 (la foto no se guarda)
+    media_type: Literal["image/jpeg", "image/png", "image/webp"] = "image/jpeg"
+    crop: str | None = Field(default=None, max_length=30)
+    municipality_id: str | None = Field(default=None, max_length=60)
+    notes: str | None = Field(default=None, max_length=300)
+
+
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _check_date(v: str | None) -> str | None:
+    if v in (None, ""):
+        return None
+    if not DATE_RE.match(v):
+        raise ValueError("Use una fecha válida (AAAA-MM-DD).")
+    try:
+        datetime.strptime(v, "%Y-%m-%d")
+    except ValueError as e:
+        raise ValueError("Use una fecha válida (AAAA-MM-DD).") from e
+    return v
+
+
+class PlotIn(BaseModel):
+    name: str = Field(min_length=2, max_length=80)
+    crop: str = Field(default="", max_length=30)
+    variety: str = Field(default="", max_length=60)
+    area_ha: float | None = Field(default=None, gt=0, le=10000)
+    area_method: Literal["manual", "gps"] = "manual"
+    municipality_id: str | None = Field(default=None, max_length=60)
+    sowing_date: str | None = None
+    notes: str = Field(default="", max_length=500)
+
+    @field_validator("name", "variety", "notes")
+    @classmethod
+    def strip(cls, v: str) -> str:
+        return v.strip()
+
+    @field_validator("sowing_date")
+    @classmethod
+    def date_ok(cls, v):
+        return _check_date(v)
+
+
+RECORD_KINDS = ("siembra", "riego", "fertilizacion", "control", "deshierbe", "aporque", "cosecha", "venta", "gasto", "observacion")
+
+
+class RecordIn(BaseModel):
+    date: str
+    kind: Literal[RECORD_KINDS]  # type: ignore[valid-type]
+    description: str = Field(default="", max_length=300)
+    quantity: float | None = Field(default=None, ge=0, le=1_000_000)
+    unit: Literal["", "kg", "qq", "arroba", "t", "l", "bolsa", "jornal", "hora"] = ""
+    cost_bs: float | None = Field(default=None, ge=0, le=10_000_000)
+
+    @field_validator("date")
+    @classmethod
+    def date_ok(cls, v):
+        d = _check_date(v)
+        if not d:
+            raise ValueError("Indique la fecha.")
+        return d

@@ -2,7 +2,9 @@ import { lazy, Suspense, useEffect, useState } from 'react'
 import { BottomNav } from './components/BottomNav'
 import { SiteFooter, SiteHeader } from './components/SiteChrome'
 import { Loading } from './components/ui'
-import { useRoute } from './lib/router'
+import { getToken } from './lib/api'
+import { onboarded } from './lib/prefs'
+import { go, useRoute } from './lib/router'
 import { useApp } from './lib/store'
 import Home from './pages/Home'
 import Sow from './pages/Sow'
@@ -17,6 +19,12 @@ const Admin = lazy(() => import('./pages/Admin'))
 const Notices = lazy(() => import('./pages/Notices'))
 const Advice = lazy(() => import('./pages/Advice'))
 const Coverage = lazy(() => import('./pages/Coverage'))
+const Field = lazy(() => import('./pages/Field'))
+const Diagnosis = lazy(() => import('./pages/Diagnosis'))
+const Calculator = lazy(() => import('./pages/Calculator'))
+const Plots = lazy(() => import('./pages/Plots'))
+const CropSheet = lazy(() => import('./pages/CropSheet'))
+const Onboarding = lazy(() => import('./pages/Onboarding'))
 const Legal = lazy(() => import('./pages/Legal'))
 const Auth = lazy(() => import('./pages/Auth').then(m => ({ default: m.Login })))
 const Register = lazy(() => import('./pages/Auth').then(m => ({ default: m.Register })))
@@ -24,7 +32,7 @@ const Profile = lazy(() => import('./pages/Auth').then(m => ({ default: m.Profil
 const ForcedPassword = lazy(() => import('./pages/Auth').then(m => ({ default: () => <m.ChangePassword forced /> })))
 
 function Page({ parts }: { parts: string[] }) {
-  const [a, b, c] = parts
+  const [a, b, c, d] = parts
   switch (a) {
     case undefined: return <Home />
     case 'escritorio':
@@ -43,6 +51,13 @@ function Page({ parts }: { parts: string[] }) {
     case 'aprender': return <Learn lessonId={b} itemId={c} />
     case 'avisos': return <Notices />
     case 'asesoria': return <Advice key={b ?? 'libre'} presetCrop={b} />
+    case 'campo':
+      if (b === 'diagnostico') return <Diagnosis />
+      if (b === 'calculadora') return <Calculator key={`${c}-${d ?? ''}`} calc={c} params={d} />
+      if (b === 'parcelas') return <Plots key={c ?? 'lista'} id={c} />
+      return <Field />
+    case 'cultivos': return b ? <CropSheet id={b} /> : <Field />
+    case 'bienvenida': return <Onboarding key={b ?? 'inicio'} step={b} />
     case 'cobertura': return <Coverage />
     case 'privacidad': return <Legal doc="privacidad" />
     case 'terminos': return <Legal doc="terminos" />
@@ -78,10 +93,12 @@ export default function App() {
   const parts = useRoute()
   const { user } = useApp()
   const section = parts[0] ?? ''
+  // Primera visita sin cuenta: bienvenida en 4 pasos (se puede saltar).
+  useEffect(() => { if (!section && !onboarded() && !getToken()) go('/bienvenida') }, [section])
   // Avisos se abre desde Clima; cobertura y páginas legales no tienen pestaña propia.
-  const nav = section === 'escritorio' ? 'sembrar' : section === 'avisos' ? 'clima' : section
+  const nav = section === 'escritorio' ? 'sembrar' : section === 'avisos' ? 'clima' : section === 'cultivos' ? 'campo' : section
   const learnList = section === 'aprender' && (!parts[1] || (parts[1] === 'biblioteca' && !parts[2]))
-  const wide = ['', 'clima', 'escritorio', 'asesoria'].includes(section) || parts[1] === 'comparar' || learnList
+  const wide = ['', 'clima', 'escritorio', 'asesoria'].includes(section) || (section === 'campo' && !parts[1]) || parts[1] === 'comparar' || learnList
   return (
     <div className="min-h-screen pb-nav">
       <a href="#main" onClick={event => { event.preventDefault(); document.getElementById('main')?.focus() }} className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-30 focus:bg-papel focus:p-2">Ir al contenido</a>

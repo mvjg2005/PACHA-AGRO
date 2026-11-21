@@ -15,6 +15,10 @@
 9. **Recuperación de clave sin SMS**: la hace un administrador con una clave temporal tras verificar a la persona.
 10. **Quechua y aimara**: estructura lista, contenido pendiente de traducción y revisión por hablantes.
 11. **Modo sin conexión**: muestra lo último guardado; no permite enviar reportes sin señal (habría que guardarlos y enviarlos después).
+12. **Revisión de plantas por foto**: es una orientación preliminar de IA, no un diagnóstico de laboratorio; puede equivocarse, sobre todo con fotos borrosas. No recomienda productos ni dosis. Sin `ANTHROPIC_API_KEY` solo hay guía por síntomas.
+13. **Fichas de cultivo**: rangos generales de literatura agronómica; no reemplazan recomendaciones por variedad de INIAF.
+14. **Condiciones para fumigar**: criterios generales (viento, lluvia, temperatura, humedad) sobre el pronóstico del modelo; la etiqueta del producto manda.
+15. **Medición de parcelas con GPS**: el GPS del celular tiene un margen de varios metros; en parcelas pequeñas el error relativo es alto.
 
 ## Próximos pasos sugeridos
 

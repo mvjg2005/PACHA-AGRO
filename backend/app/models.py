@@ -211,3 +211,37 @@ class Expert(Base):
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     created_by: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class Plot(Base):
+    """Parcela de una persona (cuaderno de campo). Solo se guarda la superficie, no el contorno GPS."""
+    __tablename__ = "plots"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    name: Mapped[str] = mapped_column(String(80))
+    crop: Mapped[str] = mapped_column(String(30), default="")
+    variety: Mapped[str] = mapped_column(String(60), default="")
+    area_ha: Mapped[float | None] = mapped_column(nullable=True)
+    area_method: Mapped[str] = mapped_column(String(20), default="manual")  # manual | gps
+    municipality_id: Mapped[str | None] = mapped_column(String(60), nullable=True)
+    sowing_date: Mapped[str | None] = mapped_column(String(10), nullable=True)  # AAAA-MM-DD
+    notes: Mapped[str] = mapped_column(String(500), default="")
+    archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    records: Mapped[list["FieldRecord"]] = relationship(back_populates="plot", cascade="all, delete-orphan",
+                                                        order_by="FieldRecord.date.desc()")
+
+
+class FieldRecord(Base):
+    """Actividad registrada en una parcela: siembra, riego, labores, gastos, cosecha, observaciones."""
+    __tablename__ = "field_records"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    plot_id: Mapped[int] = mapped_column(ForeignKey("plots.id"), index=True)
+    date: Mapped[str] = mapped_column(String(10))  # AAAA-MM-DD
+    kind: Mapped[str] = mapped_column(String(20))
+    description: Mapped[str] = mapped_column(String(300), default="")
+    quantity: Mapped[float | None] = mapped_column(nullable=True)
+    unit: Mapped[str] = mapped_column(String(12), default="")
+    cost_bs: Mapped[float | None] = mapped_column(nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    plot: Mapped[Plot] = relationship(back_populates="records")

@@ -1,0 +1,121 @@
+{
+  "note": "Rangos generales de referencia recopilados de literatura agronómica, para orientación. Varían según la variedad, la altitud y el manejo; no son una recomendación para su parcela. Confirme con INIAF o un técnico de su zona.",
+  "source_link": {"name": "FAO Ecocrop: rangos por especie", "url": "https://gaez.fao.org/pages/ecocrop"},
+  "sheets": [
+    {
+      "id": "quinua", "name": "Quinua", "scientific": "Chenopodium quinoa",
+      "summary": "Grano andino muy resistente a la sequía, al frío y a suelos salinos. En Bolivia se cultiva sobre todo en el Altiplano.",
+      "regions": "Altiplano norte, central y sur (unos 3600 a 4000 m)",
+      "growing": [
+        {"icon": "thermo", "label": "Temperatura óptima", "value": "15–20 °C"},
+        {"icon": "frost", "label": "Heladas", "value": "Tolera heladas leves; las plántulas y la floración son más sensibles"},
+        {"icon": "rain", "label": "Lluvia", "value": "300–800 mm/año; en el Altiplano sur se cultiva con menos"},
+        {"icon": "drop", "label": "Necesidad de agua", "value": "Baja"},
+        {"icon": "sun", "label": "Luz", "value": "Sol pleno"}
+      ],
+      "crop": [
+        {"icon": "clock", "label": "Ciclo", "value": "120–210 días según la variedad"},
+        {"icon": "leaf", "label": "Siembra", "value": "Directa, en surcos o en hoyos"},
+        {"icon": "calendar", "label": "Época habitual", "value": "Septiembre a noviembre (Altiplano)"}
+      ],
+      "soil": [
+        {"icon": "mountain", "label": "Suelo", "value": "Franco o franco arenoso, con buen drenaje"},
+        {"icon": "signal", "label": "pH", "value": "6–8,5 (tolera suelos algo salinos)"}
+      ],
+      "problems": ["Mildiu (hongo; manchas amarillas arriba y pelusa gris abajo de la hoja)", "Polilla de la quinua o kcona kcona (larvas que comen hojas y granos)", "Ticona o gusanos cortadores"],
+      "sow_supported": true
+    },
+    {
+      "id": "papa", "name": "Papa", "scientific": "Solanum tuberosum",
+      "summary": "Tubérculo base de la alimentación andina, con cientos de variedades nativas. Prefiere clima fresco.",
+      "regions": "Altiplano y valles (unos 2500 a 4000 m)",
+      "growing": [
+        {"icon": "thermo", "label": "Temperatura óptima", "value": "15–20 °C; noches frescas favorecen la formación de tubérculos"},
+        {"icon": "frost", "label": "Heladas", "value": "Sensible: el follaje se daña cerca de −1 a −2 °C"},
+        {"icon": "rain", "label": "Lluvia", "value": "500–800 mm durante el ciclo"},
+        {"icon": "drop", "label": "Necesidad de agua", "value": "Media; constante en la formación de tubérculos"},
+        {"icon": "sun", "label": "Luz", "value": "Sol pleno"}
+      ],
+      "crop": [
+        {"icon": "clock", "label": "Ciclo", "value": "90–180 días según la variedad"},
+        {"icon": "leaf", "label": "Siembra", "value": "Con tubérculo-semilla sano, en surcos"},
+        {"icon": "calendar", "label": "Época habitual", "value": "Octubre a diciembre en la siembra grande"}
+      ],
+      "soil": [
+        {"icon": "mountain", "label": "Suelo", "value": "Franco, suelto y profundo, con buen drenaje"},
+        {"icon": "signal", "label": "pH", "value": "5–6,5"}
+      ],
+      "problems": ["Tizón tardío o rancha (hongo; manchas oscuras que avanzan rápido con lluvia)", "Gorgojo de los Andes (larvas que hacen galerías en el tubérculo)", "Polilla de la papa"],
+      "sow_supported": true
+    },
+    {
+      "id": "maiz", "name": "Maíz", "scientific": "Zea mays",
+      "summary": "Cereal de valles y llanos. Necesita calor y suelo tibio para germinar parejo.",
+      "regions": "Valles y llanos (unos 300 a 2800 m)",
+      "growing": [
+        {"icon": "thermo", "label": "Temperatura óptima", "value": "20–30 °C; el suelo debe pasar de 10–12 °C para germinar"},
+        {"icon": "frost", "label": "Heladas", "value": "Muy sensible"},
+        {"icon": "rain", "label": "Lluvia", "value": "500–800 mm durante el ciclo"},
+        {"icon": "drop", "label": "Necesidad de agua", "value": "Media a alta; crítica en la floración"},
+        {"icon": "sun", "label": "Luz", "value": "Sol pleno"}
+      ],
+      "crop": [
+        {"icon": "clock", "label": "Ciclo", "value": "90–180 días (variedades precoces a tardías)"},
+        {"icon": "leaf", "label": "Siembra", "value": "Directa, en surcos"},
+        {"icon": "calendar", "label": "Época habitual", "value": "Depende de la zona: inicio de lluvias en valles; verano e invierno en llanos"}
+      ],
+      "soil": [
+        {"icon": "mountain", "label": "Suelo", "value": "Franco, profundo y fértil"},
+        {"icon": "signal", "label": "pH", "value": "5,5–7,5"}
+      ],
+      "problems": ["Gusano cogollero (larva que come el cogollo)", "Roya (pústulas color óxido en las hojas)", "Pudrición de mazorca"],
+      "sow_supported": true
+    },
+    {
+      "id": "haba", "name": "Haba", "scientific": "Vicia faba",
+      "summary": "Leguminosa de clima fresco que mejora el suelo porque fija nitrógeno. Se usa en rotación con papa y cereales.",
+      "regions": "Altiplano y valles (unos 2500 a 3800 m)",
+      "growing": [
+        {"icon": "thermo", "label": "Temperatura óptima", "value": "10–20 °C"},
+        {"icon": "frost", "label": "Heladas", "value": "Tolera heladas leves antes de florecer; la flor es sensible"},
+        {"icon": "rain", "label": "Lluvia", "value": "400–800 mm durante el ciclo"},
+        {"icon": "drop", "label": "Necesidad de agua", "value": "Media; importante en floración y llenado de vaina"},
+        {"icon": "sun", "label": "Luz", "value": "Sol pleno"}
+      ],
+      "crop": [
+        {"icon": "clock", "label": "Ciclo", "value": "150–210 días para grano seco"},
+        {"icon": "leaf", "label": "Siembra", "value": "Directa, en surcos"},
+        {"icon": "calendar", "label": "Época habitual", "value": "Agosto a noviembre según la zona"}
+      ],
+      "soil": [
+        {"icon": "mountain", "label": "Suelo", "value": "Franco a franco arcilloso, con buen drenaje"},
+        {"icon": "signal", "label": "pH", "value": "6,5–8"}
+      ],
+      "problems": ["Mancha chocolate (hongo; puntos café rojizos en hojas)", "Roya", "Pulgón negro"],
+      "sow_supported": false
+    },
+    {
+      "id": "cebada", "name": "Cebada", "scientific": "Hordeum vulgare",
+      "summary": "Cereal rústico para grano y forraje, adaptado a la altura y a suelos pobres.",
+      "regions": "Altiplano y valles altos (unos 2500 a 3900 m)",
+      "growing": [
+        {"icon": "thermo", "label": "Temperatura óptima", "value": "12–20 °C"},
+        {"icon": "frost", "label": "Heladas", "value": "Tolera heladas leves al inicio; sensible en la floración"},
+        {"icon": "rain", "label": "Lluvia", "value": "350–600 mm durante el ciclo"},
+        {"icon": "drop", "label": "Necesidad de agua", "value": "Baja a media"},
+        {"icon": "sun", "label": "Luz", "value": "Sol pleno"}
+      ],
+      "crop": [
+        {"icon": "clock", "label": "Ciclo", "value": "90–150 días; menos si se corta como forraje"},
+        {"icon": "leaf", "label": "Siembra", "value": "Directa, al voleo o en surcos"},
+        {"icon": "calendar", "label": "Época habitual", "value": "Noviembre a enero en el Altiplano"}
+      ],
+      "soil": [
+        {"icon": "mountain", "label": "Suelo", "value": "Franco, tolera suelos pobres"},
+        {"icon": "signal", "label": "pH", "value": "6–8"}
+      ],
+      "problems": ["Roya amarilla (pústulas amarillas en líneas)", "Mancha en red (hongo)", "Pulgones"],
+      "sow_supported": false
+    }
+  ]
+}

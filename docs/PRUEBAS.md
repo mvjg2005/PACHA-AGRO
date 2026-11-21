@@ -4,9 +4,9 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 
 | Suite | Comando | Resultado |
 |---|---|---|
-| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **106/106** aprobadas |
-| Frontend unitarias (vitest) | `cd frontend && npm test` | **7/7** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `node e2e/run.cjs http://localhost:8000` | **28/28** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
+| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **116/116** aprobadas |
+| Frontend unitarias (vitest) | `cd frontend && npm test` | **12/12** aprobadas |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `node e2e/run.cjs http://localhost:8000` | **32/32** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
 
 ## Casos de prueba por área
@@ -27,6 +27,11 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 | Cuentas | Cambio de clave, eliminación de datos personales, clave temporal obligatoria de cambiar (también en el servidor) | Sí | `test_production`, e2e |
 | Producción | No arranca con SECRET_KEY débil, CORS `*`, SQLite o WhatsApp incompleto; HSTS; `/api/health` revisa la base | Sí, también con PostgreSQL 16 | `test_production`, manual |
 | WhatsApp | Estado de conversación guardado en la base de datos | Sí | `test_production` |
+| Mi campo: foto | Imagen validada (formato real, tamaño), sin IA ofrece guía por síntomas; con IA envía la foto y un esquema JSON, máximo 3 causas; si la IA declina, guía; límite de intentos; la foto no se guarda | Sí | `test_field`, e2e |
+| Mi campo: calculadoras | Conversión de quintal (46 kg) y arroba (11,5 kg); ganancia, rendimiento requerido, precio sin pérdida, presupuesto y mezcla por mochila; datos imposibles rechazados; área GPS de un cuadrado de 100 m ≈ 1 ha | Sí | `calc.test.ts`, e2e |
+| Mi campo: fumigación | Viento fuerte, lluvia en 2 h o calor = no recomendado; sin viento o aire seco = moderado; mejor ventana de día; la serie por hora no se expone | Sí | `test_field` |
+| Mi campo: parcelas | Crear, editar, anotar, borrar; resumen de gastos, ventas, balance, cosecha y rendimiento; otra cuenta no ve ni modifica; al eliminar la cuenta se borran parcelas y cuaderno | Sí | `test_field`, e2e |
+| Bienvenida | 4 pasos, se guarda y no vuelve a aparecer | Sí | e2e |
 | Asesoría | Respuesta (IA o básica), técnicos por cultivo/departamento solo con consentimiento, recursos por tema; la IA no recibe teléfonos; admin requiere consentimiento | Sí | `test_advice`, e2e |
 | Avisos regionales | Segmentación por alcance (9 casos), validación de jerarquía, vigencia, retiro, filtros públicos y «mis avisos» | Correctos | `test_ported` |
 | Avisos regionales | Agricultor no publica; la API no otorga admin; editor publica y notifica solo a quien corresponde (simulado) | 403 / 422 / correcto | `test_ported`, e2e |

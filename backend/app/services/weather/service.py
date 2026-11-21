@@ -11,6 +11,7 @@ import httpx
 from app.services.weather import nasa_power, official, open_meteo
 from app.services.weather.base import Block, DailyValue, ProviderError
 from app.services.weather.simulated import simulated_forecast
+from app.services.weather.spray import spray_conditions
 
 OFFICIAL_ALERTS = {
     "available": False,
@@ -194,13 +195,20 @@ def get_weather(municipality: dict, mode: str = "real", today: date | None = Non
         "location": {**{k: municipality[k] for k in ("id", "name", "department_id", "department_name", "lat", "lon", "elevation", "region")},
                      **{k: municipality[k] for k in ("gps", "nearest_name", "distance_km", "far") if k in municipality}},
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "forecast": forecast.to_dict(),
+        "forecast": _public(forecast),
         "recent": recent.to_dict(),
         "climatology": _clim_summary(clim, month),
         "official_alerts": OFFICIAL_ALERTS,
         "frost_risk": frost_risk(forecast, clim, month),
         "storm_risk": storm_risk(forecast),
+        "spray": spray_conditions(forecast.extra.get("hourly")) if forecast.available and mode != "simulado" else None,
     }
+
+
+def _public(block: Block) -> dict:
+    d = block.to_dict()
+    d["extra"] = {k: v for k, v in d["extra"].items() if k != "hourly"}  # la serie por hora solo se usa en el servidor
+    return d
 
 
 def _clim_summary(clim: dict, month: int) -> dict:

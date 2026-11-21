@@ -56,7 +56,8 @@ def app_client():
     dbmod.engine = engine
     dbmod.SessionLocal.configure(bind=engine)
     service.set_client(httpx.Client(transport=mock_transport()))
-    for lim in (login_limiter, register_limiter, chat_limiter):
+    from app.routers.field import diagnosis_limiter
+    for lim in (login_limiter, register_limiter, chat_limiter, diagnosis_limiter):
         lim.reset()
     assistant.reset_state()
     with TestClient(app) as c:

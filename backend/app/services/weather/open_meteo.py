@@ -7,6 +7,7 @@ import httpx
 
 from app.core.config import get_settings
 from app.services.weather.base import STORM_CODES, Block, DailyValue, ProviderError
+from app.services.weather.spray import hourly_series
 
 SOURCE = "Open-Meteo (modelos meteorológicos globales)"
 
@@ -18,7 +19,7 @@ def fetch_forecast(lat: float, lon: float, client: httpx.Client) -> Block:
         "longitude": lon,
         "current": "temperature_2m,weather_code",
         "daily": "temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code",
-        "hourly": "soil_moisture_3_to_9cm",
+        "hourly": "soil_moisture_3_to_9cm,temperature_2m,relative_humidity_2m,wind_speed_10m,wind_gusts_10m,precipitation,precipitation_probability",
         "timezone": "America/La_Paz",
         "forecast_days": 7,
     }
@@ -76,7 +77,8 @@ def parse_forecast(data: dict) -> Block:
         current_time=cur.get("time"),
         soil_moisture=soil,
         soil_moisture_unit="m3/m3 (modelo, 3-9 cm)" if soil is not None else None,
-        extra={"grid_elevation_m": data.get("elevation"), "license": "CC BY 4.0 — datos de Open-Meteo.com"},
+        extra={"grid_elevation_m": data.get("elevation"), "license": "CC BY 4.0 — datos de Open-Meteo.com",
+               "hourly": hourly_series(hourly)},
     )
 
 

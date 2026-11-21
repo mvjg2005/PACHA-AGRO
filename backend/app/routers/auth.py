@@ -87,17 +87,19 @@ def change_password(body: PasswordChangeIn, request: Request, user: User = Depen
 def delete_account(body: DeleteAccountIn, request: Request, user: User = Depends(current_user), db: Session = Depends(get_db)):
     """Elimina los datos personales de la cuenta (derecho de supresión).
 
-    Se borran nombre, teléfono, clave, ubicación, cultivos, consentimiento, mensajes y membresías.
+    Se borran nombre, teléfono, clave, ubicación, cultivos, parcelas, cuaderno de campo, consentimiento, mensajes y membresías.
     Las publicaciones hechas en la comunidad quedan, pero firmadas como «Cuenta eliminada»."""
     import secrets
 
-    from app.models import Attendance, Membership, OutboundMessage
+    from app.models import Attendance, Membership, OutboundMessage, Plot
 
     login_limiter.check(f"{client_key(request)}:del:{user.id}")
     if user.role == "admin":
         raise HTTPException(403, "La cuenta de administrador no se puede eliminar desde aquí.")
     if not verify_password(body.password, user.password_hash):
         raise HTTPException(401, "La clave no es correcta.")
+    for plot in db.query(Plot).filter(Plot.user_id == user.id).all():
+        db.delete(plot)  # parcelas y cuaderno de campo: datos personales
     db.query(OutboundMessage).filter(OutboundMessage.user_id == user.id).delete()
     db.query(Attendance).filter(Attendance.user_id == user.id).delete()
     db.query(Membership).filter(Membership.user_id == user.id).delete()

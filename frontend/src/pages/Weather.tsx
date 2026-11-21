@@ -1,3 +1,4 @@
+import { SprayCard } from '../components/SprayCard'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { LocationSelector } from '../components/LocationPicker'
@@ -89,6 +90,7 @@ export default function Weather() {
             </Notice>
           )}
 
+          {wx.spray && <SprayCard spray={wx.spray} />}
           <StormCard wx={wx} />
           {wx.recent.available && <RecentCard wx={wx} />}
 

@@ -1,9 +1,9 @@
 const ITEMS = [
   { path: '', label: 'Inicio', d: 'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z' },
   { path: 'sembrar', label: 'Sembrar', d: 'M12 21v-9m0 0c-4 0-7-3-7-7 4 0 7 3 7 7zm0-2c0-4 3-7 7-7 0 4-3 7-7 7z' },
+  { path: 'campo', label: 'Mi campo', d: 'M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z' },
   { path: 'clima', label: 'Clima', d: 'M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6 9.5 4.25 4.25 0 0 0 7 18z' },
   { path: 'comunidad', label: 'Comunidad', d: 'M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM2 20c0-3 3-5 6-5s6 2 6 5m-1-4.6c1-.3 2-.4 3-.4 3 0 6 2 6 5' },
-  { path: 'aprender', label: 'Aprender', d: 'M4 5h6a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zm16 0h-6a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h6z' },
 ]
 
 export function BottomNav({ current, desktop = false }: { current: string; desktop?: boolean }) {

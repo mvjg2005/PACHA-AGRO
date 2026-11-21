@@ -14,6 +14,7 @@ export interface Weather {
   official_alerts: { available: boolean; source: string; url: string; message: string }
   frost_risk: { level: 'alto' | 'medio' | 'bajo' | 'desconocido'; min_tmin?: number | null; date?: string | null; basis: string | null; source: string | null; frost_days_month?: number }
   storm_risk: { level: string; days: string[]; note?: string }
+  spray?: SprayT | null
 }
 export interface Criterion { id: string; label: string; status: Status; explanation: string; data_kind: string; source: string | null; value: string | null; hint?: string | null }
 export interface Recommendation {
@@ -39,3 +40,20 @@ export interface ExpertT { id: number; full_name: string; specialty: string; ins
 export interface ResourceT { id: string; category: string; name: string; url: string; description: string; scope: string; official?: boolean }
 export interface Resources { note: string; categories: Record<string, string>; items: ResourceT[] }
 export interface AdviceT { answer: string; mode: 'ia' | 'basico'; topics: string[]; crop: string | null; experts: ExpertT[]; resources: ResourceT[]; location: string | null; note: string; ai_available: boolean }
+export interface SprayT { status: 'bueno' | 'moderado' | 'no'; label: string; reasons: string[]; wind_kmh: number | null; temp_c: number | null; rh: number | null; best_window: { start: string; end: string } | null; hours: { time: string; status: 'bueno' | 'moderado' | 'no' }[]; note: string }
+export interface SymptomT { id: string; title: string; could_be: string; check: string[]; first_steps: string[] }
+export interface DiagnosisT {
+  mode: 'ia' | 'guia'; ai_available: boolean; crop: string | null; location: string | null; photo_stored: false; note: string
+  result: null | { is_plant: boolean; image_quality: 'buena' | 'regular' | 'insuficiente'; summary: string; urgency: 'alta' | 'media' | 'baja'
+    candidates: { name: string; kind: string; kind_label: string; confidence: 'alta' | 'media' | 'baja'; signs: string }[]; verify: string[]; actions: string[] }
+  guide: SymptomT[] | null; experts: ExpertT[]; resources: ResourceT[]
+}
+export interface SheetItem { icon: string; label: string; value: string }
+export interface CropSheetT { id: string; name: string; scientific: string; summary: string; regions: string; growing: SheetItem[]; crop: SheetItem[]; soil: SheetItem[]; problems: string[]; sow_supported: boolean; note: string; source_link: { name: string; url: string } }
+export interface FieldRecordT { id: number; date: string; kind: string; kind_label: string; description: string; quantity: number | null; unit: string; cost_bs: number | null }
+export interface PlotT {
+  id: number; name: string; crop: string; crop_name: string; variety: string; area_ha: number | null; area_method: 'manual' | 'gps'
+  municipality_id: string | null; municipality_name: string | null; sowing_date: string | null; notes: string
+  summary: { costs_bs: number; income_bs: number; balance_bs: number; harvest_kg: number; yield_kg_ha: number | null; days_since_sowing: number | null; records: number }
+  records?: FieldRecordT[]
+}

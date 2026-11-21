@@ -97,7 +97,7 @@ function AdviceResult({ r, question }: { r: AdviceT; question: string }) {
   )
 }
 
-function ExpertCard({ e, question }: { e: ExpertT; question: string }) {
+export function ExpertCard({ e, question }: { e: ExpertT; question: string }) {
   const msg = encodeURIComponent(`Hola, le escribo desde PACHA-AGRO. Mi consulta: ${question}`)
   return (
     <div className="panel h-full !p-5" data-testid="expert-card">
@@ -117,7 +117,7 @@ function ExpertCard({ e, question }: { e: ExpertT; question: string }) {
   )
 }
 
-function ResourceCard({ r }: { r: ResourceT }) {
+export function ResourceCard({ r }: { r: ResourceT }) {
   return (
     <a href={r.url} target="_blank" rel="noopener noreferrer" className="tool-card h-full" data-testid="resource-card">
       <div>
