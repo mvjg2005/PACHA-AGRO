@@ -14,8 +14,16 @@ class RateLimiter:
     def check(self, key: str) -> None:
         now = time.monotonic()
         q = self._hits[key]
-        while q and now - q[0] > self.per_seconds:
+        while q and now - q[0] >= self.per_seconds:
             q.popleft()
+        # Limpia claves antiguas cuando la tabla crece, sin eliminar la clave actual.
+        if len(self._hits) > 10_000:
+            stale_before = now - self.per_seconds
+            for stale_key, hits in list(self._hits.items()):
+                while hits and hits[0] <= stale_before:
+                    hits.popleft()
+                if not hits and stale_key != key:
+                    self._hits.pop(stale_key, None)
         if len(q) >= self.max_calls:
             raise HTTPException(status_code=429, detail="Demasiados intentos. Espere un momento y vuelva a intentar.")
         q.append(now)
@@ -24,6 +32,7 @@ class RateLimiter:
         self._hits.clear()
 
 
+login_ip_limiter = RateLimiter(max_calls=40, per_seconds=300)
 login_limiter = RateLimiter(max_calls=8, per_seconds=300)
 register_limiter = RateLimiter(max_calls=10, per_seconds=3600)
 chat_limiter = RateLimiter(max_calls=40, per_seconds=60)
