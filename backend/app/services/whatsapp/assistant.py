@@ -1,6 +1,7 @@
 """Asistente conversacional. El MISMO código atiende al simulador web y al webhook oficial.
 Respuestas cortas, en español sencillo, siempre indicando la fuente de los datos."""
 import time
+import threading
 from datetime import date, datetime, timedelta
 
 from app.core.time import local_now
@@ -24,19 +25,34 @@ MENU = ("👋 Hola, soy el asistente de AgroBolivia.\nEscriba un número o su pr
 # Estado de conversación en memoria (prototipo). En producción: Redis o tabla con expiración.
 _STATE: dict[str, dict] = {}
 _TTL = 30 * 60
+_STATE_MAX = 5000
+_STATE_CALLS = 0
+_STATE_LOCK = threading.RLock()
 
 
 def _state(key: str) -> dict:
-    st = _STATE.get(key)
-    if not st or time.time() - st.get("_t", 0) > _TTL:
-        st = {}
-    st["_t"] = time.time()
-    _STATE[key] = st
-    return st
+    global _STATE_CALLS
+    now = time.time()
+    with _STATE_LOCK:
+        _STATE_CALLS += 1
+        if _STATE_CALLS % 100 == 0 or len(_STATE) >= _STATE_MAX:
+            expired = [k for k, value in _STATE.items() if now - value.get("_t", 0) > _TTL]
+            for old_key in expired:
+                _STATE.pop(old_key, None)
+        if len(_STATE) >= _STATE_MAX and key not in _STATE:
+            oldest = min(_STATE, key=lambda k: _STATE[k].get("_t", 0))
+            _STATE.pop(oldest, None)
+        st = _STATE.get(key)
+        if not st or now - st.get("_t", 0) > _TTL:
+            st = {}
+        st["_t"] = now
+        _STATE[key] = st
+        return st
 
 
 def reset_state() -> None:
-    _STATE.clear()
+    with _STATE_LOCK:
+        _STATE.clear()
 
 
 def _user_location(db: Session, user: User | None, st: dict) -> dict | None:
