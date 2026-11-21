@@ -1,0 +1,143 @@
+@startuml
+title PACHA-AGRO / AgroBolivia — arquitectura actual del repositorio
+left to right direction
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam ArrowColor #55705A
+skinparam packageBorderColor #8AA18A
+skinparam componentBorderColor #55705A
+
+actor "Productor/a" as Producer
+actor "Representante de comunidad" as Rep
+actor "Administrador/a" as Admin
+
+package "Frontend web\nReact 18 + TypeScript + Vite + Tailwind" as Frontend {
+  component "App.tsx\nEnrutamiento y composición" as App
+  package "Páginas (src/pages)" as Pages {
+    component "Home" as Home
+    component "Sow" as Sow
+    component "Weather" as Weather
+    component "Community /\nCommunityDetail" as Community
+    component "Learn / Notices" as LearnNotices
+    component "Auth / Admin" as AuthAdmin
+    component "WhatsApp (simulador)" as WhatsAppUI
+  }
+  package "Componentes y estado compartido" as Shared {
+    component "components/\nLocationPicker · GpsButton · MapView\nBottomNav · SiteChrome · UI" as Components
+    component "lib/api.ts\nfetch + JWT + errores" as ApiClient
+    component "lib/store.tsx\nestado de sesión y ubicación" as Store
+    component "lib/router.ts\nrutas hash" as Router
+  }
+  component "public/sw.js\nservice worker / caché offline" as SW
+}
+
+package "Backend\nFastAPI + Pydantic + SQLAlchemy" as Backend {
+  component "app/main.py\narranque, middleware, routers, health" as Main
+  package "Routers (app/routers)" as Routers {
+    component "auth.py" as RAuth
+    component "catalog.py\nubicaciones, cultivos, clima" as RCatalog
+    component "recommendations.py" as RRecommend
+    component "communities.py" as RCommunities
+    component "admin.py" as RAdmin
+    component "education.py / notices.py" as REduNotices
+    component "whatsapp.py\nsimulate + webhook" as RWhatsApp
+  }
+  package "Servicios (app/services)" as Services {
+    package "weather/" as WeatherServices {
+      component "service.py\ncaché, fallback y riesgos" as WeatherSvc
+      component "open_meteo.py" as OpenMeteoAdapter
+      component "nasa_power.py" as NasaAdapter
+      component "official.py\nadaptador configurable" as OfficialAdapter
+      component "simulated.py\nsolo pruebas / modo simulado" as SimAdapter
+    }
+    package "recommendation/" as RecommendationServices {
+      component "run.py\nintegra clima + reportes" as RecommendationRun
+      component "builder.py\nnormaliza WeatherView" as WeatherBuilder
+      component "engine.py\nevaluate() determinista" as Engine
+    }
+    package "whatsapp/" as WhatsAppServices {
+      component "intents.py" as Intents
+      component "assistant.py\nasistente conversacional" as Assistant
+      component "channels.py\nSimulator / Cloud API" as Channels
+      component "templates.py" as Templates
+    }
+    component "activity.py / audience.py" as OtherServices
+  }
+  package "Datos y persistencia" as Data {
+    component "data/\nlocations.json · crops.json\neducation/*.json" as CatalogData
+    component "models.py / schemas.py\nmodelos y contratos" as ModelsSchemas
+    component "db.py / deps.py\nSQLAlchemy + dependencias" as DbAccess
+  }
+}
+
+database "SQLite (desarrollo)\nPostgreSQL (producción)" as DB
+cloud "Open-Meteo\npronóstico" as OpenMeteo
+cloud "NASA POWER\nhistorial y climatología" as NASA
+cloud "Proveedor meteorológico oficial\n(adapter configurable; SENAMHI aún no integrado)" as OfficialSource
+cloud "WhatsApp Cloud API\nrequiere credenciales y plantillas" as Meta
+
+Producer --> App
+Rep --> App
+Admin --> App
+App --> Pages
+App --> Shared
+Pages --> Components
+Pages --> Store
+Pages --> ApiClient
+Router ..> App
+SW ..> App : archivos estáticos\ny GET públicos cacheables
+ApiClient --> Main : HTTPS /api\nJSON + Bearer JWT
+
+Main --> Routers : registra
+RAuth --> DbAccess
+RCatalog --> WeatherSvc
+RRecommend --> RecommendationRun
+RCommunities --> DbAccess
+RAdmin --> DbAccess
+REduNotices --> CatalogData
+REduNotices --> DbAccess
+RWhatsApp --> Assistant
+RWhatsApp --> Channels
+
+RecommendationRun --> WeatherSvc
+RecommendationRun --> WeatherBuilder
+RecommendationRun --> Engine
+RecommendationRun --> DbAccess : observaciones revisadas
+WeatherBuilder --> WeatherSvc
+Engine --> CatalogData : pesos, umbrales, calendarios
+WeatherSvc --> OpenMeteoAdapter
+WeatherSvc --> NasaAdapter
+WeatherSvc --> OfficialAdapter
+WeatherSvc --> SimAdapter
+OpenMeteoAdapter --> OpenMeteo
+NasaAdapter --> NASA
+OfficialAdapter ..> OfficialSource : solo si se configura
+WeatherSvc --> DbAccess : WeatherCache
+Assistant --> Intents
+Assistant --> RecommendationRun
+Assistant --> WeatherSvc
+Assistant --> DbAccess : estado de chat y mensajes
+Channels --> Meta : solo con WhatsApp habilitado
+Channels ..> Assistant : canal simulador
+
+DbAccess --> ModelsSchemas
+DbAccess --> DB
+ModelsSchemas --> DB : ORM\nusuarios, comunidades, membresías,\nreuniones, asistencia, avisos,\nobservaciones, cachés y mensajes
+
+note bottom of Engine
+  El motor de reglas es determinista y explicable.
+  Las reglas de quinua en el Altiplano están implementadas
+  pero siguen pendientes de validación agronómica.
+  Papa y maíz son demostrativos; haba y cebada
+  no tienen reglas aplicables.
+end note
+
+note bottom of Channels
+  El README declara WhatsApp en modo simulador.
+  El webhook y el adaptador existen, pero no equivalen
+  a una integración productiva conectada.
+end note
+
+@enduml
