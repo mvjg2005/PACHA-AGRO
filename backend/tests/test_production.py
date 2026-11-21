@@ -196,3 +196,40 @@ def test_chat_state_is_stored_in_database(app_client):
     with dbmod.SessionLocal() as s:
         assert "pending" in s.query(ChatState).one().data
     assert "Oruro" in c.post("/api/whatsapp/simulate", json={"text": "Oruro", "session_id": "s1"}).json()["replies"][0]
+
+
+
+def test_expired_weather_cache_records_are_pruned(app_client, monkeypatch):
+    from datetime import datetime, timedelta
+
+    from app import db as dbmod
+    from app.models import WeatherCache
+    from app.services.weather import service
+
+    old = datetime.utcnow() - timedelta(days=10)
+    with dbmod.SessionLocal() as db:
+        db.add(WeatherCache(key="expired-audit-entry", payload="{}", fetched_at=old, expires_at=old))
+        db.commit()
+    monkeypatch.setattr(service, "_DB_CACHE_WRITES", 99)
+    service._db_set("fresh-audit-entry", {"ok": True}, 60)
+    with dbmod.SessionLocal() as db:
+        assert db.get(WeatherCache, "expired-audit-entry") is None
+        assert db.get(WeatherCache, "fresh-audit-entry") is not None
+
+
+def test_expired_chat_states_are_pruned_periodically(app_client, monkeypatch):
+    from datetime import timedelta
+
+    from app import db as dbmod
+    from app.models import ChatState, utcnow
+    from app.services.whatsapp import assistant
+
+    with dbmod.SessionLocal() as db:
+        db.add(ChatState(key="expired-audit-state", data="{}", updated_at=utcnow() - timedelta(days=2)))
+        db.commit()
+    monkeypatch.setattr(assistant, "_STATE_SAVE_COUNT", 99)
+    with dbmod.SessionLocal() as db:
+        assistant._save_state(db, "fresh-audit-state", {"pending": None})
+    with dbmod.SessionLocal() as db:
+        assert db.get(ChatState, "expired-audit-state") is None
+        assert db.get(ChatState, "fresh-audit-state") is not None
