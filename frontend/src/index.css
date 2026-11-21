@@ -38,7 +38,7 @@ body { background: #ffffff; color: var(--color-tinta); font-family: var(--font-s
 
 .site-header { background: var(--color-papel); border-bottom: 1px solid var(--color-linea); }
 .site-header-inner, .site-main { width: min(100%, 72rem); margin-inline: auto; padding-inline: clamp(1rem, 4vw, 2.5rem); }
-.site-header-inner { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 4.15rem; }
+.site-header-inner { display: flex; align-items: center; justify-content: space-between; gap: .5rem; min-height: 4.15rem; min-width: 0; }
 .site-main { max-width: 44rem; padding-top: clamp(1.1rem, 3vw, 2.75rem); }
 .site-main-wide { max-width: 72rem; }
 .site-nav-desktop { display: none; }
@@ -102,6 +102,7 @@ body { background: #ffffff; color: var(--color-tinta); font-family: var(--font-s
   .compare-form, .compare-result-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (min-width: 56rem) {
+  .site-header-inner { gap: 1rem; }
   .home-grid { grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr); }
   .site-nav-mobile { display: none; }
   .site-nav-desktop { display: block; }
