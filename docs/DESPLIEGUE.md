@@ -27,7 +27,7 @@ El archivo `render.yaml` (Blueprint) crea:
    - `ADMIN_PHONE`: su celular con prefijo, ej. `+59171234567`
    - `ADMIN_PASSWORD`: una clave segura
 5. **Apply / Deploy Blueprint**. La primera construcción tarda unos minutos.
-6. Abra la URL `https://agrobolivia-XXXX.onrender.com`. Verifique `…/api/health` → `{"status":"ok"}`.
+6. Abra la URL `https://agrobolivia-XXXX.onrender.com`. Verifique `…/api/health` → `{"status":"ok","database":"ok"}`.
 7. Cada `git push` a `main` vuelve a desplegar automáticamente.
 
 ## Plan gratuito: tenga en cuenta
@@ -50,7 +50,7 @@ docker build -t agrobolivia .
 ```
 
 ```bash
-docker run -p 8000:8000 -e SECRET_KEY=algo-largo -e ADMIN_PASSWORD=admin12345 agrobolivia
+docker run -p 8000:8000 -e SECRET_KEY=reemplace-por-un-secreto-aleatorio-de-mas-de-32-caracteres -e ADMIN_PASSWORD=admin12345 agrobolivia
 ```
 
 Luego abra <http://localhost:8000>.
