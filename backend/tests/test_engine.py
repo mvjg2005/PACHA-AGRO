@@ -181,3 +181,21 @@ def test_confidence_explanation_says_it_is_not_a_probability():
 def test_no_rules_crop_has_action_and_no_key_factor():
     r = run(wx([3] * 7), crop="haba")
     assert r["key_factor"] is None and "técnico" in r["main_action"]
+
+
+
+def test_missing_rain_values_are_not_treated_as_zero():
+    w = wx([3] * 7, precip=[3, 3, None, 3, 3, 3, 3])
+    rain = next(c for c in run(w)["criteria"] if c["id"] == "lluvia")
+    assert rain["status"] == "gris"
+    assert rain["data_kind"] == "sin_datos"
+    assert "todos los días" in rain["explanation"]
+
+
+def test_confirmed_community_frost_report_adds_caution():
+    w = wx([3] * 7)
+    w.community_frost_reports = 1
+    frost = next(c for c in run(w)["criteria"] if c["id"] == "helada")
+    assert frost["status"] == "amarillo"
+    assert frost["data_kind"] == "comunidad"
+    assert "no aviso oficial" in frost["explanation"]
