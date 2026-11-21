@@ -29,16 +29,17 @@ def verify_password(password: str, stored: str) -> bool:
         return False
 
 
-def create_token(user_id: int) -> str:
+def create_token(user_id: int, token_version: int = 0) -> str:
     s = get_settings()
     now = datetime.now(timezone.utc)
-    payload = {"sub": str(user_id), "iat": now, "exp": now + timedelta(minutes=s.token_expire_minutes)}
+    payload = {"sub": str(user_id), "ver": token_version, "iat": now,
+               "exp": now + timedelta(minutes=s.token_expire_minutes)}
     return jwt.encode(payload, s.secret_key, algorithm="HS256")
 
 
-def decode_token(token: str) -> int | None:
+def decode_token(token: str) -> tuple[int, int] | None:
     try:
         payload = jwt.decode(token, get_settings().secret_key, algorithms=["HS256"])
-        return int(payload["sub"])
+        return int(payload["sub"]), int(payload.get("ver", 0))
     except (jwt.PyJWTError, KeyError, ValueError):
         return None

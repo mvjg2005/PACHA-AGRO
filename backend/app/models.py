@@ -29,6 +29,8 @@ class User(Base):
     crop_interests: Mapped[str] = mapped_column(String(200), default="")
     # Clave temporal dada por un administrador: debe cambiarse al ingresar.
     must_change_password: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Se incrementa al cambiar/clave, restablecer, desactivar o eliminar: revoca los JWT emitidos antes.
+    token_version: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     @property

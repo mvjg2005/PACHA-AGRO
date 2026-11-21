@@ -24,7 +24,9 @@ app = FastAPI(title="AgroBolivia API", version="0.1.0", lifespan=lifespan,
               description="Prototipo de asistencia agroclimática y comunicación comunitaria.")
 s = get_settings()
 app.add_middleware(GZipMiddleware, minimum_size=800)
-app.add_middleware(CORSMiddleware, allow_origins=s.cors_list, allow_methods=["*"], allow_headers=["Authorization", "Content-Type"])
+app.add_middleware(CORSMiddleware, allow_origins=s.cors_list,
+                   allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
+                   allow_headers=["Authorization", "Content-Type"])
 
 
 @app.middleware("http")

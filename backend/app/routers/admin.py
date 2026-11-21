@@ -72,6 +72,7 @@ def reset_password(uid: int, admin: User = Depends(admin_user), db: Session = De
     temp = "".join(secrets.choice(alphabet) for _ in range(8))
     u.password_hash = hash_password(temp)
     u.must_change_password = True
+    u.token_version += 1
     log(db, "clave_restablecida", u.full_name, admin.id)
     db.commit()
     return {"temporary_password": temp, "message": "Entregue esta clave en persona. La persona deberá cambiarla al ingresar."}
@@ -92,6 +93,7 @@ def deactivate(uid: int, admin: User = Depends(admin_user), db: Session = Depend
     if u is None or u.id == admin.id:
         raise HTTPException(400, "No se puede desactivar esta cuenta.")
     u.is_active = False
+    u.token_version += 1
     log(db, "usuario_desactivado", u.full_name, admin.id)
     db.commit()
     return {"id": u.id, "is_active": False}

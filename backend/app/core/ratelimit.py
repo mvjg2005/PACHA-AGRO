@@ -27,6 +27,7 @@ class RateLimiter:
 login_limiter = RateLimiter(max_calls=8, per_seconds=300)
 register_limiter = RateLimiter(max_calls=10, per_seconds=3600)
 chat_limiter = RateLimiter(max_calls=40, per_seconds=60)
+public_limiter = RateLimiter(max_calls=120, per_seconds=60)
 
 
 def client_key(request: Request) -> str:

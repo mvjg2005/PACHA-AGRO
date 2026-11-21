@@ -61,6 +61,43 @@ def test_invalid_token_rejected(app_client):
     assert app_client.get("/api/auth/me", headers={"Authorization": "Bearer xxx"}).status_code == 401
 
 
+def test_token_revoked_after_password_change(app_client):
+    c = app_client
+    h = register(c, "71234567")
+    assert c.get("/api/auth/me", headers=h).status_code == 200
+    r = c.post("/api/auth/password", headers=h,
+               json={"current_password": "clave123", "new_password": "nuevaClave1"})
+    assert r.status_code == 200
+    assert c.get("/api/auth/me", headers=h).status_code == 401
+    rotated = {"Authorization": f"Bearer {r.json()['token']}"}
+    assert c.get("/api/auth/me", headers=rotated).status_code == 200
+    assert c.post("/api/auth/login", json={"phone": "71234567", "password": "nuevaClave1"}).status_code == 200
+
+
+def test_token_revoked_after_admin_reset_and_deactivate(app_client):
+    from app import db as dbmod
+    from app.models import User
+
+    c = app_client
+    h = register(c, "71234567")
+    admin = admin_headers(c)
+    with dbmod.SessionLocal() as db:
+        uid = db.query(User).filter_by(phone="+59171234567").one().id
+    temp = c.post(f"/api/admin/users/{uid}/reset-password", headers=admin).json()["temporary_password"]
+    assert c.get("/api/auth/me", headers=h).status_code == 401
+    new = c.post("/api/auth/login", json={"phone": "71234567", "password": temp}).json()
+    h2 = {"Authorization": f"Bearer {new['token']}"}
+    assert c.get("/api/auth/me", headers=h2).status_code == 200
+    assert c.post(f"/api/admin/users/{uid}/deactivate", headers=admin).status_code == 200
+    assert c.get("/api/auth/me", headers=h2).status_code == 401
+
+
+def test_public_endpoints_are_rate_limited(app_client):
+    c = app_client
+    codes = [c.get("/api/weather?municipality_id=or-oruro&mode=simulado").status_code for _ in range(122)]
+    assert codes[:120] == [200] * 120 and codes[-2:] == [429, 429]
+
+
 def test_password_not_stored_in_plain_text(app_client):
     from app import db as dbmod
     from app.models import User

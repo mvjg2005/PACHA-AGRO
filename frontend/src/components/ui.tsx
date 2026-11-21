@@ -63,7 +63,7 @@ const TONE: Record<string, { cls: string; icon: IconName }> = {
 export function Notice({ tone = 'info', children }: { tone?: 'info' | 'warn' | 'ok' | 'sim'; children: ReactNode }) {
   const t = TONE[tone]
   return (
-    <div className={`flex items-start gap-2.5 border-l-[3px] px-4 py-3 ${t.cls}`}>
+    <div role="status" className={`flex items-start gap-2.5 border-l-[3px] px-4 py-3 ${t.cls}`}>
       <Icon name={t.icon} className="mt-[.2em] opacity-80" />
       <div className="min-w-0 flex-1">{children}</div>
     </div>

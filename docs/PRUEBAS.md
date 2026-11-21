@@ -4,10 +4,12 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 
 | Suite | Comando | Resultado |
 |---|---|---|
-| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **98/98** aprobadas |
+| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **101/101** aprobadas |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **7/7** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `node e2e/run.cjs http://localhost:8000` | **27/27** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `npm install && npx playwright install chromium`, luego `npm run test:e2e -- http://localhost:8000` | **27/27** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
+
+Playwright se declara en el `package.json` de la raíz. Con un Chrome del sistema se puede evitar la descarga: `CHROME_BIN=/ruta/a/chrome npm run test:e2e`. GitHub Actions instala el navegador y ejecuta esta suite contra un backend con `SEED_DEMO=true`.
 
 ## Casos de prueba por área
 
@@ -65,12 +67,14 @@ Ejecutadas el 21-11-2026. El backend usa fixtures. La suite de navegador usa el 
 | WhatsApp | Webhook sin credenciales 503; firma inválida 401; firma válida 200 | Sí | `test_api` |
 | Validación | Municipio inexistente, cultivo desconocido, variedad `<script>`, valor fuera de lista | 404 / 422 | `test_api` |
 | Seguridad | Encabezados `nosniff`, `X-Frame-Options` | Presentes | `test_api` |
+| Seguridad | Token revocado al cambiar clave, al resetearla y al desactivar la cuenta; el cambio de clave entrega un token nuevo | Sí | `test_api`, `test_production` |
+| Seguridad | Límite de peticiones en clima, ubicación y recomendaciones (120/min por IP) | 429 a partir de la 121 | `test_api` |
 | Educación | ≥7 lecciones con fuentes; quechua/aimara "pendiente"; `lang` no permitido | 422 | `test_api`, e2e #11 |
-| Rendimiento | Red emulada ≈400 kbps + 400 ms latencia | Acciones de inicio visibles en **≈2.1 s** | e2e #13 |
-| Rendimiento | Peso de la primera carga | ≈62 KB comprimidos (JS 56 KB + CSS 5 KB); mapa (44 KB) solo bajo demanda | `npm run build` |
+| Rendimiento | Red emulada ≈400 kbps + 400 ms latencia | Acciones de inicio visibles en **≈2.1 s** | e2e #14 |
+| Rendimiento | Peso de la primera carga | ≈78 KB comprimidos (JS 68 KB + CSS 9,5 KB); tipografías autoalojadas ≈148 KB; mapa (44 KB) solo bajo demanda | `npm run build` |
 | Accesibilidad | Contraste de todos los pares texto/fondo de la paleta | ≥ 4.95:1 (WCAG AA) | cálculo en revisión |
 
-> Nota: los límites de seguridad (8 inicios de sesión cada 5 min por cuenta e IP, 5 reportes por hora) viven en memoria. Si se ejecuta la suite e2e varias veces seguidas contra el mismo servidor, las pruebas que inician sesión pueden recibir `429`: reinicie el servidor antes de cada ejecución.
+> Nota: los límites de seguridad (8 inicios de sesión cada 5 min por cuenta e IP, 5 reportes por hora, 120 peticiones públicas por minuto e IP) viven en memoria. Si se ejecuta la suite e2e varias veces seguidas contra el mismo servidor, las pruebas que inician sesión pueden recibir `429`: reinicie el servidor antes de cada ejecución.
 
 ## Lo que NO se ha validado
 

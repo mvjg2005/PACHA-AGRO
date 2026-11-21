@@ -9,6 +9,7 @@ const DOCS = {
       ['Para qué los usamos', 'Para su cuenta, para mostrarle los avisos de su zona y de sus cultivos, y para los recordatorios de su comunidad. No vendemos ni compartimos sus datos con fines publicitarios.'],
       ['Quién ve su número', 'Los representantes de su comunidad solo ven los últimos 4 dígitos. Los demás miembros no ven su número.'],
       ['WhatsApp', 'Solo enviamos recordatorios y avisos a quien los aceptó. Puede darse de baja escribiendo BAJA o desde Mi cuenta. Usaremos solo la plataforma oficial de WhatsApp Business; hoy el asistente es un simulador y no envía mensajes reales.'],
+      ['Datos en su celular', 'Guardamos su municipio, la ubicación exacta que usted autorice y una copia de su perfil para que la app funcione sin conexión. Al salir de la cuenta o eliminarla, borramos esos datos y las respuestas climáticas guardadas con coordenadas.'],
       ['Seguridad', 'Las claves se guardan cifradas (nunca en texto). Las credenciales del servidor están fuera del código. Los permisos se revisan en el servidor.'],
       ['Sus derechos', 'Puede pedir ver, corregir o borrar sus datos al administrador de la plataforma. El responsable del tratamiento y su contacto deben definirse antes de usar esta plataforma con personas reales; no publicamos datos de contacto ficticios.'],
     ],

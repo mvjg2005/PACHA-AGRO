@@ -48,21 +48,23 @@ function useList<T>(url: string): [T[] | null, string | null, () => void] {
 function Meetings({ cid, isRep }: { cid: number; isRep: boolean }) {
   const [list, err, reload] = useList<Meeting>(`/api/communities/${cid}/meetings`)
   const [creating, setCreating] = useState(false)
-  const [flash, setFlash] = useState<string | null>(null)
+  const [flash, setFlash] = useState<{ text: string; tone: 'ok' | 'warn' } | null>(null)
+  const ok = (text: string) => setFlash({ text, tone: 'ok' })
+  const fail = (e: unknown) => setFlash({ text: (e as Error).message, tone: 'warn' })
   const respond = async (m: Meeting, response: string) => {
-    try { await api(`/api/meetings/${m.id}/attendance`, { body: { response } }); setFlash('Respuesta guardada.'); reload() } catch (e) { setFlash(`${(e as Error).message}`) }
+    try { await api(`/api/meetings/${m.id}/attendance`, { body: { response } }); ok('Respuesta guardada.'); reload() } catch (e) { fail(e) }
   }
   const remind = async (m: Meeting) => {
-    try { const r = await api<{ message: string; recipients: number }>(`/api/meetings/${m.id}/remind`, { method: 'POST' }); setFlash(`${r.message} (${r.recipients} personas con WhatsApp aceptado)`) } catch (e) { setFlash(`${(e as Error).message}`) }
+    try { const r = await api<{ message: string; recipients: number }>(`/api/meetings/${m.id}/remind`, { method: 'POST' }); ok(`${r.message} (${r.recipients} personas con WhatsApp aceptado)`) } catch (e) { fail(e) }
   }
   const cancel = async (m: Meeting) => {
     if (!window.confirm(`¿Cancelar la reunión "${m.title}"?`)) return
-    await api(`/api/meetings/${m.id}/cancel`, { method: 'POST' }); reload()
+    try { await api(`/api/meetings/${m.id}/cancel`, { method: 'POST' }); reload() } catch (e) { fail(e) }
   }
-  if (creating) return <MeetingForm cid={cid} onDone={() => { setCreating(false); reload(); setFlash('Reunión creada.') }} onCancel={() => setCreating(false)} />
+  if (creating) return <MeetingForm cid={cid} onDone={() => { setCreating(false); reload(); ok('Reunión creada.') }} onCancel={() => setCreating(false)} />
   return (
     <div className="space-y-3">
-      {flash && <Notice tone={flash.startsWith('') ? 'warn' : 'ok'}>{flash}</Notice>}
+      {flash && <Notice tone={flash.tone}>{flash.text}</Notice>}
       {isRep && <Button className="w-full" onClick={() => setCreating(true)}>Convocar reunión</Button>}
       {err ? <ErrorBox message={err} onRetry={reload} /> : !list ? <Loading /> : list.length === 0 ? <Notice>No hay reuniones programadas.</Notice> : list.map(m => (
         <Card key={m.id} className={m.cancelled ? 'opacity-70' : ''}>
@@ -156,15 +158,19 @@ function Reports({ cid, isRep }: { cid: number; isRep: boolean }) {
   const [kind, setKind] = useState<string | null>(null)
   const [desc, setDesc] = useState('')
   const [msg, setMsg] = useState<string | null>(null)
+  const [msgTone, setMsgTone] = useState<'ok' | 'warn'>('ok')
   const send = async () => {
-    try { const r = await api<{ label: string }>(`/api/communities/${cid}/observations`, { body: { kind, description: desc } }); setMsg(`${r.label}`); setKind(null); setDesc(''); reload() }
-    catch (e) { setMsg(`${(e as Error).message}`) }
+    try { const r = await api<{ label: string }>(`/api/communities/${cid}/observations`, { body: { kind, description: desc } }); setMsg(`${r.label}`); setMsgTone('ok'); setKind(null); setDesc(''); reload() }
+    catch (e) { setMsg(`${(e as Error).message}`); setMsgTone('warn') }
   }
-  const review = async (id: number, status: string) => { await api(`/api/observations/${id}/review`, { body: { status } }); reload() }
+  const review = async (id: number, status: string) => {
+    try { await api(`/api/observations/${id}/review`, { body: { status } }); reload() }
+    catch (e) { setMsg(`${(e as Error).message}`); setMsgTone('warn') }
+  }
   return (
     <div className="space-y-3">
       <Notice tone="warn">Los reportes son <strong>observaciones de la comunidad</strong>. No son avisos oficiales del SENAMHI.</Notice>
-      {msg && <Notice tone={msg.startsWith('') ? 'warn' : 'ok'}>{msg}</Notice>}
+      {msg && <Notice tone={msgTone}>{msg}</Notice>}
       <Card>
         <h3 className="text-lg font-bold">¿Qué pasó hoy en su zona?</h3>
         <div className="mt-2 grid grid-cols-2 gap-2">
@@ -215,12 +221,18 @@ function History({ cid }: { cid: number }) {
 
 function Requests({ cid }: { cid: number }) {
   const [list, err, reload] = useList<any>(`/api/communities/${cid}/requests`)
-  const decide = async (id: number, d: string) => { await api(`/api/memberships/${id}/${d}`, { method: 'POST' }); reload() }
+  const [actionErr, setActionErr] = useState<string | null>(null)
+  const decide = async (id: number, d: string) => {
+    setActionErr(null)
+    try { await api(`/api/memberships/${id}/${d}`, { method: 'POST' }); reload() }
+    catch (e) { setActionErr((e as Error).message) }
+  }
   if (err) return <ErrorBox message={err} onRetry={reload} />
   if (!list) return <Loading />
   if (list.length === 0) return <Notice>No hay solicitudes pendientes.</Notice>
   return (
     <div className="space-y-3">
+      {actionErr && <p role="alert" className="font-semibold text-rojo">{actionErr}</p>}
       <p className="text-musgo">Apruebe solo a personas que conoce de su comunidad.</p>
       {list.map(r => (
         <Card key={r.id}>

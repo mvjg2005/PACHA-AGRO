@@ -102,10 +102,13 @@ cd frontend && npm test
 ```
 
 ```bash
-node e2e/run.cjs http://localhost:8000
+npm install && npx playwright install chromium
+npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **98/98** backend, **7/7** unitarias frontend, **27/27** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+(Si ya tiene Chrome en el sistema, puede usar `CHROME_BIN=/ruta/a/chrome npm run test:e2e` en lugar de descargar Chromium.)
+
+Resultados actuales: **101/101** backend, **7/7** unitarias frontend, **27/27** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend, build y e2e en cada push o PR a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 

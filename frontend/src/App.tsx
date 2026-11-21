@@ -59,7 +59,7 @@ function OfflineBanner() {
   useEffect(() => {
     const on = () => { setOnline(true); setCachedAt(null) }
     const off = () => setOnline(false)
-    const cached = (e: Event) => setCachedAt((e as CustomEvent<string | null>).detail ?? '')
+    const cached = (e: Event) => setCachedAt((e as CustomEvent<string | null>).detail || null)
     window.addEventListener('online', on); window.addEventListener('offline', off); window.addEventListener('agb-offline', cached)
     return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); window.removeEventListener('agb-offline', cached) }
   }, [])

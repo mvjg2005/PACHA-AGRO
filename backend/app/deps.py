@@ -12,11 +12,14 @@ def optional_user(request: Request, db: Session = Depends(get_db)) -> User | Non
     auth = request.headers.get("Authorization", "")
     if not auth.startswith("Bearer "):
         return None
-    uid = decode_token(auth[7:])
-    if uid is None:
+    parsed = decode_token(auth[7:])
+    if parsed is None:
         return None
+    uid, version = parsed
     user = db.get(User, uid)
-    return user if user and user.is_active and (get_settings().seed_demo or not user.is_demo) else None
+    if not user or user.token_version != version:
+        return None
+    return user if user.is_active and (get_settings().seed_demo or not user.is_demo) else None
 
 
 _ALLOWED_WITH_TEMP_PASSWORD = {"/api/auth/me", "/api/auth/password"}

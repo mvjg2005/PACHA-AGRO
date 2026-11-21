@@ -66,10 +66,12 @@ export function Register() {
 export function Profile() {
   const { user, logout, refreshUser } = useApp()
   const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
   if (!user) return <Login />
   const toggle = async () => {
-    setBusy(true)
-    try { await api('/api/auth/me', { method: 'PATCH', body: { whatsapp_opt_in: !user.whatsapp_opt_in } }); await refreshUser() } finally { setBusy(false) }
+    setBusy(true); setErr(null)
+    try { await api('/api/auth/me', { method: 'PATCH', body: { whatsapp_opt_in: !user.whatsapp_opt_in } }); await refreshUser() }
+    catch (e) { setErr((e as Error).message) } finally { setBusy(false) }
   }
   return (
     <div className="space-y-4">
@@ -78,6 +80,7 @@ export function Profile() {
       <div className="rounded-md border border-linea bg-white p-4">
         <p className="text-lg font-bold">Avisos por WhatsApp</p>
         <p className="mt-1">{user.whatsapp_opt_in ? 'Usted aceptó recibir recordatorios y avisos.' : 'No recibe recordatorios ni avisos.'}</p>
+        {err && <p role="alert" className="mt-1 font-semibold text-rojo">{err}</p>}
         <Button variant="secondary" className="mt-3" disabled={busy} onClick={toggle}>{user.whatsapp_opt_in ? 'Dejar de recibir' : 'Aceptar recibir avisos'}</Button>
       </div>
       <CropInterests />
@@ -97,11 +100,13 @@ function CropInterests() {
   const { user, refreshUser } = useApp()
   const [busy, setBusy] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [err, setErr] = useState<string | null>(null)
   if (!user) return null
   const toggle = async (id: string) => {
-    setBusy(true); setSaved(false)
+    setBusy(true); setSaved(false); setErr(null)
     const next = user.crops.includes(id) ? user.crops.filter(c => c !== id) : [...user.crops, id]
-    try { await api('/api/auth/me', { method: 'PATCH', body: { crops: next } }); await refreshUser(); setSaved(true) } finally { setBusy(false) }
+    try { await api('/api/auth/me', { method: 'PATCH', body: { crops: next } }); await refreshUser(); setSaved(true) }
+    catch (e) { setErr((e as Error).message) } finally { setBusy(false) }
   }
   return (
     <div className="rounded-md border border-linea bg-white p-4">
@@ -115,6 +120,7 @@ function CropInterests() {
         })}
       </div>
       {saved && <p className="mt-2 font-semibold text-bosque" role="status">Guardado</p>}
+      {err && <p className="mt-2 font-semibold text-rojo" role="alert">{err}</p>}
     </div>
   )
 }
@@ -122,7 +128,7 @@ function CropInterests() {
 
 /** Cambio de clave. Con `forced`, es la pantalla obligatoria tras recibir una clave temporal. */
 export function ChangePassword({ forced = false }: { forced?: boolean }) {
-  const { refreshUser, logout } = useApp()
+  const { refreshUser, logout, setSession } = useApp()
   const [f, setF] = useState({ current: '', next: '', repeat: '' })
   const [err, setErr] = useState<string | null>(null)
   const [ok, setOk] = useState(false)
@@ -133,7 +139,8 @@ export function ChangePassword({ forced = false }: { forced?: boolean }) {
     if (f.next !== f.repeat) { setErr('Las dos claves nuevas no son iguales.'); return }
     setBusy(true)
     try {
-      await api('/api/auth/password', { body: { current_password: f.current, new_password: f.next } })
+      const r = await api<{ token: string; user: User }>('/api/auth/password', { body: { current_password: f.current, new_password: f.next } })
+      setSession(r.token, r.user)
       setF({ current: '', next: '', repeat: '' }); setOk(true); await refreshUser()
     } catch (e) { setErr((e as Error).message) } finally { setBusy(false) }
   }

@@ -266,7 +266,7 @@ def test_ensure_columns_adds_missing_columns_idempotently(tmp_path):
     assert "users.crop_interests" in added and "outbound_messages.wa_message_id" in added
     assert ensure_columns(eng) == []
     cols = {c["name"] for c in inspect(eng).get_columns("users")}
-    assert "crop_interests" in cols
+    assert "crop_interests" in cols and "token_version" in cols
     with eng.connect() as conn:
         assert conn.execute(text("SELECT full_name FROM users")).scalar() == "Ana"
 

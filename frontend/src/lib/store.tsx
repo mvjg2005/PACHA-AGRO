@@ -1,14 +1,35 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import { api, getToken, setToken } from './api'
+import { api, ApiError, getToken, SESSION_EXPIRED_EVENT, setToken } from './api'
 import type { Department, Municipality, User } from './types'
 
 const LOC_KEY = 'agb_municipality'
 const GPS_KEY = 'agb_gps'
+const USER_KEY = 'agb_user'
 
 /** Ubicación exacta por GPS. Se guarda solo en este celular; el servidor no la almacena. */
 export interface Gps { lat: number; lon: number; municipalityId: string; distanceKm: number; far: boolean }
 const read = (k: string) => { try { return localStorage.getItem(k) } catch { return null } }
 const write = (k: string, v: string) => { try { localStorage.setItem(k, v) } catch { /* ignorar */ } }
+const remove = (k: string) => { try { localStorage.removeItem(k) } catch { /* ignorar */ } }
+const readUser = (): User | null => {
+  try {
+    const u = JSON.parse(read(USER_KEY) ?? 'null') as User | null
+    return u && typeof u.id === 'number' ? u : null
+  } catch { return null }
+}
+
+/** Borra del service worker las respuestas guardadas con coordenadas exactas. */
+function clearLocationCache() {
+  if (typeof caches === 'undefined') return
+  caches.keys().then(keys => Promise.all(keys.map(async key => {
+    const cache = await caches.open(key)
+    const requests = await cache.keys()
+    await Promise.all(requests.filter(req => {
+      const url = new URL(req.url)
+      return url.searchParams.has('lat') || url.searchParams.has('lon')
+    }).map(req => cache.delete(req)))
+  }))).catch(() => { /* almacenamiento no disponible */ })
+}
 
 interface Ctx {
   user: User | null
@@ -30,7 +51,7 @@ interface Ctx {
 const AppCtx = createContext<Ctx | null>(null)
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null>(() => getToken() ? readUser() : null)
   const [departments, setDepartments] = useState<Department[] | null>(null)
   const [locationsError, setLocationsError] = useState<string | null>(null)
   const [municipalityId, setMid] = useState<string | null>(read(LOC_KEY))
@@ -41,20 +62,47 @@ export function AppProvider({ children }: { children: ReactNode }) {
     api<{ departments: Department[] }>('/api/locations').then(d => setDepartments(d.departments)).catch(e => setLocationsError(e.message))
   }, [])
 
-  const refreshUser = useCallback(async () => {
-    if (!getToken()) { setUser(null); return }
-    try { setUser(await api<User>('/api/auth/me')) } catch { setUser(null) }
+  const clearCredentials = useCallback(() => {
+    setToken(null)
+    setUser(null)
+    remove(USER_KEY)
   }, [])
 
+  const clearSession = useCallback(() => {
+    clearCredentials()
+    setMid(null)
+    setGpsState(null)
+    remove(LOC_KEY)
+    remove(GPS_KEY)
+    clearLocationCache()
+  }, [clearCredentials])
+
+  const refreshUser = useCallback(async () => {
+    if (!getToken()) { clearCredentials(); return }
+    try {
+      const u = await api<User>('/api/auth/me')
+      setUser(u)
+      write(USER_KEY, JSON.stringify(u))
+    } catch (e) {
+      // Sin red se conserva el último perfil conocido; solo un 401 cierra la sesión.
+      if (e instanceof ApiError && e.status === 401) clearSession()
+    }
+  }, [clearCredentials, clearSession])
+
   useEffect(() => { loadLocations(); refreshUser() }, [loadLocations, refreshUser])
+
+  useEffect(() => {
+    window.addEventListener(SESSION_EXPIRED_EVENT, clearSession)
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, clearSession)
+  }, [clearSession])
 
   const value = useMemo<Ctx>(() => ({
     user,
     setSession: (token, u) => {
-      setToken(token); setUser(u)
+      setToken(token); setUser(u); write(USER_KEY, JSON.stringify(u))
       if (u.default_municipality_id && !read(LOC_KEY)) { setMid(u.default_municipality_id); write(LOC_KEY, u.default_municipality_id) }
     },
-    logout: () => { setToken(null); setUser(null) },
+    logout: clearSession,
     refreshUser,
     departments, locationsError, reloadLocations: loadLocations,
     municipalityId,

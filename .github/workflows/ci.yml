@@ -48,3 +48,39 @@ jobs:
         run: npm test
       - name: Compilación (TypeScript + Vite)
         run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+      - name: Instalar dependencias
+        run: |
+          pip install -r backend/requirements.txt
+          npm ci
+          npm ci --prefix frontend
+      - name: Compilar frontend
+        run: npm run build --prefix frontend
+      - name: Instalar Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Pruebas extremo a extremo
+        run: |
+          cd backend
+          SEED_DEMO=true ADMIN_PHONE=70000000 ADMIN_PASSWORD=admin12345 \
+            SECRET_KEY=ci-only-secret-key-with-at-least-32-chars \
+            python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 > /tmp/agrobolivia-uvicorn.log 2>&1 &
+          for i in $(seq 1 45); do curl -fsS http://127.0.0.1:8000/api/health && break; sleep 1; done
+          cd ..
+          npm run test:e2e -- http://127.0.0.1:8000

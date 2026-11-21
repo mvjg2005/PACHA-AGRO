@@ -1,4 +1,5 @@
 const TOKEN_KEY = 'agb_token'
+export const SESSION_EXPIRED_EVENT = 'agb-session-expired'
 
 export function getToken(): string | null {
   try { return localStorage.getItem(TOKEN_KEY) } catch { return null }
@@ -38,7 +39,10 @@ export async function api<T = any>(path: string, opts: { method?: string; body?:
   let data: any = null
   try { data = await res.json() } catch { /* sin cuerpo */ }
   if (!res.ok) {
-    if (res.status === 401 && token) setToken(null)
+    if (res.status === 401 && token) {
+      setToken(null)
+      window.dispatchEvent(new Event(SESSION_EXPIRED_EVENT))
+    }
     const fields: Record<string, string> = {}
     for (const e of data?.errors ?? []) fields[e.field] = e.message
     throw new ApiError(res.status, typeof data?.detail === 'string' ? data.detail : 'Ocurrió un problema. Intente de nuevo.', fields)

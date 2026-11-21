@@ -22,7 +22,7 @@ El archivo `render.yaml` (Blueprint) crea:
 
 1. Asegúrese de que el código esté en la rama **`main`** (el Blueprint despliega `main`).
 2. Entre a <https://render.com> e inicie sesión con GitHub.
-3. **New + → Blueprint** → elija el repositorio `mvjg2005/PACHA-AGRO` → Render lee `render.yaml`.
+3. **New + → Blueprint** → elija el repositorio `henryflors/PACHA-AGRO` → Render lee `render.yaml`.
 4. Le pedirá los valores que no están en el archivo:
    - `ADMIN_PHONE`: su celular con prefijo, ej. `+59171234567`
    - `ADMIN_PASSWORD`: una clave segura
@@ -39,7 +39,7 @@ El archivo `render.yaml` (Blueprint) crea:
 ## Verificado antes de publicar
 
 - Imagen Docker construida (288 MB) y ejecutada como Render: variable `PORT=10000`, PostgreSQL 16, usuario sin privilegios.
-- Suite e2e completa contra el contenedor: **13/13**.
+- Suite e2e completa contra el contenedor: **27/27**.
 - Detrás del proxy, los límites de intentos cuentan por IP real del visitante (`--proxy-headers`): 10 registros permitidos por IP y hora, el 11.º bloqueado, otra IP sigue funcionando.
 - No se hizo un despliegue real en Render desde el entorno de desarrollo (requiere su cuenta).
 
@@ -71,7 +71,7 @@ Configuración ya incluida en el repositorio: `vercel.json`, `api/index.py`, `re
 ## Pasos
 
 1. Entre a <https://vercel.com> e inicie sesión con GitHub.
-2. **Add New… → Project** → importe `mvjg2005/PACHA-AGRO`.
+2. **Add New… → Project** → importe `henryflors/PACHA-AGRO`.
 3. En la pantalla de configuración deje *Framework Preset: Other* y **no cambie** los comandos (los toma de `vercel.json`).
 4. Abra **Environment Variables** y agregue:
 
@@ -107,7 +107,7 @@ Vercel publica en producción la rama **`main`**. Si el código está en otra ra
 
 - `vercel build` (CLI 39.3.0) ejecutado localmente: compila el frontend y empaqueta la función con `backend/app/**` y el driver `psycopg`.
 - Punto de entrada probado sin eventos de arranque (como en Vercel) y con SQLite en `/tmp`.
-- Suite e2e completa (13/13) ejecutada contra **PostgreSQL 16**.
+- Suite e2e completa (27/27) ejecutada contra **PostgreSQL 16**.
 - La inicialización de la base de datos tolera varias instancias arrancando a la vez.
 - No se pudo hacer un despliegue real desde el entorno de desarrollo (requiere su cuenta de Vercel).
 

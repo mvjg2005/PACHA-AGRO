@@ -23,6 +23,7 @@ function Admin() {
   const [users, setUsers] = useState<any[] | null>(null)
   const [report, setReport] = useState<Record<string, any> | null>(null)
   const [err, setErr] = useState<string | null>(null)
+  const [actionErr, setActionErr] = useState<string | null>(null)
   const [members, setMembers] = useState<{ cid: number; list: any[] } | null>(null)
   const load = () => {
     setErr(null)
@@ -31,22 +32,29 @@ function Admin() {
   }
   useEffect(() => { if (user?.role === 'admin') load() }, [user])
   if (!user || user.role !== 'admin') return <ErrorBox message="Solo para administradores." />
-  const decide = async (id: number, d: string) => { await api(`/api/admin/communities/${id}/${d}`, { method: 'POST' }); load() }
-  const showMembers = async (cid: number) => setMembers({ cid, list: await api(`/api/admin/memberships?community_id=${cid}`) })
-  const setRole = async (mid: number, role: string) => { await api(`/api/admin/memberships/${mid}/role`, { body: { role } }); if (members) showMembers(members.cid) }
-  const [temp, setTemp] = useState<{ name: string; pw: string } | null>(null)
-  const resetPw = async (uid: number, name: string) => {
-    if (!window.confirm(`¿Dar una clave temporal a ${name}? Su clave actual dejará de funcionar.`)) return
-    const r = await api<{ temporary_password: string }>(`/api/admin/users/${uid}/reset-password`, { method: 'POST' })
-    setTemp({ name, pw: r.temporary_password })
+  const action = async (fn: () => Promise<unknown>) => {
+    setActionErr(null)
+    try { await fn() } catch (e) { setActionErr((e as Error).message) }
   }
-  const setGlobalRole = async (uid: number, role: string) => { await api(`/api/admin/users/${uid}/role`, { body: { role } }); load() }
-  const deactivate = async (uid: number) => { if (window.confirm('¿Desactivar esta cuenta?')) { await api(`/api/admin/users/${uid}/deactivate`, { method: 'POST' }); load() } }
+  const decide = (id: number, d: string) => action(async () => { await api(`/api/admin/communities/${id}/${d}`, { method: 'POST' }); load() })
+  const showMembers = (cid: number) => action(async () => setMembers({ cid, list: await api(`/api/admin/memberships?community_id=${cid}`) }))
+  const setRole = (mid: number, role: string) => action(async () => { await api(`/api/admin/memberships/${mid}/role`, { body: { role } }); if (members) await showMembers(members.cid) })
+  const [temp, setTemp] = useState<{ name: string; pw: string } | null>(null)
+  const resetPw = (uid: number, name: string) => {
+    if (!window.confirm(`¿Dar una clave temporal a ${name}? Su clave actual dejará de funcionar.`)) return
+    return action(async () => {
+      const r = await api<{ temporary_password: string }>(`/api/admin/users/${uid}/reset-password`, { method: 'POST' })
+      setTemp({ name, pw: r.temporary_password })
+    })
+  }
+  const setGlobalRole = (uid: number, role: string) => action(async () => { await api(`/api/admin/users/${uid}/role`, { body: { role } }); load() })
+  const deactivate = (uid: number) => { if (window.confirm('¿Desactivar esta cuenta?')) return action(async () => { await api(`/api/admin/users/${uid}/deactivate`, { method: 'POST' }); load() }) }
   if (err) return <ErrorBox message={err} onRetry={load} />
   if (!pending || !users || !report || !approved) return <Loading />
   return (
     <div className="space-y-5">
       <PageTitle title="Administración" subtitle="Comunidades, permisos y reportes." />
+      {actionErr && <p role="alert" className="font-semibold text-rojo">{actionErr}</p>}
       <section>
         <h2 className="mb-2 text-xl font-bold">Comunidades por aprobar ({pending.length})</h2>
         {pending.length === 0 ? <Notice>No hay solicitudes.</Notice> : pending.map(c => (
@@ -147,7 +155,11 @@ function PublishNotices() {
     try { const r = await api<{ message: string; recipients: number }>(`/api/notices/${n.id}/notify`, { method: 'POST' }); setMsg(`${r.message} (${r.recipients} personas)`) }
     catch (e) { setErr((e as Error).message) }
   }
-  const archive = async (n: RegionalNotice) => { if (window.confirm(`¿Retirar "${n.title}"?`)) { await api(`/api/notices/${n.id}/archive`, { method: 'POST' }); load() } }
+  const archive = async (n: RegionalNotice) => {
+    if (!window.confirm(`¿Retirar "${n.title}"?`)) return
+    try { await api(`/api/notices/${n.id}/archive`, { method: 'POST' }); load() }
+    catch (e) { setErr((e as Error).message) }
+  }
   const sel = inputCls
   return (
     <section className="space-y-3">

@@ -149,7 +149,10 @@ def test_admin_temporary_password_must_be_changed(app_client):
     t = login(c, "71234567", temp)
     assert c.get("/api/auth/me", headers=t).json()["must_change_password"] is True
     assert c.get("/api/me/communities", headers=t).status_code == 403  # bloqueado hasta cambiarla
-    assert c.post("/api/auth/password", json={"current_password": temp, "new_password": "miClaveNueva1"}, headers=t).status_code == 200
+    changed = c.post("/api/auth/password", json={"current_password": temp, "new_password": "miClaveNueva1"}, headers=t)
+    assert changed.status_code == 200
+    assert c.get("/api/auth/me", headers=t).status_code == 401  # el token anterior queda revocado
+    t = {"Authorization": f"Bearer {changed.json()['token']}"}
     assert c.get("/api/me/communities", headers=t).status_code == 200
 
 

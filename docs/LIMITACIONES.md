@@ -21,6 +21,6 @@
 - Convenio con SENAMHI para avisos oficiales y datos de estaciones.
 - Validar umbrales y calendarios con técnicos de PROINPA/INIAF y productores; ampliar a papa y maíz.
 - Conectar WhatsApp Cloud API con plantillas aprobadas y números de prueba.
-- PWA con caché del último pronóstico para zonas sin señal.
-- Migrar a PostgreSQL + Alembic + Redis; desplegar con HTTPS.
+- Ampliar la PWA: hoy cachea el pronóstico, pero no los mapas ni las respuestas con sesión iniciada.
+- Sustituir la migración mínima por Alembic y el límite de peticiones en memoria por Redis; desplegar con HTTPS.
 - Prueba piloto con una comunidad real, con consentimiento informado.

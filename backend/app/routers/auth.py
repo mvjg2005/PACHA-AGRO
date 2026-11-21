@@ -31,7 +31,7 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db)):
     db.flush()
     log(db, "registro", "Nueva cuenta de agricultor", user.id)
     db.commit()
-    return {"token": create_token(user.id), "user": UserOut.model_validate(user)}
+    return {"token": create_token(user.id, user.token_version), "user": UserOut.model_validate(user)}
 
 
 @router.post("/login")
@@ -41,7 +41,7 @@ def login(body: LoginIn, request: Request, db: Session = Depends(get_db)):
     if (not user or not user.is_active or (user.is_demo and not get_settings().seed_demo)
             or not verify_password(body.password, user.password_hash)):
         raise HTTPException(401, "Número o clave incorrectos.")
-    return {"token": create_token(user.id), "user": UserOut.model_validate(user)}
+    return {"token": create_token(user.id, user.token_version), "user": UserOut.model_validate(user)}
 
 
 @router.get("/me", response_model=UserOut)
@@ -78,9 +78,10 @@ def change_password(body: PasswordChangeIn, request: Request, user: User = Depen
         raise HTTPException(422, "La clave nueva debe ser distinta de la actual.")
     user.password_hash = hash_password(body.new_password)
     user.must_change_password = False
+    user.token_version += 1
     log(db, "clave_cambiada", "", user.id)
     db.commit()
-    return {"ok": True, "user": UserOut.model_validate(user)}
+    return {"ok": True, "token": create_token(user.id, user.token_version), "user": UserOut.model_validate(user)}
 
 
 @router.delete("/me")
@@ -104,6 +105,7 @@ def delete_account(body: DeleteAccountIn, request: Request, user: User = Depends
     user.full_name = "Cuenta eliminada"
     user.phone = f"eliminado-{user.id}-{secrets.token_hex(3)}"[:20]
     user.password_hash = hash_password(secrets.token_urlsafe(32))
+    user.token_version += 1
     user.is_active = False
     user.whatsapp_opt_in, user.whatsapp_opt_in_at = False, None
     user.default_municipality_id, user.crop_interests = None, ""

@@ -2,8 +2,9 @@
  * - La app (HTML, JS, CSS) queda guardada para abrir sin señal.
  * - Clima, avisos, biblioteca, ubicaciones y cultivos: primero la red; si falla, la última copia guardada,
  *   marcada con la cabecera x-agb-offline y la fecha en que se guardó.
- * - No se guardan respuestas con sesión iniciada (datos personales) ni peticiones que no sean GET. */
-const VERSION = 'agb-v1'
+ * - No se guardan respuestas con sesión iniciada (datos personales), con coordenadas GPS en la URL
+ *   ni peticiones que no sean GET. */
+const VERSION = 'agb-v2'
 const SHELL = ['/', '/index.html', '/favicon.svg', '/manifest.webmanifest']
 const API_CACHEABLE = /^\/api\/(weather|notices|education|locations|crops|locate)/
 
@@ -39,7 +40,8 @@ self.addEventListener('fetch', event => {
     })))
     return
   }
-  if (API_CACHEABLE.test(url.pathname) && !req.headers.get('Authorization')) {
+  const hasGps = url.searchParams.has('lat') || url.searchParams.has('lon')
+  if (API_CACHEABLE.test(url.pathname) && !hasGps && !req.headers.get('Authorization')) {
     event.respondWith((async () => {
       const cache = await caches.open(VERSION)
       try {

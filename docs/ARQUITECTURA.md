@@ -4,12 +4,12 @@
 
 | Requisito clave | Decisión |
 |---|---|
-| Usuarios con poca experiencia tecnológica, celulares económicos, internet lento | Web *mobile-first*, sin instalación, ~62 KB comprimidos en la primera carga, fuentes del sistema (sin descargar tipografías), mapa cargado solo bajo demanda |
+| Usuarios con poca experiencia tecnológica, celulares económicos, internet lento | Web *mobile-first*, sin instalación, ≈78 KB comprimidos en la primera carga (JS + CSS), tipografías autoalojadas, mapa cargado solo bajo demanda |
 | Consultar condiciones de siembra en < 1 minuto | Asistente de 6 preguntas, una por pantalla, con botones grandes; 7 toques desde el inicio; sin registro |
 | Distinguir datos reales, pronósticos, datos del agricultor, comunitarios y simulados | Cada bloque de datos lleva `source` y `kind`; la interfaz muestra etiquetas de color |
 | No inventar alertas oficiales | SENAMHI se muestra como "no integrado" con enlace oficial; los reportes de agricultores son "observaciones comunitarias" |
 | WhatsApp como canal principal, sin automatizaciones no autorizadas | Patrón *canal* (simulador ↔ Cloud API oficial), un solo asistente para ambos |
-| Extensible a 9 departamentos y nuevos cultivos | Ubicaciones, cultivos, calendarios, pesos y umbrales en JSON; ninguno está en el código |
+| Extensible a 9 departamentos y nuevos cultivos | Ubicaciones, cultivos, calendarios, pesos y umbrales del motor en JSON; los umbrales de visualización del clima están en el servicio meteorológico |
 | Futuro machine learning | Motor de recomendación puro (sin red ni BD) que recibe una vista normalizada del clima |
 
 ## 2. Justificación tecnológica (equipo de 5 estudiantes)
@@ -73,9 +73,9 @@ Encabezado: Ingresar / Perfil (consentimiento WhatsApp, salir, Admin*)
 ## 5. Diseño de pantallas y sistema visual
 
 - **Paleta** (tokens en `frontend/src/index.css`): verde bosque `#1E4A2C`, verde brote `#DCE7D1`, crema `#FAF6EE`, tierra `#7A4E2D`, ocre `#B87A2A`, amarillo suave `#F3D98B` para advertencias, rojo teja `#A63A2B`. Todas las combinaciones texto/fondo usadas superan 4.5:1.
-- **Identidad**: franja inspirada en el aguayo (bandas planas, sin degradados), ilustración de andenes, títulos con serif clásica del sistema.
+- **Identidad**: franja inspirada en el aguayo (bandas planas, sin degradados), ilustración de andenes, títulos con serif Newsreader autoalojada.
 - **Tipografía**: base 18 px; botones de 48–64 px de alto; un concepto por pantalla en el asistente.
-- **Semáforo** siempre con emoji + palabra + color (no depende solo del color).
+- **Semáforo** siempre con forma + palabra + color (no depende solo del color ni usa emoticones).
 - **Estados**: carga con texto, errores en lenguaje simple con "Intentar de nuevo", confirmaciones verdes.
 - **Accesibilidad**: enlace "Ir al contenido", `aria-live` en resultados, foco visible, `prefers-reduced-motion`.
 

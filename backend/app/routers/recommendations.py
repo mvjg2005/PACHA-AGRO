@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
+from app.core.ratelimit import client_key, public_limiter
 from app.data.catalog import crops_config, get_municipality
 from app.db import get_db
 from app.schemas import RecommendationIn
@@ -11,7 +12,8 @@ router = APIRouter(prefix="/api", tags=["recomendaciones"])
 
 
 @router.post("/recommendations")
-def create_recommendation(body: RecommendationIn, db: Session = Depends(get_db)):
+def create_recommendation(body: RecommendationIn, request: Request, db: Session = Depends(get_db)):
+    public_limiter.check(client_key(request))
     from app.routers.catalog import resolve_location
 
     m = resolve_location(body.municipality_id, body.lat, body.lon)

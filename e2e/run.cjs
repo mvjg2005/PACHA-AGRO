@@ -1,7 +1,9 @@
 /**
  * Pruebas de extremo a extremo de AgroBolivia (Playwright, Chromium).
- * Requisitos: backend corriendo con el frontend compilado en http://localhost:8000 y SEED_DEMO=true.
- * Uso: node e2e/run.cjs [URL]
+ * Requisitos: `npm install` en la raíz, `npx playwright install chromium` (o definir CHROME_BIN
+ * con un Chrome del sistema), backend corriendo con el frontend compilado en http://localhost:8000
+ * y SEED_DEMO=true.
+ * Uso: npm run test:e2e -- [URL]
  */
 const { chromium } = require('playwright')
 const fs = require('fs')
@@ -22,7 +24,7 @@ async function test(name, fn) {
 const assert = (c, m) => { if (!c) throw new Error(m) }
 
 ;(async () => {
-  const browser = await chromium.launch()
+  const browser = await chromium.launch(process.env.CHROME_BIN ? { executablePath: process.env.CHROME_BIN } : {})
   // Los service workers se bloquean por defecto: sus peticiones no pasan por page.route (las pruebas que simulan
   // respuestas dejarían de funcionar). La prueba de modo sin conexión los activa explícitamente.
   const phone = { viewport: { width: 360, height: 740 }, hasTouch: true, isMobile: true, serviceWorkers: 'block' }
@@ -256,8 +258,8 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     await btn(ed, /Crear cuenta/).click(); await ed.waitForURL(/comunidad/)
     assert((await ed.evaluate(async () => (await fetch('/api/notices', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + localStorage.getItem('agb_token') }, body: JSON.stringify({ title: 'Intento sin permiso', summary: 'No debería publicarse' }) })).status)) === 403, 'publicó sin ser editor')
     await admin.goto(`${BASE}/#/admin`)
-    await admin.locator('li', { hasText: 'Elena Editora' }).getByRole('button', { name: 'Hacer editor' }).click()
-    await admin.locator('li', { hasText: 'Elena Editora' }).getByRole('button', { name: 'Quitar editor' }).waitFor()
+    await admin.locator('li', { hasText: 'Elena Editora' }).getByRole('button', { name: 'Hacer editor' }).last().click()
+    await admin.locator('li', { hasText: 'Elena Editora' }).getByRole('button', { name: 'Quitar editor' }).last().waitFor()
     await ed.reload(); await ed.goto(`${BASE}/#/admin`)
     await ed.getByText('Usted es editor de contenido.').waitFor()
     assert(await ed.getByText('Comunidades por aprobar').count() === 0, 'el editor ve secciones de administrador')
@@ -396,7 +398,7 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     await btn(admin, /^Ingresar$/).click(); await admin.waitForURL(/comunidad/)
     await admin.goto(`${BASE}/#/admin`)
     admin.once('dialog', d => d.accept())
-    await admin.locator('li', { hasText: 'Pedro Olvido' }).getByRole('button', { name: 'Clave temporal' }).click()
+    await admin.locator('li', { hasText: 'Pedro Olvido' }).getByRole('button', { name: 'Clave temporal' }).last().click()
     const temp = (await admin.getByTestId('temp-password').innerText()).match(/: (\S+)$/)[1]
     const p = await newPage()
     await p.goto(`${BASE}/#/ingresar`)

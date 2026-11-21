@@ -54,4 +54,4 @@ Webhook Meta  ──┘   intents (reglas en español) └─ CloudAPIChannel (s
 4. Exponer el backend por HTTPS y registrar `https://<dominio>/api/whatsapp/webhook` como webhook (campo `messages`).
 5. Probar con números de prueba antes de abrirlo a comunidades.
 
-Pendiente para producción: guardar el estado de conversación en BD/Redis (hoy en memoria), cola de envíos con reintentos, y registro de la ventana de 24 h por usuario.
+El estado de conversación ya se guarda en la base de datos (expira a los 30 minutos). Pendiente para producción: cola de envíos con reintentos y registro de la ventana de 24 h por usuario.

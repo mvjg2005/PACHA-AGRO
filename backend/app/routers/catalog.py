@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 
+from app.core.ratelimit import client_key, public_limiter
 from app.data.catalog import NEAR_KM, crops_config, get_municipality, in_bolivia, locations, nearest_municipality, point_location
 from app.services.weather.service import get_weather
 
@@ -36,7 +37,8 @@ def resolve_location(municipality_id: str | None, lat: float | None, lon: float 
 
 
 @router.get("/locate")
-def locate(lat: float = Query(ge=-90, le=90), lon: float = Query(ge=-180, le=180)):
+def locate(request: Request, lat: float = Query(ge=-90, le=90), lon: float = Query(ge=-180, le=180)):
+    public_limiter.check(client_key(request))
     """Municipio registrado más cercano a unas coordenadas (para «Usar mi ubicación»)."""
     if not in_bolivia(lat, lon):
         raise HTTPException(422, "Esa ubicación está fuera de Bolivia.")
@@ -48,7 +50,8 @@ def locate(lat: float = Query(ge=-90, le=90), lon: float = Query(ge=-180, le=180
 
 
 @router.get("/weather")
-def weather(municipality_id: str | None = Query(None, max_length=60), mode: str = Query("real", pattern="^(real|simulado)$"),
+def weather(request: Request, municipality_id: str | None = Query(None, max_length=60), mode: str = Query("real", pattern="^(real|simulado)$"),
             lat: float | None = Query(None, ge=-90, le=90), lon: float | None = Query(None, ge=-180, le=180)):
+    public_limiter.check(client_key(request))
     w = get_weather(resolve_location(municipality_id, lat, lon), mode)
     return w

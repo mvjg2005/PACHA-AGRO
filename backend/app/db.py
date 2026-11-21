@@ -38,6 +38,7 @@ ADDED_COLUMNS = [
     ("outbound_messages", "error", "VARCHAR(300)"),
     ("outbound_messages", "updated_at", "TIMESTAMP"),
     ("users", "must_change_password", "BOOLEAN DEFAULT FALSE"),
+    ("users", "token_version", "INTEGER DEFAULT 0"),
 ]
 
 
