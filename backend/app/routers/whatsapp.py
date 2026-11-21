@@ -41,7 +41,7 @@ def simulate(body: ChatIn, request: Request, mode: str = Query("real", pattern="
 def inbox(user: User = Depends(current_user), db: Session = Depends(get_db)):
     rows = db.scalars(select(OutboundMessage).where(OutboundMessage.user_id == user.id).order_by(OutboundMessage.id.desc()).limit(20))
     return [{"id": m.id, "template": m.template, "body": m.body, "status": m.status, "channel": m.channel,
-             "created_at": m.created_at.isoformat(timespec="minutes")} for m in rows]
+             "created_at": m.created_at.isoformat(timespec="minutes") + "+00:00"} for m in rows]
 
 
 # ---- Webhook oficial de WhatsApp Cloud API (inactivo sin credenciales) ----
@@ -61,18 +61,49 @@ async def receive(request: Request, db: Session = Depends(get_db)):
     if not (s.whatsapp_enabled and s.whatsapp_app_secret):
         raise HTTPException(503, "WhatsApp no está configurado en este servidor.")
     raw = await request.body()
+    if len(raw) > 1_048_576:
+        raise HTTPException(413, "El webhook supera el tamaño permitido.")
     expected = "sha256=" + hmac.new(s.whatsapp_app_secret.encode(), raw, hashlib.sha256).hexdigest()
     if not hmac.compare_digest(expected, request.headers.get("X-Hub-Signature-256", "")):
         raise HTTPException(401, "Firma inválida.")
-    payload = json.loads(raw)
+    try:
+        payload = json.loads(raw)
+    except (json.JSONDecodeError, UnicodeDecodeError) as exc:
+        raise HTTPException(400, "El webhook debe contener JSON válido.") from exc
+    if not isinstance(payload, dict):
+        raise HTTPException(400, "El webhook debe contener un objeto JSON.")
     channel = get_channel()
-    for entry in payload.get("entry", []):
-        for change in entry.get("changes", []):
-            for msg in change.get("value", {}).get("messages", []):
-                if msg.get("type") != "text":
+    if not channel.connected:
+        raise HTTPException(503, "Faltan WHATSAPP_TOKEN o WHATSAPP_PHONE_NUMBER_ID.")
+    entries = payload.get("entry", [])
+    if not isinstance(entries, list):
+        raise HTTPException(400, "El campo entry del webhook no es válido.")
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        changes = entry.get("changes", [])
+        if not isinstance(changes, list):
+            continue
+        for change in changes:
+            if not isinstance(change, dict):
+                continue
+            value = change.get("value", {})
+            if not isinstance(value, dict):
+                continue
+            messages = value.get("messages", [])
+            if not isinstance(messages, list):
+                continue
+            for msg in messages:
+                if not isinstance(msg, dict) or msg.get("type") != "text":
                     continue
-                phone = "+" + msg["from"]
+                sender = msg.get("from")
+                text_payload = msg.get("text")
+                body = text_payload.get("body") if isinstance(text_payload, dict) else None
+                if not isinstance(sender, str) or not sender.isdigit() or not isinstance(body, str) or not body.strip():
+                    logger.warning("Mensaje de WhatsApp omitido por estructura inválida")
+                    continue
+                phone = "+" + sender
                 user = db.scalar(select(User).where(User.phone == phone, User.is_active.is_(True)))
-                for reply in assistant.handle(db, f"wa:{phone}", msg["text"]["body"], user):
+                for reply in assistant.handle(db, f"wa:{phone}", body, user):
                     channel.send_text(phone, reply)
     return {"ok": True}
