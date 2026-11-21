@@ -81,3 +81,13 @@ def test_nasa_climatology_fill_values_are_missing_not_zero():
     parsed = parse_climatology(data)
     assert parsed["frost_days"]["NOV"] is None
     assert parsed["precip_mm_day"]["NOV"] is None
+
+
+
+def test_weather_cache_converts_invalid_provider_payload_to_controlled_error():
+    from app.services.weather.service import _cached
+
+    service.cache.clear()
+    value = _cached("forecast", (1.0, 2.0), lambda: {"daily": None}["daily"]["missing"])
+    assert "_error" in value
+    assert "incompletos o inválidos" in value["_error"]
