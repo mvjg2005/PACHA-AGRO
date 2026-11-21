@@ -42,7 +42,7 @@ class CloudAPIChannel:
     def _post(self, payload: dict) -> str:
         try:
             r = httpx.post(self.url, json=payload, headers=self.headers, timeout=15)
-            return "enviado" if r.status_code == 200 else "error"
+            return "enviado" if r.is_success else "error"
         except httpx.HTTPError:
             logger.exception("Error enviando a WhatsApp Cloud API")
             return "error"
