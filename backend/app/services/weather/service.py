@@ -72,6 +72,11 @@ def _cached(kind: str, key: tuple, fn):
     except ProviderError as e:
         value = {"_error": str(e)}
         cache.set(ck, value, _TTL["error"])
+    except (KeyError, TypeError, ValueError, IndexError, AttributeError) as e:
+        # Las respuestas con forma inesperada del proveedor no deben convertir
+        # una consulta pública de clima en un HTTP 500.
+        value = {"_error": f"El proveedor devolvió datos incompletos o inválidos ({type(e).__name__})."}
+        cache.set(ck, value, _TTL["error"])
     return value
 
 
