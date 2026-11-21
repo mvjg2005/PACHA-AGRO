@@ -1,5 +1,5 @@
 """Datos iniciales. Las cuentas y la comunidad de demostración son FICTICIAS y están marcadas is_demo=True."""
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -55,7 +55,7 @@ def seed(db: Session) -> None:
 
 def seed_regional_notices(db: Session, author_id: int) -> None:
     """Avisos regionales de DEMOSTRACIÓN (ficticios, basados en los ejemplos de PACHAAGRO)."""
-    exp = datetime.now() + timedelta(days=20)
+    exp = local_now() + timedelta(days=20)
     demo = [
         ("nacional", {}, "aviso", "Actualice sus cultivos de interés",
          "Marque en su perfil qué cultivos produce para recibir solo los avisos que le corresponden."),
