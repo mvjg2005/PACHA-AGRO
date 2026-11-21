@@ -35,13 +35,15 @@ Nada se presenta como algo que no es: los datos **simulados**, las **observacion
 
 ## Ejecutar (5 minutos)
 
-Requisitos: Python 3.11+ y Node.js 18+.
+Requisitos: Python 3.11+ y Node.js 18+ para la aplicación. Para las pruebas Playwright se requiere Node.js 22+.
 
 ```bash
 cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && cp .env.example .env
 ```
 
-Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). Luego compile el frontend:
+En Windows PowerShell, para crear e instalar el entorno virtual use `cd backend`, `py -3.12 -m venv .venv`, ` .\\.venv\\Scripts\\python.exe -m pip install -r requirements-dev.txt` y `Copy-Item .env.example .env`. Para arrancar use ` .\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --port 8000` desde la carpeta backend.
+
+Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). La clave JWT debe tener al menos 32 caracteres; genérela con `python -c "import secrets; print(secrets.token_urlsafe(48))"`. No use la clave de ejemplo en producción. Luego compile el frontend:
 
 ```bash
 cd frontend && npm install && npm run build
@@ -62,6 +64,8 @@ cd frontend && npm run dev
 ```
 
 (Vite en <http://localhost:5173> redirige `/api` al backend.)
+
+Mantenga `SEED_DEMO=false` para el uso normal y en producción. Active `SEED_DEMO=true` únicamente en una base local desechable para las pruebas E2E; no habilite cuentas demo en producción.
 
 ### Cuentas ficticias para pruebas locales (`SEED_DEMO=true`)
 
@@ -98,10 +102,13 @@ cd frontend && npm test
 ```
 
 ```bash
-node e2e/run.cjs http://localhost:8000
+cd e2e
+npm install
+npx playwright install chromium
+npm test -- http://localhost:8000
 ```
 
-Resultados actuales: **85/85** backend, **7/7** unitarias frontend, **19/19** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Los resultados **85/85** backend, **7/7** frontend y **19/19** E2E son los registrados antes de esta auditoría. Esta rama añade pruebas de regresión y un trabajo E2E de GitHub Actions; no se deben considerar aprobadas hasta que el flujo del pull request termine. Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 
