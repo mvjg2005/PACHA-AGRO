@@ -219,14 +219,6 @@ def _attendance(db, user, intent, st: dict | None = None) -> str:
             )
         mt = db.get(Meeting, last.meeting_id) if last else None
 
-    if mt is None and community_ids:
-        mt = db.scalar(
-            select(Meeting).where(
-                Meeting.community_id.in_(community_ids),
-                Meeting.cancelled.is_(False),
-                Meeting.starts_at >= now,
-            ).order_by(Meeting.starts_at)
-        )
     if (mt is None or mt.cancelled or mt.community_id not in community_ids
             or mt.starts_at < now - timedelta(hours=6)):
         st.pop("pending_meeting_id", None)
