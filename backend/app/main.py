@@ -1,12 +1,15 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app import db as dbmod
@@ -51,8 +54,13 @@ for r in (auth.router, catalog.router, recommendations.router, communities.route
 
 
 @app.get("/api/health")
-def health():
-    return {"status": "ok"}
+def health(db: Session = Depends(dbmod.get_db)):
+    """Readiness check: verifica que la base responda antes de marcar la instancia saludable."""
+    try:
+        db.execute(text("SELECT 1"))
+    except SQLAlchemyError as exc:
+        raise HTTPException(status_code=503, detail="Base de datos no disponible.") from exc
+    return {"status": "ok", "database": "ok"}
 
 
 # Sirve el frontend compilado (opcional): un solo proceso para la demostración.
