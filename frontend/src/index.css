@@ -42,10 +42,6 @@ body { background: #ffffff; color: var(--color-tinta); font-family: var(--font-s
 .site-main { max-width: 44rem; padding-top: clamp(1.1rem, 3vw, 2.75rem); }
 .site-main-wide { max-width: 72rem; }
 .site-nav-desktop { display: none; }
-.site-nav-mobile { width: calc(100% - var(--viewport-scrollbar-width, 0px)); }
-@media (max-width: 55.999rem) {
-  .site-header-inner > a:last-child { margin-right: var(--viewport-scrollbar-width, 0px); }
-}
 .site-primary, .site-text-link { display: inline-flex; align-items: center; min-height: 2.65rem; font-weight: 650; }
 .site-primary { background: #204634; color: #fff; border-radius: .3rem; padding: .65rem 1rem; }
 .site-primary:hover { background: #2e5a44; }
