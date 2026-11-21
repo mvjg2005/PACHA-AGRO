@@ -175,18 +175,16 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     for (const r of ['', 'sembrar', 'sembrar/comparar', 'clima', 'comunidad', 'whatsapp', 'aprender', 'aprender/granizo', 'aprender/biblioteca', 'aprender/biblioteca/ficha-cultivo-quinua', 'avisos', 'cobertura', 'privacidad', 'terminos', 'ingresar', 'registro']) {
       await p.goto(`${BASE}/#/${r}`); await p.waitForTimeout(600)
       const metrics = await p.evaluate(() => {
+        const root = document.documentElement
+        const limit = root.clientWidth
         const nodes = [...document.querySelectorAll('body *')].map(el => {
           const b = el.getBoundingClientRect()
           const style = getComputedStyle(el)
           return { tag: el.tagName.toLowerCase(), cls: String(el.className || '').slice(0, 80), id: el.id, left: Math.round(b.left * 10) / 10, right: Math.round(b.right * 10) / 10, width: Math.round(b.width * 10) / 10, overflow: style.overflowX }
-        }).filter(x => x.right > innerWidth + 0.5 || x.left < -0.5).sort((a, b) => b.right - a.right).slice(0, 5)
-        const root = document.documentElement
-        const body = document.body
-        const rr = root.getBoundingClientRect()
-        const br = body.getBoundingClientRect()
-        return { width: root.scrollWidth, innerWidth, clientWidth: root.clientWidth, bodyWidth: body.scrollWidth, bodyClientWidth: body.clientWidth, rootRect: { left: rr.left, right: rr.right, width: rr.width }, bodyRect: { left: br.left, right: br.right, width: br.width }, scrollX, nodes }
+        }).filter(x => x.right > limit + 0.5 || x.left < -0.5).sort((a, b) => b.right - a.right).slice(0, 8)
+        return { scrollWidth: root.scrollWidth, clientWidth: limit, innerWidth, nodes }
       })
-      if (metrics.width > 320) bad.push(`${r || 'inicio'}:${JSON.stringify(metrics)}`)
+      if (metrics.scrollWidth > metrics.clientWidth + 1) bad.push(`${r || 'inicio'}:${JSON.stringify(metrics)}`)
     }
     assert(bad.length === 0, `desborde en ${bad.join(', ')}`)
   })
