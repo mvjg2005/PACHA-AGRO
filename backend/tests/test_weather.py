@@ -5,6 +5,7 @@ import httpx
 
 from app.data.catalog import get_municipality
 from app.services.weather import service
+from app.services.weather.nasa_power import parse_climatology
 from tests.conftest import mock_transport
 
 M = get_municipality("or-oruro")
@@ -65,3 +66,18 @@ def test_cache_avoids_repeated_calls():
     first = calls["n"]
     service.get_weather(M, "real", TODAY)
     assert calls["n"] == first == 3
+
+
+
+def test_nasa_climatology_fill_values_are_missing_not_zero():
+    data = {
+        "properties": {
+            "parameter": {
+                "FROST_DAYS": {"NOV": -999},
+                "PRECTOTCORR": {"NOV": -999},
+            }
+        }
+    }
+    parsed = parse_climatology(data)
+    assert parsed["frost_days"]["NOV"] is None
+    assert parsed["precip_mm_day"]["NOV"] is None
