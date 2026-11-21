@@ -187,7 +187,7 @@ class WeatherCache(Base):
     key: Mapped[str] = mapped_column(String(120), primary_key=True)
     payload: Mapped[str] = mapped_column(Text)
     fetched_at: Mapped[datetime] = mapped_column(DateTime)
-    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    expires_at: Mapped[datetime] = mapped_column(DateTime, index=True)
 
 
 class ChatState(Base):
@@ -195,4 +195,4 @@ class ChatState(Base):
     __tablename__ = "chat_state"
     key: Mapped[str] = mapped_column(String(120), primary_key=True)
     data: Mapped[str] = mapped_column(Text, default="{}")
-    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
