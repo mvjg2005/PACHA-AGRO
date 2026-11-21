@@ -274,3 +274,17 @@ class SenaIn(BaseModel):
     @classmethod
     def strip(cls, v: str) -> str:
         return v.strip()
+
+
+class AgentChatMessage(BaseModel):
+    role: Literal["user", "assistant", "system"]
+    content: str = Field(max_length=2000)
+
+
+class AgentChatIn(BaseModel):
+    message: str = Field(min_length=1, max_length=1000)
+    municipality_id: str | None = Field(default=None, max_length=60)
+    lat: float | None = Field(default=None, ge=-90, le=90)
+    lon: float | None = Field(default=None, ge=-180, le=180)
+    crop: str | None = Field(default=None, max_length=30)
+    history: list[AgentChatMessage] = Field(default_factory=list, max_length=12)

@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     # Asistente con IA (Claude). Sin ANTHROPIC_API_KEY funciona en modo básico (sin IA), igual de útil para contactos.
     anthropic_api_key: str = ""
     assistant_model: str = "claude-opus-5-5"
+    # Alternativa para Pacha IA si no hay clave de Anthropic (opcional).
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-2.5-flash"
 
     # Fuente meteorológica oficial con contrato normalizado (p. ej. un servicio de SENAMHI habilitado).
     # No existe una API pública documentada: solo se usa si se configura. Ver docs/FUENTES_DATOS.md.

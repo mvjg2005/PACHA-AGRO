@@ -234,3 +234,7 @@ body { background: var(--color-surface); color: var(--color-tinta); font-family:
 .article-cover svg { min-width: 0; }
 .mobile-quick { display: none; }
 @media (max-width: 40rem) { .mobile-quick { display: grid; } }
+
+/* Pacha IA: botón flotante sobre la barra inferior del celular. */
+.pacha-fab { bottom: calc(4.75rem + env(safe-area-inset-bottom)); }
+@media (min-width: 80rem) { .pacha-fab { bottom: 1.5rem; } }

@@ -43,6 +43,12 @@ const PATHS = {
   notebook: 'M4 4h12a2 2 0 0 1 2 2v14H6a2 2 0 0 1-2-2zM8 8h6M8 12h6M18 8h2M18 12h2',
   scale: 'M12 3v18M7 21h10M5 7h14M5 7l-3 7a3 3 0 0 0 6 0zM19 7l-3 7a3 3 0 0 0 6 0z',
   coins: 'M9 14a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM18.1 10.4A6 6 0 1 1 10.3 18M7 6h1v4M16.7 13.9l.7.7-2.8 2.8',
+  mic: 'M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3zm5 9a5 5 0 0 1-10 0M12 16v5M8 21h8',
+  micOff: 'M1 1l22 22M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V5a3 3 0 0 0-5.68-1.33M19 11a7 7 0 0 1-1.16 3.86M12 18a6.99 6.99 0 0 1-7-7M12 18v3M8 21h8',
+  volumeMute: 'M11 5L6 9H2v6h4l5 4V5zm12 4l-6 6m0-6l6 6',
+  send: 'M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z',
+  refresh: 'M23 4v6h-6M1 20v-6h6M3.5 9a9 9 0 0 1 14.8-3.4L23 10M1 14l4.7 4.4A9 9 0 0 0 20.5 15',
+  chevronDown: 'M6 9l6 6 6-6',
 }
 export type IconName = keyof typeof PATHS
 

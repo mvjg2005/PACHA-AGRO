@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { BottomNav } from './components/BottomNav'
+import { PachaIA } from './components/PachaIA'
 import { SiteFooter, SiteHeader } from './components/SiteChrome'
 import { Loading } from './components/ui'
 import { useRoute } from './lib/router'
@@ -107,6 +108,7 @@ export default function App() {
       </main>
       <SiteFooter />
       <BottomNav current={nav} />
+      <PachaIA />
     </div>
   )
 }

@@ -54,6 +54,7 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 | **Mi campo** (inspirado en apps como Plantix y FieldMargin): revisar una planta con una **foto** (posibles causas, qué verificar, primeras medidas sin químicos y técnicos de la zona), **calculadoras** (ganancia, rendimiento requerido, precio sin pérdida, presupuesto de insumos, mezcla según la etiqueta; con quintales y arrobas), **condiciones para fumigar** hora por hora, **fichas de cultivo con lectura en voz alta** y **parcelas con cuaderno de campo** (superficie medida caminando con GPS, gastos, cosecha, ventas, balance y rendimiento) | Sí. La revisión por foto usa IA con `ANTHROPIC_API_KEY`; sin ella ofrece una guía por síntomas. La foto no se guarda. Nunca se indican productos ni dosis |
 | Bienvenida en la primera visita (cultivos, perfil y ubicación) | Sí; se puede saltar |
 | **Señas que se miden** y **Pachagrama digital**: registro de bioindicadores andinos, comparación con lluvia y heladas medidas por satélite (terciles desde 2001), tabla de aciertos frente al azar por departamento | Sí, con datos reales de NASA POWER. Los registros de ejemplo solo aparecen con `SEED_DEMO=true` y están marcados |
+| **Pacha IA**: asistente flotante por **voz y texto** en todas las pantallas (micrófono y lectura en voz alta del navegador), con el clima real del municipio, técnicos del directorio con WhatsApp y respuestas con formato | Sí. Redacta con Claude (`ANTHROPIC_API_KEY`) o Gemini (`GEMINI_API_KEY`); sin claves responde el motor local con los mismos datos reales. Integrado desde el prototipo hecho con Antigravity |
 | **Asesoría con IA**: responde preguntas del campo y recomienda técnicos/ingenieros agrónomos (WhatsApp, llamada, correo) y sitios especializados (SENAMHI, INIAF, FAO Ecocrop, PlantwisePlus, EOSDA, OneSoil, Windy, Meteoblue…) | Sí: con `ANTHROPIC_API_KEY` usa IA; sin ella, respuesta automática básica. Los contactos los elige el servidor del directorio (solo técnicos con consentimiento, cargados por el administrador); la IA nunca inventa teléfonos ni enlaces |
 | Adaptador para fuente meteorológica oficial con contrato normalizado | Sí: listo; se activa con `OFFICIAL_WEATHER_URL` |
 | Avisos oficiales SENAMHI | No: no integrados (ver [docs/FUENTES_DATOS.md](docs/FUENTES_DATOS.md)); se enlaza al sitio oficial |
@@ -133,7 +134,7 @@ npx playwright install chromium
 npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **127/127** backend, **12/12** unitarias frontend, **33/33** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **137/137** backend, **16/16** unitarias frontend, **34/34** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Auditoría y presentación
 

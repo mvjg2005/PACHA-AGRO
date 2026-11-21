@@ -10,7 +10,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.core.config import check_production, get_settings
 from app import db as dbmod
-from app.routers import admin, advice, auth, catalog, communities, education, field, notices, senas, recommendations, whatsapp
+from app.routers import admin, advice, agent, auth, catalog, communities, education, field, notices, senas, recommendations, whatsapp
 
 
 @asynccontextmanager
@@ -33,7 +33,7 @@ async def security_headers(request: Request, call_next):
     resp.headers["X-Content-Type-Options"] = "nosniff"
     resp.headers["X-Frame-Options"] = "DENY"
     resp.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    resp.headers["Permissions-Policy"] = "geolocation=(self), camera=(), microphone=()"
+    resp.headers["Permissions-Policy"] = "geolocation=(self), camera=(), microphone=(self)"
     if s.environment == "production":
         resp.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     return resp
@@ -50,7 +50,7 @@ async def validation_handler(request: Request, exc: RequestValidationError):
 
 
 for r in (auth.router, catalog.router, recommendations.router, communities.router, admin.router, education.router,
-          notices.router, advice.router, field.router, senas.router, whatsapp.router):
+          notices.router, advice.router, field.router, senas.router, agent.router, whatsapp.router):
     app.include_router(r)
 
 

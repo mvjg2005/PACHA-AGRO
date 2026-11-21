@@ -604,6 +604,21 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     assert(p.errors.length === 0, p.errors.join(';'))
   })
 
+  await test('Pacha IA: chat flotante con formato (sin asteriscos), datos de la zona y técnicos', async () => {
+    const p = await newPage()
+    await p.addInitScript(() => { localStorage.setItem('agb_municipality', 'or-challapata'); localStorage.setItem('agb_agent_voice', 'false') })
+    await p.goto(BASE)
+    await p.getByTestId('pacha-open').click()
+    await p.getByTestId('pacha-input').fill('¿Puedo sembrar quinua?'); await p.keyboard.press('Enter')
+    await p.waitForFunction(() => document.querySelectorAll('[data-testid=pacha-log] li').length >= 2, null, { timeout: 60000 })
+    const log = await p.getByTestId('pacha-log').innerText()
+    assert(!log.includes('**'), 'quedan asteriscos en la respuesta')
+    assert(log.includes('Challapata') && /WhatsApp/.test(log), 'falta la zona o el técnico')
+    await p.getByRole('button', { name: 'Cerrar Pacha IA' }).click()
+    assert(await p.evaluate(() => document.documentElement.scrollWidth) <= 360, 'desborde horizontal')
+    assert(p.errors.length === 0, p.errors.join(';'))
+  })
+
   await browser.close()
   fs.writeFileSync(path.join(OUT, 'resultados.json'), JSON.stringify(results, null, 2))
   const failed = results.filter(r => !r.ok).length
