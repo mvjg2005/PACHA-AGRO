@@ -199,3 +199,13 @@ def test_confirmed_community_frost_report_marks_caution():
     frost = next(c for c in r["criteria"] if c["id"] == "helada")
     assert frost["status"] == "amarillo"
     assert "reporte(s) comunitario(s)" in frost["explanation"]
+
+
+def test_frost_reports_are_included_even_when_only_climatology_is_available():
+    w = wx([3] * 7, available=False, frost_days=3)
+    w.community_frost_reports = 2
+    r = run(w)
+    frost = next(c for c in r["criteria"] if c["id"] == "helada")
+    assert frost["status"] == "amarillo"
+    assert frost["data_kind"] == "climatologia"
+    assert "reporte(s) comunitario(s)" in frost["explanation"]
