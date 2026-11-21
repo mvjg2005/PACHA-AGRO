@@ -39,7 +39,9 @@ class RateLimiter:
                     self._hits.pop(oldest, None)
 
     def reset(self) -> None:
-        self._hits.clear()
+        with self._lock:
+            self._hits.clear()
+            self._checks = 0
 
 
 login_limiter = RateLimiter(max_calls=8, per_seconds=300)
