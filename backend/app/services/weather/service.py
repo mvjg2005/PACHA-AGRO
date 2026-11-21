@@ -25,17 +25,31 @@ class _Cache:
     def __init__(self):
         self._data: dict = {}
         self._lock = threading.Lock()
+        self._writes = 0
+        self._max_entries = 512
 
     def get(self, key):
         with self._lock:
             item = self._data.get(key)
             if item and item[0] > time.monotonic():
                 return item[1]
+            if item:
+                self._data.pop(key, None)
             return None
 
     def set(self, key, value, ttl):
+        now = time.monotonic()
         with self._lock:
-            self._data[key] = (time.monotonic() + ttl, value)
+            self._writes += 1
+            # Los cachés diarios crean claves nuevas; retira expiradas y mantiene un máximo.
+            if self._writes % 100 == 0 or len(self._data) >= self._max_entries:
+                for old_key, item in list(self._data.items()):
+                    if item[0] <= now:
+                        self._data.pop(old_key, None)
+            if len(self._data) >= self._max_entries and key not in self._data:
+                oldest = min(self._data, key=lambda k: self._data[k][0])
+                self._data.pop(oldest, None)
+            self._data[key] = (now + ttl, value)
 
     def clear(self):
         with self._lock:
