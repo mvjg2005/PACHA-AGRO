@@ -182,8 +182,8 @@ def test_observations_are_labeled_community_not_official(app_client):
     before_review = c.post("/api/recommendations", json={"municipality_id": "or-challapata", "crop": "quinua", "soil_moisture": "si", "irrigation": "secano"}).json()
     before_storm = next(x for x in before_review["criteria"] if x["id"] == "tormenta")
     assert before_storm["data_kind"] != "comunidad"
-    assert c.post(f"/api/observations/{obs[0]['id']}/review", json={"status": "confirmada"}, headers=rep).status_code == 409
     assert c.post(f"/api/observations/{obs[0]['id']}/review", json={"status": "confirmada"}, headers=rep).status_code == 200
+    assert c.post(f"/api/observations/{obs[0]['id']}/review", json={"status": "confirmada"}, headers=rep).status_code == 409
     # El reporte de granizo aparece en la recomendación como dato comunitario
     rec = c.post("/api/recommendations", json={"municipality_id": "or-challapata", "crop": "quinua", "soil_moisture": "si", "irrigation": "secano"}).json()
     storm = next(x for x in rec["criteria"] if x["id"] == "tormenta")
