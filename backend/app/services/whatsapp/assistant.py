@@ -197,10 +197,35 @@ def _attendance(db, user, intent, st: dict | None = None) -> str:
     comms = _user_communities(db, user)
     community_ids = [c.id for c in comms]
     now = local_now()
-    mt = db.get(Meeting, st.get("pending_meeting_id")) if st.get("pending_meeting_id") else None
+    pending_meeting_id = st.get("pending_meeting_id")
+    mt = db.get(Meeting, pending_meeting_id) if pending_meeting_id else None
 
-    # Si el estado local no existe (p. ej. reinicio), solo usar recordatorios ligados
-    # a reuniones vigentes, no el último mensaje histórico sin validar.
+    # Si el usuario respondió a una pregunta de asistencia, esa reunión debe ser
+    # la única candidata. No redirigir un SI/NO a otra reunión si fue cancelada.
+    if pending_meeting_id:
+        if (mt is None or mt.cancelled or mt.community_id not in community_ids
+                or mt.starts_at < now - timedelta(hours=6)):
+            st.pop("pending_meeting_id", None)
+            return "La reunión que consultó ya no está disponible. Vuelva a preguntar por la próxima reunión."
+    else:
+        # Tras reiniciar el proceso, solo asociar una respuesta si hay un recordatorio
+        # verificable para una reunión vigente de una comunidad donde sigue siendo miembro.
+        last = None
+        if community_ids:
+            last = db.scalar(
+                select(OutboundMessage)
+                .join(Meeting, OutboundMessage.meeting_id == Meeting.id)
+                .where(
+                    OutboundMessage.user_id == user.id,
+                    OutboundMessage.status.in_(("simulado", "enviado", "entregado", "leido")),
+                    Meeting.community_id.in_(community_ids),
+                    Meeting.cancelled.is_(False),
+                    Meeting.starts_at >= now - timedelta(hours=6),
+                )
+                .order_by(OutboundMessage.id.desc())
+            )
+        mt = db.get(Meeting, last.meeting_id) if last else None
+
     if (mt is None or mt.cancelled or mt.community_id not in community_ids
             or mt.starts_at < now - timedelta(hours=6)):
         last = None
