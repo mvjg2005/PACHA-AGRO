@@ -399,4 +399,4 @@ def test_meeting_with_timezone_offset_is_normalized_to_bolivia(app_client):
         headers=rep,
     )
     assert response.status_code == 201, response.text
-    assert response.json()["starts_at"] == local_expected.isoformat(timespec="minutes")
+    assert response.json()["starts_at"] == local_expected.isoformat(timespec="minutes") + "-04:00"
