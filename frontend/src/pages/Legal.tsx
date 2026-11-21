@@ -1,16 +1,18 @@
 import { PageTitle } from '../components/ui'
 
-/** Privacidad y términos (idea de PACHAAGRO, adaptado a los datos reales que usa AgroBolivia). */
+/** Privacidad y términos (adaptados al tratamiento que realiza el prototipo). */
 const DOCS = {
   privacidad: {
     icon: '', title: 'Política de privacidad',
     sections: [
-      ['Qué datos pedimos', 'Para crear una cuenta: nombre, número de celular y una clave. De forma opcional: su municipio y sus cultivos de interés. Registramos la fecha en que acepta recibir mensajes por WhatsApp. Para consultar el clima o la siembra no hace falta cuenta.'],
-      ['Para qué los usamos', 'Para su cuenta, para mostrarle los avisos de su zona y de sus cultivos, y para los recordatorios de su comunidad. No vendemos ni compartimos sus datos con fines publicitarios.'],
-      ['Quién ve su número', 'Los representantes de su comunidad solo ven los últimos 4 dígitos. Los demás miembros no ven su número.'],
-      ['WhatsApp', 'Solo enviamos recordatorios y avisos a quien los aceptó. Puede darse de baja escribiendo BAJA o desde Mi cuenta. Usaremos solo la plataforma oficial de WhatsApp Business; hoy el asistente es un simulador y no envía mensajes reales.'],
-      ['Seguridad', 'Las claves se guardan cifradas (nunca en texto). Las credenciales del servidor están fuera del código. Los permisos se revisan en el servidor.'],
-      ['Sus derechos', 'Puede pedir ver, corregir o borrar sus datos al administrador de la plataforma. El responsable del tratamiento y su contacto deben definirse antes de usar esta plataforma con personas reales; no publicamos datos de contacto ficticios.'],
+      ['Qué datos pedimos', 'Para crear una cuenta solicitamos nombre, número de celular y una clave. La clave no se guarda en texto legible: el servidor almacena un hash PBKDF2-SHA256 con sal. De forma opcional puede guardar municipio, cultivos de interés y consentimiento para WhatsApp.'],
+      ['Para qué los usamos', 'Usamos los datos para gestionar la cuenta, mostrar avisos de su zona y cultivos, organizar actividades comunitarias y guardar las observaciones que usted decida registrar. No vendemos datos ni los usamos con fines publicitarios.'],
+      ['Quién ve su información', 'Los permisos se aplican desde el servidor. Los representantes de comunidad solo ven los últimos 4 dígitos del celular de sus miembros. Las notas privadas de sus registros de señas no se muestran a otras personas. Las publicaciones comunitarias pueden ser visibles para los miembros autorizados de esa comunidad.'],
+      ['Ubicación y servicios meteorológicos', 'Cuando consulta el clima mediante GPS, el navegador obtiene sus coordenadas con su permiso y el servidor las utiliza para solicitar información meteorológica. El proyecto indica que las coordenadas GPS no se guardan en la base de datos; aun así, se envían al proveedor meteorológico para resolver la consulta. Si elige un municipio, se utiliza la ubicación de ese municipio.'],
+      ['Servicios externos e inteligencia artificial', 'El pronóstico y los datos históricos se consultan en servicios externos como Open-Meteo y NASA POWER. Si la Asesoría con IA está habilitada, el texto de su pregunta y el contexto necesario para responderla se envían a Anthropic. Si el análisis de una fotografía de planta con IA está habilitado, la imagen también se envía temporalmente al proveedor para procesarla. PACHA-AGRO no guarda la fotografía en su propia base de datos, pero no debe interpretarse como que la imagen nunca sale del servidor. Evite incluir nombres, teléfonos u otros datos personales en preguntas o fotografías. El tratamiento que haga cada proveedor se rige también por sus propias políticas.'],
+      ['WhatsApp', 'Solo se envían recordatorios o avisos a quienes dieron su consentimiento. Puede retirar el consentimiento desde Mi cuenta o escribiendo BAJA cuando el canal oficial esté conectado. En la configuración de demostración, WhatsApp es un simulador y no envía mensajes reales.'],
+      ['Seguridad', 'El servidor verifica permisos y almacena claves mediante hash criptográfico con sal, no mediante cifrado reversible. Se aplican controles de acceso y límites de intentos. Ningún sistema conectado a internet puede garantizar seguridad absoluta.'],
+      ['Sus derechos y contacto', 'Puede cambiar sus datos disponibles y eliminar su cuenta desde la plataforma. Antes de un piloto con personas reales, la organización responsable debe definir y publicar el nombre del responsable del tratamiento, un contacto funcional, plazos de conservación y el canal para solicitudes de acceso o corrección. Este prototipo todavía no publica un responsable ni contacto institucional confirmado.'],
     ],
   },
   terminos: {
