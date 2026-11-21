@@ -67,15 +67,26 @@ def _history(m: dict, today: date) -> dict | None:
 
 
 def _metric(daily: dict, k: str, c: int) -> float | None:
-    """Valor del indicador `k` en la campaña `c`, o None si faltan más del 10 % de los días."""
+    """Estima el indicador de campaña si hay al menos un 90 % de valores válidos.
+
+    Se valida la variable concreta (precipitación o temperatura mínima), no solo
+    la existencia de una fila diaria. Los pocos días faltantes se compensan
+    proporcionalmente; si superan el 10 %, el resultado queda sin datos.
+    """
     start, end = windows(c)[k]
     days = [d.isoformat() for d in _days_in(start, end)]
-    have = [daily[d] for d in days if d in daily]
-    if len(have) < 0.9 * len(days):
+    index = 1 if k == "lluvia" else 0
+    values = []
+    for day in days:
+        row = daily.get(day)
+        if isinstance(row, (list, tuple)) and len(row) > index and row[index] is not None:
+            values.append(row[index])
+    if len(values) < 0.9 * len(days):
         return None
     if k == "lluvia":
-        return round(sum(r for _, r in have if r is not None) * len(days) / len(have), 1)
-    return round(sum(1 for t, _ in have if t is not None and t < 0) * len(days) / len(have), 1)
+        return round(sum(values) * len(days) / len(values), 1)
+    frost_days = sum(1 for temperature in values if temperature < 0)
+    return round(frost_days * len(days) / len(values), 1)
 
 
 def _tercile(value: float, others: list[float]) -> tuple[float, float]:

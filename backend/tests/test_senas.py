@@ -47,6 +47,26 @@ def test_outcome_by_terciles(history):
     assert senas.outcome(m, 2024, TODAY, {})["lluvia"]["status"] == "sin_datos"
 
 
+def test_metric_checks_valid_values_of_each_variable():
+    from app.services.senas import _days_in, _metric, windows
+
+    # 11 de 91 temperaturas faltantes superan el 10 %: no se deben contar como días sin helada.
+    start, end = windows(2024)["helada"]
+    frost_days = [d.isoformat() for d in _days_in(start, end)]
+    frost_history = {day: [None if i < 11 else -1.0, 2.0] for i, day in enumerate(frost_days)}
+    assert _metric(frost_history, "helada", 2024) is None
+
+    # 16 de 151 lluvias faltantes superan el 10 % aunque todas las filas existan.
+    start, end = windows(2024)["lluvia"]
+    rain_days = [d.isoformat() for d in _days_in(start, end)]
+    rain_history = {day: [3.0, None if i < 16 else 1.0] for i, day in enumerate(rain_days)}
+    assert _metric(rain_history, "lluvia", 2024) is None
+
+    # Hasta el 10 % sí se estima proporcionalmente usando solo valores válidos.
+    valid_rain = {day: [3.0, None if i < 15 else 1.0] for i, day in enumerate(rain_days)}
+    assert _metric(valid_rain, "lluvia", 2024) == float(len(rain_days))
+
+
 def _post(c, h, **kw):
     return c.post("/api/senas/observaciones", json={"municipality_id": "or-challapata", **kw}, headers=h)
 
