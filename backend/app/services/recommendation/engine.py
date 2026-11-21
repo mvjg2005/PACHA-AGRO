@@ -306,9 +306,9 @@ def _rain(th, a: Answers, wx: WeatherView, fk) -> Criterion:
     if not (wx.forecast_available and wx.daily):
         return Criterion("lluvia", label, GRAY, "No hay pronóstico de lluvia disponible.", "sin_datos")
     # Un valor None significa que el proveedor no entregó el dato, no que no lloverá.
-    if any(d.get("precip_mm") is None for d in wx.daily):
+    if len(wx.daily) < 7 or any(d.get("precip_mm") is None for d in wx.daily):
         return Criterion("lluvia", label, GRAY,
-                         "El pronóstico no contiene datos de lluvia para todos los días; no podemos calcular el acumulado semanal.",
+                         "El pronóstico no contiene datos de lluvia para los siete días; no podemos calcular el acumulado semanal.",
                          "sin_datos", wx.forecast_source)
     vals = [float(d["precip_mm"]) for d in wx.daily]
     total, peak = sum(vals), max(vals)
