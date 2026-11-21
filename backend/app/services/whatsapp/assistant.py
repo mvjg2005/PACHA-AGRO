@@ -23,6 +23,7 @@ MENU = ("👋 Hola, soy el asistente de AgroBolivia.\nEscriba un número o su pr
 # Estado de conversación guardado en la base de datos (tabla chat_state): sobrevive a reinicios y
 # despliegues, algo necesario con WhatsApp real. Expira tras 30 minutos sin mensajes.
 _TTL = 30 * 60
+_STATE_SAVE_COUNT = 0
 
 
 def _load_state(db: Session, key: str) -> dict:
@@ -41,9 +42,16 @@ def _load_state(db: Session, key: str) -> dict:
 def _save_state(db: Session, key: str, st: dict) -> None:
     import json
 
+    global _STATE_SAVE_COUNT
     from app.models import ChatState, utcnow
+    now = utcnow()
+    _STATE_SAVE_COUNT += 1
+    # Las conversaciones anónimas también se guardan para continuidad del diálogo.
+    # Purgar diariamente evita que sesiones abandonadas crezcan indefinidamente.
+    if _STATE_SAVE_COUNT % 100 == 0:
+        db.query(ChatState).filter(ChatState.updated_at < now - timedelta(days=1)).delete(synchronize_session=False)
     row = db.get(ChatState, key) or ChatState(key=key)
-    row.data, row.updated_at = json.dumps(st, ensure_ascii=False), utcnow()
+    row.data, row.updated_at = json.dumps(st, ensure_ascii=False), now
     db.merge(row)
     db.commit()
 
