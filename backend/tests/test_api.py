@@ -349,3 +349,20 @@ def test_unsolicited_yes_does_not_confirm_the_next_meeting(app_client):
     assert "No encontré una reunión vigente" in reply
     current = c.get(f"/api/communities/{cid}/meetings", headers=farmer).json()[0]
     assert current["id"] == meeting["id"] and current["my_response"] is None
+
+
+def test_aware_meeting_timestamp_is_converted_to_bolivia_time(app_client):
+    from datetime import timezone
+    from zoneinfo import ZoneInfo
+
+    c = app_client
+    cid, rep = make_community(c)
+    aware = datetime.now(timezone.utc).replace(microsecond=0) + timedelta(days=3)
+    expected = aware.astimezone(ZoneInfo("America/La_Paz")).replace(tzinfo=None)
+    response = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Hora con zona", "place": "Sede", "starts_at": aware.isoformat()},
+        headers=rep,
+    )
+    assert response.status_code == 201, response.text
+    assert response.json()["starts_at"] == expected.isoformat(timespec="minutes")
