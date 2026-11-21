@@ -1,10 +1,11 @@
 """Fuentes meteorológicas y manejo de datos faltantes."""
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 
 import httpx
 
 from app.data.catalog import get_municipality
-from app.services.weather import service
+from app.services.weather import metno, service
+from app.services.weather.base import Block, DailyValue
 from tests.conftest import mock_transport
 
 M = get_municipality("or-oruro")
@@ -88,3 +89,37 @@ def test_malformed_provider_payload_does_not_break_weather():
     w = service.get_weather(M, "real", TODAY)
     assert w["forecast"]["available"] is False
     assert w["forecast"]["error"]
+
+
+def test_metno_parser_builds_daily_and_hourly_forecast():
+    base = datetime(2026, 11, 21, 4, 0, tzinfo=timezone.utc)  # 00:00 en Bolivia
+    series = []
+    for i in range(8):  # 48 horas cada 6 h
+        moment = base + timedelta(hours=6 * i)
+        series.append({
+            "time": moment.isoformat().replace("+00:00", "Z"),
+            "data": {
+                "instant": {"details": {"air_temperature": 10 + i, "relative_humidity": 60, "wind_speed": 2}},
+                "next_6_hours": {"summary": {"symbol_code": "rain"}, "details": {"precipitation_amount": 1.5}},
+            },
+        })
+    block = metno.parse_forecast({"properties": {"timeseries": series}}, TODAY)
+    assert block.available and block.source == metno.SOURCE
+    assert len(block.daily) == 2
+    assert block.daily[0].tmin == 10 and block.daily[1].tmax == 17
+    assert block.daily[0].weather_code == 61
+    assert block.extra["hourly"] and block.extra["license"]
+
+
+def test_open_meteo_limit_falls_back_to_metno(monkeypatch):
+    fake = Block(
+        available=True, source=metno.SOURCE, kind="pronostico",
+        daily=[DailyValue(date=TODAY.isoformat(), tmin=5, tmax=18, precip_mm=1.0, weather_code=61)],
+        extra={"license": metno.LICENSE},
+    )
+    monkeypatch.setattr(service.metno, "fetch_forecast", lambda *args, **kwargs: fake)
+    use(open_meteo="limit")
+    w = service.get_weather(M, "real", TODAY)
+    assert w["forecast"]["available"] is True
+    assert w["forecast"]["source"] == metno.SOURCE
+    assert w["forecast"]["extra"]["fallback_from"]

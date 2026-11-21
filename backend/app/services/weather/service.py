@@ -9,7 +9,7 @@ from datetime import date, datetime, timedelta, timezone
 import httpx
 
 from app.core.time import local_today
-from app.services.weather import nasa_power, official, open_meteo
+from app.services.weather import metno, nasa_power, official, open_meteo
 from app.services.weather.base import Block, DailyValue, ProviderError
 from app.services.weather.simulated import simulated_forecast
 from app.services.weather.spray import spray_conditions
@@ -22,9 +22,9 @@ OFFICIAL_ALERTS = {
                "Consulte los avisos oficiales en senamhi.gob.bo o en sus canales oficiales.",
 }
 
-_TTL = {"season": 86400, "official": 900, "forecast": 3600, "recent": 6 * 3600, "climatology": 30 * 86400, "error": 300}
+_TTL = {"season": 86400, "official": 900, "forecast": 3600, "metno": 3600, "recent": 6 * 3600, "climatology": 30 * 86400, "error": 300}
 # Antigüedad máxima de un dato guardado que se puede mostrar cuando el proveedor falla (indicando su hora).
-_STALE_MAX = {"season": 30 * 86400, "official": 12 * 3600, "forecast": 12 * 3600, "recent": 3 * 86400, "climatology": 365 * 86400}
+_STALE_MAX = {"season": 30 * 86400, "official": 12 * 3600, "forecast": 12 * 3600, "metno": 12 * 3600, "recent": 3 * 86400, "climatology": 365 * 86400}
 logger = logging.getLogger("agrobolivia.weather")
 
 
@@ -174,27 +174,38 @@ def _cached(kind: str, key: tuple, fn):
     return value
 
 
-def _forecast(lat: float, lon: float, key: tuple) -> Block:
-    """Fuente oficial primero (si está configurada); si falla, Open-Meteo. Los errores quedan registrados."""
+def _forecast(lat: float, lon: float, key: tuple, today: date | None = None,
+              altitude: float | None = None) -> Block:
+    """Fuente oficial → Open-Meteo → MET Norway. Los errores quedan registrados."""
     from app.core.config import get_settings
 
     errors = []
     if get_settings().official_weather_url:
         o = _cached("official", key, lambda: official.fetch_official(lat, lon, get_client()))
-        if isinstance(o, Block):
+        if isinstance(o, Block) and o.available:
             return o
-        errors.append(o["_error"])
+        errors.append(o.get("_error", "La fuente oficial no entregó pronóstico.") if isinstance(o, dict) else "La fuente oficial no entregó pronóstico.")
+
     f = _cached("forecast", key, lambda: open_meteo.fetch_forecast(lat, lon, get_client()))
     if isinstance(f, Block) and f.extra.get("stale"):
         today = local_today().isoformat()
         f = replace(f, daily=[d for d in f.daily if d.date >= today])
-        if not f.daily:
-            return Block(available=False, source=open_meteo.SOURCE, kind="pronostico", error=f.extra["error_now"])
-    if isinstance(f, Block):
+    if isinstance(f, Block) and f.available:
         if errors:
             f.extra = {**f.extra, "fallback_from": errors}
         return f
-    errors.append(f["_error"])
+    errors.append(f.get("_error", "Open-Meteo no entregó pronóstico.") if isinstance(f, dict) else (f.error or "Open-Meteo no entregó pronóstico."))
+
+    # Respaldo gratuito y sin clave: MET Norway.
+    m = _cached("metno", (*key, altitude or ""),
+                lambda: metno.fetch_forecast(lat, lon, get_client(), today, altitude))
+    if isinstance(m, Block) and m.extra.get("stale"):
+        today = local_today().isoformat()
+        m = replace(m, daily=[d for d in m.daily if d.date >= today])
+    if isinstance(m, Block) and m.available:
+        m.extra = {**m.extra, "fallback_from": errors}
+        return m
+    errors.append(m.get("_error", "MET Norway no entregó pronóstico.") if isinstance(m, dict) else (m.error or "MET Norway no entregó pronóstico."))
     return Block(available=False, source=open_meteo.SOURCE, kind="pronostico", error=" ".join(errors))
 
 
@@ -208,7 +219,7 @@ def get_weather(municipality: dict, mode: str = "real", today: date | None = Non
         recent = Block(available=False, source="—", kind="simulado", error="No se usa en modo simulado.")
         clim = {"available": False}
     else:
-        forecast = _forecast(lat, lon, key)
+        forecast = _forecast(lat, lon, key, today, municipality.get("elevation"))
         # Los datos diarios de NASA dependen del día consultado: la fecha entra en la clave.
         r = _cached("recent", (*key, today.isoformat()), lambda: nasa_power.fetch_recent(lat, lon, get_client(), today))
         recent = r if isinstance(r, Block) else Block(available=False, source=nasa_power.SOURCE, kind="estimacion", error=r["_error"])

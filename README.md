@@ -30,7 +30,7 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 | Criterio | Qué aporta PACHA-AGRO |
 |---|---|
 | **Innovación (40)** | Mide el acierto de los bioindicadores andinos con datos satelitales, con la vara del azar. Se suman la revisión de plantas por foto con IA y la asesoría con técnicos reales. |
-| **Viabilidad técnica (30)** | Todo funciona con datos reales y gratuitos (Open-Meteo y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 121 pruebas de backend, 12 de frontend y 33 en navegador de celular. Desplegable en Render con un archivo. |
+| **Viabilidad técnica (30)** | Todo funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 127 pruebas de backend, 12 de frontend y 33 en navegador de celular. Desplegable en Render con un archivo. |
 | **Impacto (30)** | Productoras y productores del Altiplano, valles y llanos: decidir cuándo sembrar, revisar plantas, hacer cuentas, organizarse en comunidad y valorar su propio saber. Funciona en celulares sencillos, con poca señal, lectura en voz alta y sin registrarse para lo esencial. |
 
 ## Qué funciona hoy
@@ -39,7 +39,7 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 |---|---|
 | Página principal con navegación que se adapta a móvil, tableta y escritorio | Sí |
 | Selección de departamento → municipio → cultivo (9 departamentos, 32 municipios) | Sí |
-| Clima: pronóstico **Open-Meteo**, historial y climatología **NASA POWER**, riesgo de helada, tormentas | Sí: datos reales (con caché y respaldo) |
+| Clima: pronóstico **Open-Meteo**, respaldo **MET Norway**, historial y climatología **NASA POWER**, riesgo de helada, tormentas | Sí: datos reales (con caché y respaldo) |
 | Recomendación de siembra con factor decisivo, acción principal y fuentes | Sí: **Quinua en el Altiplano** (Oruro, Potosí, La Paz) · Papa y Maíz en modo *demostración* · Haba y Cebada sin reglas |
 | Registro e inicio de sesión de agricultores (celular + clave) | Sí |
 | Comunidades con aprobación del administrador; solicitudes de unión aprobadas por el representante | Sí |
@@ -133,7 +133,7 @@ npx playwright install chromium
 npm run test:e2e -- http://localhost:8000
 ```
 
-Últimos resultados registrados por el proyecto antes de la auditoría: **121/121** backend, **12/12** unitarias frontend y **33/33** extremo a extremo (también se documenta una ejecución contra PostgreSQL actualizado). Durante la auditoría se añadió una prueba de regresión para datos meteorológicos faltantes; aún debe ejecutarse junto con la suite completa en un entorno limpio. GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **127/127** backend, **12/12** unitarias frontend, **33/33** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Auditoría y presentación
 
@@ -143,7 +143,7 @@ npm run test:e2e -- http://localhost:8000
 
 - [docs/ARQUITECTURA.md](docs/ARQUITECTURA.md) — arquitectura, justificación tecnológica, mapa de navegación, pantallas, seguridad.
 - [docs/ALGORITMO.md](docs/ALGORITMO.md) — motor de recomendación, criterios, pesos y umbrales experimentales.
-- [docs/FUENTES_DATOS.md](docs/FUENTES_DATOS.md) — evaluación de SENAMHI, NASA POWER y Open-Meteo.
+- [docs/FUENTES_DATOS.md](docs/FUENTES_DATOS.md) — evaluación de SENAMHI, NASA POWER, Open-Meteo y MET Norway.
 - [docs/WHATSAPP.md](docs/WHATSAPP.md) — integración oficial, consentimiento, plantillas, costos y pasos para conectar.
 - [docs/PRUEBAS.md](docs/PRUEBAS.md) — casos de prueba y resultados.
 - [docs/DESPLIEGUE.md](docs/DESPLIEGUE.md) — despliegue en Render (recomendado) o Vercel.

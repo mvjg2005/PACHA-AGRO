@@ -4,7 +4,7 @@ Resultados documentados por el proyecto el 21-11-2026. El backend usa fixtures. 
 
 | Suite | Comando | Resultado |
 |---|---|---|
-| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **121/121** aprobadas |
+| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **127/127** aprobadas |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **12/12** aprobadas |
 | Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `npm run test:e2e -- http://localhost:8000` | **33/33** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
@@ -61,7 +61,8 @@ El servidor debe estar iniciado con el frontend compilado y `SEED_DEMO=true`, co
 | Recomendación | Fuera de calendario; ventana que cruza el año (maíz nov–ene) | 🔴; 🟡 en enero | `test_engine` |
 | Recomendación | Haba (sin reglas); quinua en llanos | ⚪ sin criterios | `test_engine`, e2e #3 |
 | Recomendación | Reporte comunitario de granizo influye | Criterio "tormenta" con `data_kind=comunidad` y texto "no es aviso oficial" | `test_api` |
-| Datos faltantes | Open-Meteo con límite diario | Error en español, riesgo por climatología, confianza baja | `test_weather`, `test_engine` |
+| Datos faltantes | Open-Meteo con límite diario | Se usa el respaldo MET Norway y se indica en Clima | `test_weather` |
+| Datos faltantes | Open-Meteo y MET Norway caídos | Error en español, riesgo por climatología, confianza baja | `test_weather`, `test_engine` |
 | Datos faltantes | Todas las fuentes caídas | Riesgo "desconocido", ⚪ | `test_weather` |
 | Datos faltantes | Interfaz sin pronóstico | Mensaje claro y botón «Intentar de nuevo» | e2e #4 |
 | Datos faltantes | Sin conexión al backend | "No hay conexión… Intente de nuevo" + botón | e2e #5 |
