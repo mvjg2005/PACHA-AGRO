@@ -98,11 +98,10 @@ async def receive(request: Request, db: Session = Depends(get_db)):
                 for reply in assistant.handle(db, f"wa:{phone}", msg["text"]["body"], user):
                     result = channel.send_text(phone, reply)
                     if result.get("status") == "fallido":
-                        # El estado de conversación y el ID se pudieron guardar antes del envío.
-                        # Quitar el ID para que Meta pueda reintentar el webhook.
-                        db.delete(db.get(InboundMessage, message_id))
-                        db.commit()
-                        raise HTTPException(502, "No se pudo entregar la respuesta de WhatsApp; se permite reintentar.")
+                        # La respuesta del asistente puede haber producido efectos persistidos
+                        # (asistencia, reporte o avance de conversación). Mantener el wamid evita
+                        # que un reintento de Meta repita esos efectos.
+                        logger.error("No se pudo entregar la respuesta de WhatsApp para el mensaje %s", message_id)
                 handled["messages"] += 1
     db.commit()
     return {"ok": True, **handled}
