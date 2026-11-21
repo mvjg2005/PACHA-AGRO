@@ -4,6 +4,7 @@ import time
 from datetime import date, timedelta
 
 from app.core.time import local_now
+from app.core.config import get_settings
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -62,8 +63,12 @@ def _user_location(db: Session, user: User | None, st: dict) -> dict | None:
 
 
 def _user_communities(db: Session, user: User) -> list[Community]:
-    return list(db.scalars(select(Community).join(Membership).where(
-        Membership.user_id == user.id, Membership.status == "approved", Community.status == "approved")))
+    query = select(Community).join(Membership).where(
+        Membership.user_id == user.id, Membership.status == "approved", Community.status == "approved"
+    )
+    if not get_settings().seed_demo:
+        query = query.where(Community.is_demo.is_(False))
+    return list(db.scalars(query))
 
 
 def handle(db: Session, key: str, text: str, user: User | None, mode: str = "real", today: date | None = None) -> list[str]:
@@ -215,7 +220,8 @@ def _save_report(db, user, pending) -> str:
     from app.routers.communities import create_observation
 
     c = db.get(Community, pending["community_id"])
-    if user is None or not user.is_active or c is None or c.status != "approved":
+    if (user is None or not user.is_active or c is None or c.status != "approved"
+            or (c.is_demo and not get_settings().seed_demo)):
         return "⚠️ Su cuenta o comunidad ya no está habilitada. No registré el reporte."
     membership = db.scalar(select(Membership).where(
         Membership.user_id == user.id, Membership.community_id == c.id, Membership.status == "approved"
