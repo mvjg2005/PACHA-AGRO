@@ -79,7 +79,8 @@ def test_pending_community_not_listed_until_admin_approves(app_client):
     assert c.get("/api/communities").json() == []
     # El solicitante aún no puede crear reuniones
     assert c.post(f"/api/communities/{cid}/meetings", json={"title": "X reunión", "place": "Sede", "starts_at": FUTURE}, headers=rep).status_code == 404
-    c.post(f"/api/admin/communities/{cid}/approve", headers=admin_headers(c))
+    assert c.post(f"/api/admin/communities/{cid}/approve", headers=admin_headers(c)).status_code == 200
+    assert c.post(f"/api/admin/communities/{cid}/approve", headers=admin_headers(c)).status_code == 409
     lst = c.get("/api/communities?department_id=oruro").json()
     assert len(lst) == 1 and lst[0]["representatives"] == ["Rosa Quispe"]
 
@@ -178,6 +179,7 @@ def test_observations_are_labeled_community_not_official(app_client):
     obs = c.get(f"/api/communities/{cid}/observations", headers=farmer).json()
     assert obs[0]["label"].startswith("Observación comunitaria") and obs[0]["review_status"] == "sin_revisar"
     assert c.post(f"/api/observations/{obs[0]['id']}/review", json={"status": "confirmada"}, headers=farmer).status_code == 403
+    assert c.post(f"/api/observations/{obs[0]['id']}/review", json={"status": "confirmada"}, headers=rep).status_code == 200
     assert c.post(f"/api/observations/{obs[0]['id']}/review", json={"status": "confirmada"}, headers=rep).status_code == 200
     # El reporte de granizo aparece en la recomendación como dato comunitario
     rec = c.post("/api/recommendations", json={"municipality_id": "or-challapata", "crop": "quinua", "soil_moisture": "si", "irrigation": "secano"}).json()
