@@ -5,6 +5,7 @@ from datetime import date, datetime, timezone
 
 import httpx
 
+from app.core.time import local_today
 from app.services.weather import nasa_power, official, open_meteo
 from app.services.weather.base import Block, ProviderError
 from app.services.weather.simulated import simulated_forecast
@@ -93,6 +94,7 @@ def _forecast(lat: float, lon: float, key: tuple) -> Block:
 
 
 def get_weather(municipality: dict, mode: str = "real", today: date | None = None) -> dict:
+    today = today or local_today()
     lat, lon = municipality["lat"], municipality["lon"]
     key = (round(lat, 2), round(lon, 2))
 
@@ -102,12 +104,12 @@ def get_weather(municipality: dict, mode: str = "real", today: date | None = Non
         clim = {"available": False}
     else:
         forecast = _forecast(lat, lon, key)
-        r = _cached("recent", key, lambda: nasa_power.fetch_recent(lat, lon, get_client(), today))
+        r = _cached("recent", (*key, today.isoformat()), lambda: nasa_power.fetch_recent(lat, lon, get_client(), today))
         recent = r if isinstance(r, Block) else Block(available=False, source=nasa_power.SOURCE, kind="estimacion", error=r["_error"])
         c = _cached("climatology", key, lambda: nasa_power.fetch_climatology(lat, lon, get_client()))
         clim = c if "_error" not in c else {"available": False, "error": c["_error"]}
 
-    month = (today or date.today()).month
+    month = today.month
     return {
         "mode": mode,
         "location": {k: municipality[k] for k in ("id", "name", "department_id", "department_name", "lat", "lon", "elevation", "region")},
