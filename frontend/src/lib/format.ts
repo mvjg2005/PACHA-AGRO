@@ -1,5 +1,4 @@
 const DIAS = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb']
-const MESES = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic']
 
 export function dayLabel(iso: string, today = new Date()): string {
   const [y, m, d] = iso.split('-').map(Number)
@@ -13,7 +12,7 @@ export function dayLabel(iso: string, today = new Date()): string {
 
 export function dateLong(iso: string): string {
   // Una fecha sin offset representa hora local de Bolivia; las marcas con offset son instantes UTC/absolutos.
-  const hasZone = /(?:Z|[+-]\\d{2}:\\d{2})$/i.test(iso)
+  const hasZone = /(?:Z|[+-]\d{2}:\d{2})$/i.test(iso)
   const d = new Date(hasZone ? iso : `${iso}-04:00`)
   if (isNaN(d.getTime())) return iso
   const parts = new Intl.DateTimeFormat('es-BO', {
