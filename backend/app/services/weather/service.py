@@ -63,6 +63,7 @@ class _Cache:
 
 cache = _Cache()
 _client: httpx.Client | None = None
+_DB_CACHE_WRITES = 0
 
 
 def get_client() -> httpx.Client:
@@ -123,6 +124,7 @@ def _db_get(dbkey: str):
 
 
 def _db_set(dbkey: str, value, ttl: int) -> None:
+    global _DB_CACHE_WRITES
     from app import db as dbmod
     from app.models import WeatherCache
     try:
@@ -131,6 +133,11 @@ def _db_set(dbkey: str, value, ttl: int) -> None:
             row = s.get(WeatherCache, dbkey) or WeatherCache(key=dbkey)
             row.payload, row.fetched_at, row.expires_at = _dump(value), now, now + timedelta(seconds=ttl)
             s.merge(row)
+            _DB_CACHE_WRITES += 1
+            if _DB_CACHE_WRITES % 100 == 0:
+                s.query(WeatherCache).filter(
+                    WeatherCache.expires_at < now - timedelta(days=7)
+                ).delete(synchronize_session=False)
             s.commit()
     except Exception:  # noqa: BLE001
         logger.warning("No se pudo guardar la caché persistente del clima", exc_info=True)
