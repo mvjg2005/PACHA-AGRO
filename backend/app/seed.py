@@ -1,7 +1,7 @@
 """Datos iniciales. Las cuentas y la comunidad de demostración son FICTICIAS y están marcadas is_demo=True."""
 from datetime import timedelta
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -15,6 +15,21 @@ DEMO_USERS = [
     ("+59170000001", "Representante Demo", "representative"),
     ("+59170000002", "Agricultora Demo", "member"),
 ]
+
+
+def _demo_data_complete(db: Session) -> bool:
+    user_ids = list(db.scalars(select(User.id).where(User.is_demo.is_(True))))
+    community_id = db.scalar(select(Community.id).where(Community.is_demo.is_(True)))
+    if len(user_ids) != len(DEMO_USERS) or community_id is None:
+        return False
+    memberships = db.scalar(select(func.count(Membership.id)).where(
+        Membership.community_id == community_id,
+        Membership.user_id.in_(user_ids),
+        Membership.status == "approved",
+    )) or 0
+    meetings = db.scalar(select(func.count(Meeting.id)).where(Meeting.community_id == community_id)) or 0
+    notices = db.scalar(select(func.count(Notice.id)).where(Notice.community_id == community_id)) or 0
+    return memberships == len(DEMO_USERS) and meetings >= 1 and notices >= 1
 
 
 def seed(db: Session) -> None:
@@ -34,8 +49,16 @@ def seed(db: Session) -> None:
             if not db.scalar(select(User.id).where(User.phone == s.admin_phone)):
                 raise
 
-    if not s.seed_demo or db.scalar(select(User.id).where(User.is_demo.is_(True))):
+    if not s.seed_demo:
         return
+    if db.scalar(select(User.id).where(User.is_demo.is_(True))) or db.scalar(
+        select(Community.id).where(Community.is_demo.is_(True))
+    ):
+        if _demo_data_complete(db):
+            return
+        raise RuntimeError(
+            "Los datos demo existentes están incompletos. Revise las cuentas, comunidad, membresías y contenido demo antes de iniciar."
+        )
 
     users = []
     for phone, name, _ in DEMO_USERS:
@@ -89,7 +112,5 @@ def seed(db: Session) -> None:
         db.commit()
     except IntegrityError:
         db.rollback()
-        demo_count = len(db.scalars(select(User.id).where(User.is_demo.is_(True))).all())
-        demo_community = db.scalar(select(Community.id).where(Community.is_demo.is_(True)))
-        if demo_count != len(DEMO_USERS) or demo_community is None:
+        if not _demo_data_complete(db):
             raise
