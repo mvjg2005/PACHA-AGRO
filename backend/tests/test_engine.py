@@ -209,3 +209,11 @@ def test_frost_reports_are_included_even_when_only_climatology_is_available():
     assert frost["status"] == "amarillo"
     assert frost["data_kind"] == "climatologia"
     assert "reporte(s) comunitario(s)" in frost["explanation"]
+
+
+def test_partial_rainfall_forecast_is_unknown_not_a_weekly_total():
+    w = wx([3] * 5)
+    r = run(w)
+    rain = next(c for c in r["criteria"] if c["id"] == "lluvia")
+    assert rain["status"] == "gris"
+    assert "siete días" in rain["explanation"]
