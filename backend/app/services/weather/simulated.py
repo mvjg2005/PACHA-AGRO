@@ -3,13 +3,14 @@ import hashlib
 import random
 from datetime import date, datetime, timedelta, timezone
 
+from app.core.time import local_now, local_today
 from app.services.weather.base import Block, DailyValue
 
 SOURCE = "SIMULACIÓN de AgroBolivia (datos ficticios para demostración)"
 
 
 def simulated_forecast(municipality: dict, today: date | None = None) -> Block:
-    today = today or date.today()
+    today = today or local_today()
     seed = int(hashlib.sha256(f"{municipality['id']}{today.isoformat()}".encode()).hexdigest()[:8], 16)
     rnd = random.Random(seed)
     elev = municipality.get("elevation", 3800)
@@ -28,6 +29,6 @@ def simulated_forecast(municipality: dict, today: date | None = None) -> Block:
         available=True, source=SOURCE, kind="simulado",
         fetched_at=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         daily=daily, current_temp=round((daily[0].tmin + daily[0].tmax) / 2, 1),
-        current_time=datetime.now().strftime("%Y-%m-%dT%H:%M"),
+        current_time=local_now().strftime("%Y-%m-%dT%H:%M"),
         soil_moisture=0.16, soil_moisture_unit="m3/m3 (SIMULADO)",
     )

@@ -275,8 +275,12 @@ function Indicators({ weather }: { weather: ReturnType<typeof useWeather> }) {
     const v = r.soil_moisture
     soil = { value: `${Math.round(v * 100)} %`, note: v >= 0.5 ? 'Buena' : v >= 0.3 ? 'Regular' : 'Baja', pct: v * 100, source: 'NASA POWER, capa superficial (índice)' }
   }
-  const pastRain = r.available ? r.daily.reduce((a, d) => a + (d.precip_mm ?? 0), 0) : null
-  const nextRain = f.available ? f.daily.reduce((a, d) => a + (d.precip_mm ?? 0), 0) : null
+  const rains = (days: Weather['forecast']['daily']) => {
+    const values = days.map(d => d.precip_mm).filter((v): v is number => v != null)
+    return values.length === days.length ? values.reduce((a, v) => a + v, 0) : null
+  }
+  const pastRain = r.available ? rains(r.daily) : null
+  const nextRain = f.available ? rains(f.daily) : null
   const frostDays = c.available ? c.frost_days_month ?? null : null
   const updated = new Date(wx.generated_at).toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })
   const fr = wx.frost_risk.level
@@ -301,10 +305,10 @@ function Indicators({ weather }: { weather: ReturnType<typeof useWeather> }) {
       <div className="grid grid-cols-1 gap-4 min-[30rem]:grid-cols-2 lg:grid-cols-4" data-testid="indicators">
         <Indicator icon="drop" label="Humedad del suelo" value={soil.value} note={soil.note} pct={soil.pct} color="var(--color-tint)" source={soil.source} />
         <Indicator icon="rain" label="Lluvia reciente" value={pastRain === null ? '—' : `${pastRain.toFixed(0)} mm`}
-          note={r.available ? `en ${r.daily.length} días` : 'Sin dato'} pct={pastRain === null ? null : (pastRain / 30) * 100} color="var(--color-secondary)"
+          note={pastRain === null ? (r.available ? 'Datos incompletos' : 'Sin dato') : `en ${r.daily.length} días`} pct={pastRain === null ? null : (pastRain / 30) * 100} color="var(--color-secondary)"
           source={r.available ? `NASA POWER, hasta el ${dayLabel(r.extra?.last_date ?? '')}` : 'Historial no disponible'} />
         <Indicator icon="cloud" label="Lluvia próxima" value={nextRain === null ? '—' : `${nextRain.toFixed(0)} mm`}
-          note={f.available ? 'en 7 días' : 'Sin pronóstico'} pct={nextRain === null ? null : (nextRain / 30) * 100} color="#5f3900"
+          note={nextRain === null ? (f.available ? 'Datos incompletos' : 'Sin pronóstico') : 'en 7 días'} pct={nextRain === null ? null : (nextRain / 30) * 100} color="#5f3900"
           source={f.available ? `Pronóstico ${sourceShort(wx)}` : 'El pronóstico no está disponible ahora'} />
         <Indicator icon="frost" label="Heladas en este mes" value={frostDays === null ? '—' : `${Math.round(frostDays)} días`}
           note="promedio histórico" pct={frostDays === null ? null : (frostDays / 30) * 100} color="var(--color-outline)"
