@@ -128,7 +128,7 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     assert(await p.locator('text=Solicitudes').count() === 0, 've "Solicitudes"')
     const r = await p.evaluate(async () => (await fetch('/api/communities/1/meetings', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + localStorage.getItem('agb_token') }, body: JSON.stringify({ title: 'Falsa', place: 'x lugar', starts_at: '2030-01-01T10:00:00' }) })).status)
     assert(r === 403, `API devolvió ${r}`)
-    await btn(p, /^✔ Sí$/).click(); await p.waitForSelector('text=Respuesta guardada')
+    await btn(p, /^Sí$/).click(); await p.waitForSelector('text=Respuesta guardada')
   })
 
   await test('Reuniones: el representante convoca una reunión y envía recordatorio (simulado)', async () => {
@@ -138,8 +138,8 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     await p.waitForSelector('text=Usted es representante verificado de esta comunidad.', { timeout: 7000 }).catch(async () => {
       const details = await p.evaluate(async () => {
         const token = localStorage.getItem('agb_token')
-        const me = await fetch('/api/me/communities', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()).catch(e => String(e))
-        return { url: location.href, body: document.body.innerText.slice(0, 1200), communities: me }
+        const communities = await fetch('/api/me/communities', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()).catch(e => String(e))
+        return { url: location.href, body: document.body.innerText.slice(0, 1000), communities }
       })
       throw new Error('La cuenta demo no aparece como representante aprobado: ' + JSON.stringify(details))
     })
@@ -191,7 +191,9 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
         const nodes = [...document.querySelectorAll('body *')].map(el => {
           const b = el.getBoundingClientRect()
           const style = getComputedStyle(el)
-          return { tag: el.tagName.toLowerCase(), cls: String(el.className || '').slice(0, 80), id: el.id, left: Math.round(b.left * 10) / 10, right: Math.round(b.right * 10) / 10, width: Math.round(b.width * 10) / 10, overflow: style.overflowX }
+          return { tag: el.tagName.toLowerCase(), cls: String(el.className || '').slice(0, 80),
+            left: Math.round(b.left * 10) / 10, right: Math.round(b.right * 10) / 10,
+            width: Math.round(b.width * 10) / 10, overflow: style.overflowX }
         }).filter(x => x.right > limit + 0.5 || x.left < -0.5).sort((a, b) => b.right - a.right).slice(0, 8)
         return { scrollWidth: root.scrollWidth, clientWidth: limit, innerWidth, nodes }
       })
