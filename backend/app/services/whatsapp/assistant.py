@@ -228,24 +228,6 @@ def _attendance(db, user, intent, st: dict | None = None) -> str:
 
     if (mt is None or mt.cancelled or mt.community_id not in community_ids
             or mt.starts_at < now - timedelta(hours=6)):
-        last = None
-        if community_ids:
-            last = db.scalar(
-                select(OutboundMessage)
-                .join(Meeting, OutboundMessage.meeting_id == Meeting.id)
-                .where(
-                    OutboundMessage.user_id == user.id,
-                    OutboundMessage.status.in_(("simulado", "enviado", "entregado", "leido")),
-                    Meeting.community_id.in_(community_ids),
-                    Meeting.cancelled.is_(False),
-                    Meeting.starts_at >= now - timedelta(hours=6),
-                )
-                .order_by(OutboundMessage.id.desc())
-            )
-        mt = db.get(Meeting, last.meeting_id) if last else None
-
-    if (mt is None or mt.cancelled or mt.community_id not in community_ids
-            or mt.starts_at < now - timedelta(hours=6)):
         st.pop("pending_meeting_id", None)
         return "No encontré una reunión vigente para confirmar."
     set_attendance(db, mt, user, "si" if intent == "yes" else "no", channel="whatsapp")
