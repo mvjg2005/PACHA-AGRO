@@ -20,7 +20,7 @@ export async function api<T = any>(path: string, opts: { method?: string; body?:
   const timer = setTimeout(() => ctrl.abort(), opts.timeoutMs ?? 25000)
   const headers: Record<string, string> = {}
   const token = getToken()
-  if (token) headers.Authorization = \`Bearer \${token}\`
+  if (token) headers.Authorization = `Bearer ${token}`
   if (opts.body !== undefined) headers['Content-Type'] = 'application/json'
   try {
     const res = await fetch(path, {
