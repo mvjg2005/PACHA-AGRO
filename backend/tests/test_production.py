@@ -157,8 +157,10 @@ def test_admin_temporary_password_must_be_changed(app_client):
 
 def test_production_problems_detected():
     from app.core.config import Settings, production_problems
-    bad = Settings(environment="production", secret_key="corta", cors_origins="*", database_url="sqlite:///x.db",
+    bad = Settings(environment="production", secret_key="x" * 32, cors_origins="*", database_url="sqlite:///x.db",
+                   
                    whatsapp_enabled=True, admin_password="123", seed_demo=True)
+    bad.secret_key = "corta"  # simula una configuración recibida desde una variable débil
     errors, warnings = production_problems(bad)
     assert len(errors) == 4 and len(warnings) == 2
     good = Settings(environment="production", secret_key="x" * 40, cors_origins="https://agro.example",
@@ -169,6 +171,7 @@ def test_production_problems_detected():
 def test_check_production_refuses_to_start(monkeypatch):
     from app.core import config
     monkeypatch.setattr(config.get_settings(), "environment", "production")
+    monkeypatch.setattr(config.get_settings(), "secret_key", "corta")
     with pytest.raises(RuntimeError, match="SECRET_KEY"):
         config.check_production()
     monkeypatch.setattr(config.get_settings(), "environment", "development")
