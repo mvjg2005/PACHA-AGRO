@@ -16,8 +16,8 @@ def chat(c, message, **kw):
 def test_status_and_local_greeting(app_client):
     s = app_client.get("/api/ai/agent/status").json()
     assert s["agent_name"] == "Pacha IA" and s["provider"] == "local"
-    d = chat(app_client, "Hola, ¿cómo estás?")
-    assert d["provider"] == "local" and "Pacha IA" in d["reply"]
+    d = chat(app_client, "Hola")
+    assert d["provider"] == "local" and "Pacha IA" in d["reply"] and "¿Cómo está usted?" in d["reply"]
     assert d["location"]["id"] == "or-challapata"  # municipio por defecto válido
     assert "**" not in d["speech_text"] and "Pacha IA" in d["speech_text"]
 
@@ -107,3 +107,21 @@ def test_microphone_allowed_for_voice(app_client):
 @pytest.mark.parametrize("msg", ["", "x" * 1001])
 def test_validation(app_client, msg):
     assert app_client.post("/api/ai/agent/chat", json={"message": msg}).status_code == 422
+
+
+@pytest.mark.parametrize("msg,expected", [
+    ("hola te amo", "cariño"),
+    ("hola hola como estas", "Muy bien, gracias por preguntar"),
+    ("gracias", "Con mucho gusto"),
+    ("chau", "Hasta pronto"),
+    ("¿eres humano?", "no una persona"),
+    ("hola, ¿va a helar?", "riesgo de helada es"),
+])
+def test_local_engine_converses_naturally(app_client, msg, expected):
+    d = chat(app_client, msg, municipality_id="or-challapata")
+    assert expected in d["reply"], d["reply"]
+
+
+def test_repeated_greeting_is_short(app_client):
+    d = chat(app_client, "hola", history=[{"role": "user", "content": "hola"}, {"role": "assistant", "content": "¡Hola!"}])
+    assert d["reply"].startswith("¡Hola de nuevo")

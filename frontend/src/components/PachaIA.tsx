@@ -41,6 +41,7 @@ export function PachaIA() {
   const [listening, setListening] = useState(false)
   const [speakingId, setSpeakingId] = useState<string | null>(null)
   const [voiceErr, setVoiceErr] = useState<string | null>(null)
+  const [provider, setProvider] = useState<string | null>(null)
   const endRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const recRef = useRef<ReturnType<typeof createSpeechRecognizer> | null>(null)
@@ -53,7 +54,11 @@ export function PachaIA() {
   useEffect(() => { setMsgs(prev => (prev.length <= 1 ? [welcome()] : prev)) }, [municipalityId, user?.id])
   useEffect(() => { if (open) endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }) }, [msgs, open, busy])
   useEffect(() => {
-    if (open) { setTimeout(() => inputRef.current?.focus(), 200); return }
+    if (open) {
+      setTimeout(() => inputRef.current?.focus(), 200)
+      if (provider === null) api<{ provider: string }>('/api/ai/agent/status').then(r => setProvider(r.provider)).catch(() => setProvider('desconocido'))
+      return
+    }
     stopSpeaking(); setSpeakingId(null); recRef.current?.stop(); setListening(false)
   }, [open])
   useEffect(() => {
@@ -152,6 +157,7 @@ export function PachaIA() {
               </div>
             </header>
 
+            {provider === 'local' && <p className="border-b border-linea bg-[var(--color-surface-low)] px-3 py-1.5 text-[11px] text-musgo" data-testid="pacha-basic">Modo básico: respuestas automáticas con datos reales. La conversación libre con IA se activa cuando el administrador configura la clave de IA.</p>}
             {listening && <p className="flex items-center gap-2 border-b border-rojo/20 bg-rojo-50 px-3 py-1.5 text-xs font-semibold text-rojo" role="status"><span className="h-2 w-2 animate-ping rounded-full bg-rojo" />Le escucho… hable con claridad</p>}
             {voiceErr && <p className="border-b border-rojo/20 bg-rojo-50 px-3 py-1.5 text-xs text-rojo" role="alert">{voiceErr}</p>}
 
