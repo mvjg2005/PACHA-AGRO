@@ -163,7 +163,7 @@ def _next_meeting(db, user, st: dict) -> str:
     if not comms:
         return "Aún no es miembro aprobado de ninguna comunidad."
     mt = db.scalar(select(Meeting).where(Meeting.community_id.in_([c.id for c in comms]), Meeting.cancelled.is_(False),
-                                         Meeting.starts_at >= datetime.now() - timedelta(hours=2)).order_by(Meeting.starts_at))
+                                         Meeting.starts_at >= local_now() - timedelta(hours=2)).order_by(Meeting.starts_at))
     if not mt:
         return "No hay reuniones programadas en su comunidad."
     st["pending_meeting_id"] = mt.id
