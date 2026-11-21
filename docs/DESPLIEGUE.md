@@ -16,7 +16,9 @@ Dos opciones configuradas en el repositorio. **Recomendada: Render** (servidor c
 El archivo `render.yaml` (Blueprint) crea:
 - **agrobolivia**: servicio web que construye el `Dockerfile` (compila el frontend y arranca FastAPI, que sirve web + API).
 - **agrobolivia-db**: PostgreSQL. Su URL se pasa sola como `DATABASE_URL`.
+- `ENVIRONMENT=production` activa validaciones estrictas de seguridad.
 - `SECRET_KEY` se genera automáticamente.
+- `SEED_DEMO=false` evita cuentas públicas conocidas y comunidades ficticias en producción.
 
 ## Pasos
 
@@ -25,9 +27,9 @@ El archivo `render.yaml` (Blueprint) crea:
 3. **New + → Blueprint** → elija el repositorio `mvjg2005/PACHA-AGRO` → Render lee `render.yaml`.
 4. Le pedirá los valores que no están en el archivo:
    - `ADMIN_PHONE`: su celular con prefijo, ej. `+59171234567`
-   - `ADMIN_PASSWORD`: una clave segura
+   - `ADMIN_PASSWORD`: una clave segura de al menos 12 caracteres
 5. **Apply / Deploy Blueprint**. La primera construcción tarda unos minutos.
-6. Abra la URL `https://agrobolivia-XXXX.onrender.com`. Verifique `…/api/health` → `{"status":"ok"}`.
+6. Abra la URL `https://agrobolivia-XXXX.onrender.com`. Verifique `…/api/health` → `{"status":"ok","database":"ok"}`.
 7. Cada `git push` a `main` vuelve a desplegar automáticamente.
 
 ## Plan gratuito: tenga en cuenta
@@ -77,10 +79,11 @@ Configuración ya incluida en el repositorio: `vercel.json`, `api/index.py`, `re
 
    | Variable | Valor |
    |---|---|
-   | `SECRET_KEY` | un texto largo y aleatorio (ver abajo) |
+   | `ENVIRONMENT` | `production` |
+   | `SECRET_KEY` | un texto aleatorio de al menos 32 caracteres (ver abajo) |
    | `ADMIN_PHONE` | su celular con prefijo, ej. `+59171234567` |
-   | `ADMIN_PASSWORD` | una clave segura para el administrador |
-   | `SEED_DEMO` | `false` en producción. Use `true` para pruebas con cuentas ficticias. |
+   | `ADMIN_PASSWORD` | una clave segura de al menos 12 caracteres para el administrador |
+   | `SEED_DEMO` | `false` en producción. Use `true` solo en un entorno de demostración aislado. |
 
    Para generar `SECRET_KEY`:
    ```bash
@@ -90,7 +93,7 @@ Configuración ya incluida en el repositorio: `vercel.json`, `api/index.py`, `re
 6. Agregue la base de datos: en el proyecto → **Storage** → **Create Database** → **Neon (Postgres)** → conéctela al proyecto. Vercel crea la variable `DATABASE_URL` automáticamente.
    *Si su integración crea la variable con otro nombre (p. ej. `POSTGRES_URL`), agregue manualmente `DATABASE_URL` con el mismo valor.*
 7. **Deployments → … → Redeploy** para que tome `DATABASE_URL`. Las tablas y los datos de demostración se crean solos en la primera petición.
-8. Verifique: `https://<su-proyecto>.vercel.app/api/health` debe responder `{"status":"ok"}`.
+8. Verifique: `https://<su-proyecto>.vercel.app/api/health` debe responder `{"status":"ok","database":"ok"}`.
 
 ## Rama de producción
 
