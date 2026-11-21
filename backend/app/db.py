@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from app.core.config import get_settings
@@ -29,10 +29,20 @@ def _make_engine(url: str):
 
 
 def init_db() -> None:
-    """Crea tablas y datos iniciales; los errores reales abortan el arranque."""
+    """Crea tablas y datos iniciales; solo tolera una carrera si las tablas existen."""
+    from sqlalchemy.exc import SQLAlchemyError
+
     from app.seed import seed
 
-    Base.metadata.create_all(engine)
+    try:
+        Base.metadata.create_all(engine)
+    except SQLAlchemyError:
+        # Otra instancia puede haber creado las tablas justo antes. No ocultar
+        # fallos de conexión o DDL: comprobar que el esquema completo ya existe.
+        existing = set(inspect(engine).get_table_names())
+        expected = set(Base.metadata.tables)
+        if not expected.issubset(existing):
+            raise
     with SessionLocal() as db:
         seed(db)
 
