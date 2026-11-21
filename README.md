@@ -62,7 +62,7 @@ Nada se presenta como algo que no es: los datos **simulados**, las **observacion
 
 ## Ejecutar (5 minutos)
 
-Requisitos: Python 3.11+ y Node.js 18+.
+Requisitos: Python 3.11+, Node.js 18+ y npm. Para la suite E2E también se instala Chromium mediante Playwright.
 
 ```bash
 cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && cp .env.example .env
@@ -127,10 +127,17 @@ cd frontend && npm test
 ```
 
 ```bash
+# Desde la raíz del repositorio: instala Playwright (una sola vez)
+npm install
+npx playwright install chromium
 node e2e/run.cjs http://localhost:8000
 ```
 
 Resultados actuales: **121/121** backend, **12/12** unitarias frontend, **33/33** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+
+## Auditoría y presentación
+
+- [docs/AUDITORIA_ABSTRACTHON.md](docs/AUDITORIA_ABSTRACTHON.md) — evaluación frente a los 3 criterios de Abstracthon, hallazgos, MVP recomendado, guion de 4 minutos y próximos pasos.
 
 ## Documentación
 
