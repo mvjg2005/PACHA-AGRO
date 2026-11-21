@@ -2,7 +2,9 @@
 import hashlib
 import hmac
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+
+import pytest
 
 from tests.conftest import admin_headers, register
 
@@ -288,11 +290,113 @@ def test_webhook_signature_verification(app_client, monkeypatch):
     body = json.dumps({"entry": [{"changes": [{"value": {"messages": [{"from": "59171234567", "type": "text", "text": {"body": "hola"}}]}}]}]}).encode()
     bad = app_client.post("/api/whatsapp/webhook", content=body, headers={"X-Hub-Signature-256": "sha256=bad", "Content-Type": "application/json"})
     assert bad.status_code == 401
+    malformed = b"{"
+    malformed_sig = "sha256=" + hmac.new(b"shh", malformed, hashlib.sha256).hexdigest()
+    malformed_response = app_client.post(
+        "/api/whatsapp/webhook", content=malformed,
+        headers={"X-Hub-Signature-256": malformed_sig, "Content-Type": "application/json"},
+    )
+    assert malformed_response.status_code == 400
+
+    class FakeChannel:
+        connected = True
+
+        def send_text(self, to, text):
+            return "simulado"
+
+    monkeypatch.setattr("app.routers.whatsapp.get_channel", lambda: FakeChannel())
     sig = "sha256=" + hmac.new(b"shh", body, hashlib.sha256).hexdigest()
-    ok = app_client.post("/api/whatsapp/webhook", content=body, headers={"X-Hub-Signature-256": sig, "Content-Type": "application/json"})
-    assert ok.status_code == 200  # canal = simulador (sin token), no se envía nada real
+    ok = app_client.post(
+        "/api/whatsapp/webhook", content=body,
+        headers={"X-Hub-Signature-256": sig, "Content-Type": "application/json"},
+    )
+    assert ok.status_code == 200
 
 
 def test_security_headers(app_client):
     r = app_client.get("/api/health")
     assert r.headers["X-Content-Type-Options"] == "nosniff" and r.headers["X-Frame-Options"] == "DENY"
+
+
+
+def test_login_rate_limit_applies_to_ip_across_phone_numbers(app_client, monkeypatch):
+    from app.core.ratelimit import login_ip_limiter
+
+    monkeypatch.setattr(login_ip_limiter, "max_calls", 2)
+    login_ip_limiter.reset()
+    phones = ["71234567", "72234567", "73234567"]
+    statuses = [
+        app_client.post("/api/auth/login", json={"phone": phone, "password": "wrong"}).status_code
+        for phone in phones
+    ]
+    assert statuses == [401, 401, 429]
+
+
+def test_production_settings_reject_insecure_defaults():
+    from app.core.config import Settings, validate_runtime_settings
+
+    with pytest.raises(RuntimeError):
+        validate_runtime_settings(Settings(environment="production"))
+    validate_runtime_settings(Settings(
+        environment="production",
+        secret_key="s" * 48,
+        admin_password="AdminSecurePassword2026!",
+        seed_demo=False,
+    ))
+
+
+def test_whitespace_only_community_name_is_rejected(app_client):
+    user = register(app_client, "78888888", "Persona Prueba")
+    response = app_client.post(
+        "/api/communities",
+        json={"name": "   ", "municipality_id": "or-oruro"},
+        headers=user,
+    )
+    assert response.status_code == 422
+
+
+def test_whatsapp_yes_without_attendance_context_does_not_mark_next_meeting(app_client):
+    c = app_client
+    cid, rep = make_community(c)
+    farmer = join_and_approve(c, cid, rep)
+    created = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Asamblea futura", "place": "Sede", "starts_at": FUTURE},
+        headers=rep,
+    )
+    assert created.status_code == 201
+    reply = chat(c, "si", farmer)[0]
+    assert "No encontré una reunión vigente" in reply
+    meeting = c.get(f"/api/communities/{cid}/meetings", headers=farmer).json()[0]
+    assert meeting["my_response"] is None
+
+
+def test_whatsapp_meeting_question_binds_yes_to_that_meeting(app_client):
+    c = app_client
+    cid, rep = make_community(c)
+    farmer = join_and_approve(c, cid, rep)
+    created = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Asamblea futura", "place": "Sede", "starts_at": FUTURE},
+        headers=rep,
+    )
+    assert created.status_code == 201
+    assert "Asamblea futura" in chat(c, "¿Cuándo es la reunión de mi comunidad?", farmer)[0]
+    assert "Registramos que SÍ" in chat(c, "si", farmer)[0]
+    meeting = c.get(f"/api/communities/{cid}/meetings", headers=farmer).json()[0]
+    assert meeting["my_response"] == "si"
+
+
+def test_meeting_with_timezone_offset_is_normalized_to_bolivia(app_client):
+    c = app_client
+    cid, rep = make_community(c)
+    starts_utc = datetime.now(timezone.utc) + timedelta(days=5)
+    bolivia_offset = timezone(timedelta(hours=-4))
+    local_expected = starts_utc.astimezone(bolivia_offset).replace(tzinfo=None)
+    response = c.post(
+        f"/api/communities/{cid}/meetings",
+        json={"title": "Reunión con zona", "place": "Sede", "starts_at": starts_utc.isoformat()},
+        headers=rep,
+    )
+    assert response.status_code == 201, response.text
+    assert response.json()["starts_at"] == local_expected.isoformat(timespec="minutes")
