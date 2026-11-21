@@ -9,6 +9,8 @@ Controles contra suplantación y acceso no autorizado:
 """
 from datetime import datetime, timedelta
 
+from app.core.time import local_now, to_local_naive
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
@@ -18,7 +20,7 @@ from app.core.config import get_settings
 from app.data.catalog import get_municipality
 from app.db import get_db
 from app.deps import current_user, get_approved_community, membership_of, require_member, require_representative
-from app.models import ActivityLog, Attendance, Community, Meeting, Membership, Notice, Observation, OutboundMessage, User
+from app.models import ActivityLog, Attendance, Community, Meeting, Membership, Notice, Observation, OutboundMessage, User, utcnow
 from app.schemas import AttendanceIn, CommunityIn, MeetingIn, NoticeIn, ObservationIn, ReviewIn
 from app.services.activity import log
 
@@ -124,7 +126,7 @@ def pending_requests(cid: int, user: User = Depends(current_user), db: Session =
     require_representative(db, user, cid)
     rows = db.execute(select(Membership, User).join(User, User.id == Membership.user_id).where(
         Membership.community_id == cid, Membership.status == "pending")).all()
-    return [{"id": m.id, "user_name": u.full_name, "phone_last4": u.phone[-4:], "role": m.role, "created_at": m.created_at.isoformat(timespec="minutes")} for m, u in rows]
+    return [{"id": m.id, "user_name": u.full_name, "phone_last4": u.phone[-4:], "role": m.role, "created_at": m.created_at.isoformat(timespec="minutes") + "+00:00"} for m, u in rows]
 
 
 @router.get("/communities/{cid}/members")
@@ -149,6 +151,8 @@ def decide_membership(mid: int, decision: str, user: User = Depends(current_user
     require_representative(db, user, m.community_id)
     if m.user_id == user.id and user.role != "admin":
         raise HTTPException(403, "No puede aprobar su propia solicitud.")
+    if m.status != "pending":
+        raise HTTPException(409, "La solicitud ya fue revisada.")
     m.status = "approved" if decision == "approve" else "rejected"
     m.reviewed_by = user.id
     target = db.get(User, m.user_id)
@@ -165,7 +169,7 @@ def list_meetings(cid: int, include_past: bool = False, user: User = Depends(cur
     require_member(db, user, cid)
     q = select(Meeting).where(Meeting.community_id == cid)
     if not include_past:
-        q = q.where(Meeting.starts_at >= datetime.now() - timedelta(hours=6))
+        q = q.where(Meeting.starts_at >= local_now() - timedelta(hours=6))
     return [meeting_out(db, mt, user) for mt in db.scalars(q.order_by(Meeting.starts_at))]
 
 
@@ -173,10 +177,10 @@ def list_meetings(cid: int, include_past: bool = False, user: User = Depends(cur
 def create_meeting(cid: int, body: MeetingIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
     get_approved_community(db, cid)
     require_representative(db, user, cid)
-    starts = body.starts_at.replace(tzinfo=None)
-    if starts < datetime.now() - timedelta(minutes=5):
+    starts = to_local_naive(body.starts_at)
+    if starts < local_now() - timedelta(minutes=5):
         raise HTTPException(422, "La fecha de la reunión ya pasó.")
-    if starts > datetime.now() + timedelta(days=365):
+    if starts > local_now() + timedelta(days=365):
         raise HTTPException(422, "La fecha es demasiado lejana.")
     mt = Meeting(community_id=cid, title=body.title, description=body.description, place=body.place, starts_at=starts, created_by=user.id)
     db.add(mt)
@@ -240,22 +244,32 @@ def remind(mid: int, user: User = Depends(current_user), db: Session = Depends(g
     mt = _meeting_for_member(db, mid, user)
     require_representative(db, user, mt.community_id)
     c = db.get(Community, mt.community_id)
+    if mt.cancelled:
+        raise HTTPException(409, "La reunión fue cancelada.")
+    if mt.starts_at < local_now():
+        raise HTTPException(409, "No se pueden enviar recordatorios para una reunión pasada.")
     recipients = db.scalars(select(User).join(Membership, Membership.user_id == User.id).where(
-        Membership.community_id == mt.community_id, Membership.status == "approved", User.whatsapp_opt_in.is_(True))).all()
+        Membership.community_id == mt.community_id, Membership.status == "approved",
+        User.is_active.is_(True), User.whatsapp_opt_in.is_(True))).all()
     channel = get_channel()
     body = (f"📅 Recordatorio AgroBolivia\nReunión: {mt.title}\nComunidad: {c.name}\n"
             f"Día: {mt.starts_at:%d/%m/%Y} a las {mt.starts_at:%H:%M}\nLugar: {mt.place}\n"
             "¿Va a asistir? Responda SI o NO.")
     sent = 0
+    failed = 0
     for r in recipients:
         status = channel.send_template(r.phone, "recordatorio_reunion", [mt.title, c.name, f"{mt.starts_at:%d/%m %H:%M}", mt.place])
         db.add(OutboundMessage(user_id=r.id, template="recordatorio_reunion", body=body, meeting_id=mt.id, channel=channel.name, status=status))
-        sent += 1
-    log(db, "recordatorio", f"{mt.title}: {sent} destinatarios ({channel.name})", user.id, mt.community_id)
+        if status == "enviado":
+            sent += 1
+        elif status == "error":
+            failed += 1
+    log(db, "recordatorio", f"{mt.title}: {sent} enviados, {failed} errores ({channel.name})", user.id, mt.community_id)
     db.commit()
-    return {"recipients": sent, "channel": channel.name, "connected": channel.connected,
-            "message": "Recordatorios generados en el SIMULADOR (no se enviaron mensajes reales)." if not channel.connected
-            else f"Recordatorios enviados a {sent} personas."}
+    message = ("Recordatorios generados en el SIMULADOR (no se enviaron mensajes reales)." if not channel.connected
+               else f"Recordatorios enviados: {sent}; con error: {failed}.")
+    return {"recipients": len(recipients), "sent": sent, "failed": failed,
+            "channel": channel.name, "connected": channel.connected, "message": message}
 
 
 # ---------- Avisos ----------
@@ -267,7 +281,7 @@ def list_notices(cid: int, user: User = Depends(current_user), db: Session = Dep
     rows = db.execute(select(Notice, User).join(User, User.id == Notice.author_id).where(Notice.community_id == cid).order_by(Notice.created_at.desc()).limit(50)).all()
     return [{"id": n.id, "title": n.title, "body": n.body, "category": n.category, "author": u.full_name,
              "author_role": "Representante verificado" if u.role != "admin" else "Administrador",
-             "created_at": n.created_at.isoformat(timespec="minutes")} for n, u in rows]
+             "created_at": n.created_at.isoformat(timespec="minutes") + "+00:00"} for n, u in rows]
 
 
 @router.post("/communities/{cid}/notices", status_code=201)
@@ -284,11 +298,11 @@ def create_notice(cid: int, body: NoticeIn, user: User = Depends(current_user), 
 # ---------- Observaciones comunitarias ----------
 
 def create_observation(db: Session, c: Community, user: User, kind: str, description: str, observed_at: datetime | None, channel: str = "web") -> Observation:
-    recent = db.scalar(select(func.count(Observation.id)).where(Observation.user_id == user.id, Observation.created_at >= datetime.now() - timedelta(hours=1)))
+    recent = db.scalar(select(func.count(Observation.id)).where(Observation.user_id == user.id, Observation.created_at >= utcnow() - timedelta(hours=1)))
     if recent >= 5:
         raise HTTPException(429, "Ya envió varios reportes en la última hora.")
-    when = (observed_at or datetime.now()).replace(tzinfo=None)
-    if when > datetime.now() + timedelta(minutes=10) or when < datetime.now() - timedelta(days=7):
+    when = to_local_naive(observed_at) if observed_at is not None else local_now()
+    if when > local_now() + timedelta(minutes=10) or when < local_now() - timedelta(days=7):
         raise HTTPException(422, "La fecha de la observación debe ser de los últimos 7 días.")
     o = Observation(community_id=c.id, municipality_id=c.municipality_id, user_id=user.id, kind=kind,
                     description=description, observed_at=when, channel=channel)
@@ -335,4 +349,4 @@ def activity(cid: int, user: User = Depends(current_user), db: Session = Depends
     get_approved_community(db, cid)
     require_member(db, user, cid)
     rows = db.scalars(select(ActivityLog).where(ActivityLog.community_id == cid).order_by(ActivityLog.created_at.desc()).limit(40)).all()
-    return [{"action": a.action, "detail": a.detail, "created_at": a.created_at.isoformat(timespec="minutes")} for a in rows]
+    return [{"action": a.action, "detail": a.detail, "created_at": a.created_at.isoformat(timespec="minutes") + "+00:00"} for a in rows]
