@@ -93,4 +93,7 @@ jobs:
           exit 1
       - name: Pruebas E2E
         working-directory: e2e
+        env:
+          ADMIN_PHONE: "+59170000000"
+          ADMIN_PASSWORD: admin12345
         run: npm test -- http://127.0.0.1:8000
