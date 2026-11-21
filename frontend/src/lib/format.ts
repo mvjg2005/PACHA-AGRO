@@ -12,15 +12,25 @@ export function dayLabel(iso: string, today = new Date()): string {
 }
 
 export function dateLong(iso: string): string {
-  const d = new Date(iso)
+  // Una fecha sin offset representa hora local de Bolivia; las marcas con offset son instantes UTC/absolutos.
+  const hasZone = /(?:Z|[+-]\\d{2}:\\d{2})$/i.test(iso)
+  const d = new Date(hasZone ? iso : `${iso}-04:00`)
   if (isNaN(d.getTime())) return iso
-  return `${DIAS[d.getDay()]} ${d.getDate()} ${MESES[d.getMonth()]} · ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
+  const parts = new Intl.DateTimeFormat('es-BO', {
+    timeZone: 'America/La_Paz', weekday: 'short', day: 'numeric', month: 'short',
+    hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+  }).formatToParts(d)
+  const part = (type: string) => parts.find(p => p.type === type)?.value ?? ''
+  const weekday = part('weekday').replace('.', '')
+  return `${weekday} ${part('day')} ${part('month')} · ${part('hour')}:${part('minute')}`
 }
 
 export function updatedAt(iso: string | null): string {
   if (!iso) return '—'
   const d = new Date(iso)
-  return isNaN(d.getTime()) ? iso : d.toLocaleString('es-BO', { dateStyle: 'medium', timeStyle: 'short' })
+  return isNaN(d.getTime()) ? iso : d.toLocaleString('es-BO', {
+    dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/La_Paz',
+  })
 }
 
 export function weatherIcon(code: number | null, storm = false): { icon: string; text: string } {
