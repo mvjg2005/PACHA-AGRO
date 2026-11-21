@@ -29,20 +29,12 @@ def _make_engine(url: str):
 
 
 def init_db() -> None:
-    """Crea tablas y datos iniciales. Seguro de llamar varias veces y desde instancias en paralelo."""
-    from sqlalchemy.exc import SQLAlchemyError
-
+    """Crea tablas y datos iniciales; los errores reales abortan el arranque."""
     from app.seed import seed
 
-    try:
-        Base.metadata.create_all(engine)
-    except SQLAlchemyError:
-        pass  # otra instancia la creó al mismo tiempo
+    Base.metadata.create_all(engine)
     with SessionLocal() as db:
-        try:
-            seed(db)
-        except SQLAlchemyError:
-            db.rollback()  # otra instancia sembró los datos al mismo tiempo
+        seed(db)
 
 
 engine = _make_engine(get_settings().database_url)
