@@ -67,7 +67,7 @@ function OfflineBanner() {
   const when = cachedAt ? new Date(cachedAt).toLocaleString('es-BO', { dateStyle: 'short', timeStyle: 'short' }) : null
   return (
     <div role="status" data-testid="offline-banner" className="border-b-2 border-ocre bg-sol-50 px-4 py-2 text-center font-semibold text-sol-ink">
-      📶 Sin conexión.{cachedAt !== null ? ` Mostrando datos guardados${when ? ` (${when})` : ''}` : ' Se mostrarán los últimos datos guardados.'}
+      Sin conexión.{cachedAt !== null ? ` Mostrando datos guardados${when ? ` (${when})` : ''}` : ' Se mostrarán los últimos datos guardados.'}
     </div>
   )
 }
@@ -82,10 +82,10 @@ export default function App() {
   const wide = ['', 'clima', 'escritorio'].includes(section) || parts[1] === 'comparar' || learnList
   const [layoutWidth, setLayoutWidth] = useState(() => document.documentElement.clientWidth)
   useEffect(() => {
-    const updateLayoutWidth = () => setLayoutWidth(document.documentElement.clientWidth)
-    updateLayoutWidth()
-    window.addEventListener('resize', updateLayoutWidth)
-    return () => window.removeEventListener('resize', updateLayoutWidth)
+    const update = () => setLayoutWidth(document.documentElement.clientWidth)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
   }, [])
   const scrollbarGutter = Math.max(0, window.innerWidth - layoutWidth)
   return (
