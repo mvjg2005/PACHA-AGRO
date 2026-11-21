@@ -388,7 +388,7 @@ def test_cancelled_pending_meeting_does_not_redirect_yes_to_another_meeting(app_
 
 
 
-def test_failed_whatsapp_reply_removes_inbound_dedup_record_for_retry(app_client, monkeypatch):
+def test_failed_whatsapp_reply_keeps_inbound_dedup_record_to_prevent_duplicate_side_effects(app_client, monkeypatch):
     from app import db as dbmod
     from app.core.config import get_settings
     from app.models import InboundMessage
@@ -414,6 +414,6 @@ def test_failed_whatsapp_reply_removes_inbound_dedup_record_for_retry(app_client
         "/api/whatsapp/webhook", content=body,
         headers={"X-Hub-Signature-256": sig, "Content-Type": "application/json"},
     )
-    assert response.status_code == 502
+    assert response.status_code == 200
     with dbmod.SessionLocal() as db:
-        assert db.get(InboundMessage, "wamid.retry-test-001") is None
+        assert db.get(InboundMessage, "wamid.retry-test-001") is not None
