@@ -157,7 +157,10 @@ def notify(nid: int, user: User = Depends(require_publisher), db: Session = Depe
     channel = get_channel()
     tpl = regional_notice_template(n.title, n.summary, scope_label(n))
     sent = 0
-    for u in db.scalars(select(User).where(User.whatsapp_opt_in.is_(True), User.is_active.is_(True))):
+    recipient_query = select(User).where(User.whatsapp_opt_in.is_(True), User.is_active.is_(True))
+    if not get_settings().seed_demo:
+        recipient_query = recipient_query.where(User.is_demo.is_(False))
+    for u in db.scalars(recipient_query):
         if not notice_matches(n.scope, n.department_id, n.municipality_id, n.crop_id, context_for(u.default_municipality_id, u.crops)):
             continue
         res = channel.send_template(u.phone, tpl["name"], tpl["parameters"])
