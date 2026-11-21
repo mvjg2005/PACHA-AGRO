@@ -41,7 +41,20 @@ Requisitos: Python 3.11+ y Node.js 18+ para la aplicación. Para las pruebas Pla
 cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && cp .env.example .env
 ```
 
-En Windows PowerShell, para crear e instalar el entorno virtual use `cd backend`, `py -3.12 -m venv .venv`, `.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt` y `Copy-Item .env.example .env`. Para arrancar use ` .\\.venv\\Scripts\\python.exe -m uvicorn app.main:app --port 8000` desde la carpeta backend.
+En Windows PowerShell, use estos comandos para instalar y arrancar la aplicación:
+
+```powershell
+cd backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+Copy-Item .env.example .env
+# Edite .env y complete SECRET_KEY y ADMIN_PASSWORD
+cd ..\frontend
+npm install
+npm run build
+cd ..\backend
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000
+```
 
 Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). La clave JWT debe tener al menos 32 caracteres; genérela con `python -c "import secrets; print(secrets.token_urlsafe(48))"`. No use la clave de ejemplo en producción. Luego compile el frontend:
 
