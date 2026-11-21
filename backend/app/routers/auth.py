@@ -1,16 +1,15 @@
-from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
-from app.core.ratelimit import client_key, login_limiter, register_limiter
+from app.core.ratelimit import client_key, login_ip_limiter, login_limiter, register_limiter
 from app.core.security import create_token, hash_password, verify_password
 from app.data.catalog import get_municipality
 from app.db import get_db
 from app.deps import current_user
-from app.models import User
+from app.models import User, utcnow
 from app.schemas import LoginIn, ProfileUpdate, RegisterIn, UserOut
 from app.services.activity import log
 
@@ -25,7 +24,7 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db)):
     if body.default_municipality_id and not get_municipality(body.default_municipality_id):
         raise HTTPException(422, "Municipio no válido.")
     user = User(full_name=body.full_name, phone=body.phone, password_hash=hash_password(body.password),
-                whatsapp_opt_in=body.whatsapp_opt_in, whatsapp_opt_in_at=datetime.now() if body.whatsapp_opt_in else None,
+                whatsapp_opt_in=body.whatsapp_opt_in, whatsapp_opt_in_at=utcnow() if body.whatsapp_opt_in else None,
                 default_municipality_id=body.default_municipality_id)
     db.add(user)
     db.flush()
@@ -36,6 +35,7 @@ def register(body: RegisterIn, request: Request, db: Session = Depends(get_db)):
 
 @router.post("/login")
 def login(body: LoginIn, request: Request, db: Session = Depends(get_db)):
+    login_ip_limiter.check(client_key(request))
     login_limiter.check(f"{client_key(request)}:{body.phone}")
     user = db.scalar(select(User).where(User.phone == body.phone))
     if (not user or not user.is_active or (user.is_demo and not get_settings().seed_demo)
