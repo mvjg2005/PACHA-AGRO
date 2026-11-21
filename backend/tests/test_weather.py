@@ -65,3 +65,19 @@ def test_cache_avoids_repeated_calls():
     first = calls["n"]
     service.get_weather(M, "real", TODAY)
     assert calls["n"] == first == 3
+
+
+def test_climatology_fill_values_are_normalized_to_none():
+    from app.services.weather.nasa_power import MONTHS, parse_climatology
+
+    data = {
+        "properties": {
+            "parameter": {
+                "FROST_DAYS": {month: -999 for month in MONTHS},
+                "PRECTOTCORR": {month: -999 for month in MONTHS},
+            }
+        }
+    }
+    result = parse_climatology(data)
+    assert result["frost_days"]["JAN"] is None
+    assert result["precip_mm_day"]["JAN"] is None

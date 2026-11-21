@@ -7,7 +7,7 @@ os.environ["DATABASE_URL"] = "sqlite:///:memory:"
 os.environ["SEED_DEMO"] = "false"
 os.environ["ADMIN_PHONE"] = "+59170000099"
 os.environ["ADMIN_PASSWORD"] = "admin-test-123"
-os.environ["SECRET_KEY"] = "test-secret"
+os.environ["SECRET_KEY"] = "test-secret-for-agrobolivia-tests-32chars"
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import httpx  # noqa: E402

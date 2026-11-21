@@ -9,6 +9,8 @@ Controles contra suplantación y acceso no autorizado:
 """
 from datetime import datetime, timedelta
 
+from app.core.time import as_local_naive, local_now
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
@@ -18,7 +20,7 @@ from app.core.config import get_settings
 from app.data.catalog import get_municipality
 from app.db import get_db
 from app.deps import current_user, get_approved_community, membership_of, require_member, require_representative
-from app.models import ActivityLog, Attendance, Community, Meeting, Membership, Notice, Observation, OutboundMessage, User
+from app.models import ActivityLog, Attendance, Community, Meeting, Membership, Notice, Observation, OutboundMessage, User, utcnow
 from app.schemas import AttendanceIn, CommunityIn, MeetingIn, NoticeIn, ObservationIn, ReviewIn
 from app.services.activity import log
 
@@ -112,7 +114,12 @@ def join(cid: int, user: User = Depends(current_user), db: Session = Depends(get
     c = get_approved_community(db, cid)
     if membership_of(db, user, cid):
         raise HTTPException(409, "Ya envió una solicitud o ya es miembro.")
-    db.add(Membership(user_id=user.id, community_id=c.id, role="member", status="pending"))
+    try:
+        with db.begin_nested():
+            db.add(Membership(user_id=user.id, community_id=c.id, role="member", status="pending"))
+            db.flush()
+    except IntegrityError:
+        raise HTTPException(409, "Ya existe una solicitud o membresía para esta comunidad.")
     log(db, "solicitud_union", user.full_name, user.id, c.id)
     db.commit()
     return {"status": "pending", "message": "Solicitud enviada. El representante debe aprobarla."}
@@ -147,6 +154,8 @@ def decide_membership(mid: int, decision: str, user: User = Depends(current_user
     if m.role == "representative" and user.role != "admin":
         raise HTTPException(403, "Solo un administrador aprueba representantes.")
     require_representative(db, user, m.community_id)
+    if m.status != "pending":
+        raise HTTPException(409, "Esta solicitud ya fue resuelta.")
     if m.user_id == user.id and user.role != "admin":
         raise HTTPException(403, "No puede aprobar su propia solicitud.")
     m.status = "approved" if decision == "approve" else "rejected"
@@ -165,7 +174,7 @@ def list_meetings(cid: int, include_past: bool = False, user: User = Depends(cur
     require_member(db, user, cid)
     q = select(Meeting).where(Meeting.community_id == cid)
     if not include_past:
-        q = q.where(Meeting.starts_at >= datetime.now() - timedelta(hours=6))
+        q = q.where(Meeting.starts_at >= local_now() - timedelta(hours=6))
     return [meeting_out(db, mt, user) for mt in db.scalars(q.order_by(Meeting.starts_at))]
 
 
@@ -173,10 +182,11 @@ def list_meetings(cid: int, include_past: bool = False, user: User = Depends(cur
 def create_meeting(cid: int, body: MeetingIn, user: User = Depends(current_user), db: Session = Depends(get_db)):
     get_approved_community(db, cid)
     require_representative(db, user, cid)
-    starts = body.starts_at.replace(tzinfo=None)
-    if starts < datetime.now() - timedelta(minutes=5):
+    starts = as_local_naive(body.starts_at)
+    now = local_now()
+    if starts < now - timedelta(minutes=5):
         raise HTTPException(422, "La fecha de la reunión ya pasó.")
-    if starts > datetime.now() + timedelta(days=365):
+    if starts > now + timedelta(days=365):
         raise HTTPException(422, "La fecha es demasiado lejana.")
     mt = Meeting(community_id=cid, title=body.title, description=body.description, place=body.place, starts_at=starts, created_by=user.id)
     db.add(mt)
@@ -200,7 +210,16 @@ def set_attendance(db: Session, mt: Meeting, user: User, response: str, channel:
     if a:
         a.response, a.channel = response, channel
     else:
-        db.add(Attendance(meeting_id=mt.id, user_id=user.id, response=response, channel=channel))
+        try:
+            with db.begin_nested():
+                db.add(Attendance(meeting_id=mt.id, user_id=user.id, response=response, channel=channel))
+                db.flush()
+        except IntegrityError:
+            # Otra solicitud concurrente insertó la misma respuesta unique (meeting,user).
+            a = db.scalar(select(Attendance).where(Attendance.meeting_id == mt.id, Attendance.user_id == user.id))
+            if a is None:
+                raise
+            a.response, a.channel = response, channel
     log(db, "asistencia", f"{user.full_name}: {response} ({mt.title})", user.id, mt.community_id)
 
 
@@ -239,9 +258,15 @@ def remind(mid: int, user: User = Depends(current_user), db: Session = Depends(g
 
     mt = _meeting_for_member(db, mid, user)
     require_representative(db, user, mt.community_id)
+    if mt.cancelled or mt.starts_at < local_now() - timedelta(hours=2):
+        raise HTTPException(409, "No se pueden enviar recordatorios para una reunión cancelada o finalizada.")
     c = db.get(Community, mt.community_id)
-    recipients = db.scalars(select(User).join(Membership, Membership.user_id == User.id).where(
-        Membership.community_id == mt.community_id, Membership.status == "approved", User.whatsapp_opt_in.is_(True))).all()
+    recipient_query = select(User).join(Membership, Membership.user_id == User.id).where(
+        Membership.community_id == mt.community_id, Membership.status == "approved",
+        User.is_active.is_(True), User.whatsapp_opt_in.is_(True))
+    if not get_settings().seed_demo:
+        recipient_query = recipient_query.where(User.is_demo.is_(False))
+    recipients = db.scalars(recipient_query).all()
     from app.services.whatsapp.templates import meeting_template
 
     channel = get_channel()
@@ -285,11 +310,12 @@ def create_notice(cid: int, body: NoticeIn, user: User = Depends(current_user), 
 # ---------- Observaciones comunitarias ----------
 
 def create_observation(db: Session, c: Community, user: User, kind: str, description: str, observed_at: datetime | None, channel: str = "web") -> Observation:
-    recent = db.scalar(select(func.count(Observation.id)).where(Observation.user_id == user.id, Observation.created_at >= datetime.now() - timedelta(hours=1)))
+    recent = db.scalar(select(func.count(Observation.id)).where(Observation.user_id == user.id, Observation.created_at >= utcnow() - timedelta(hours=1)))
     if recent >= 5:
         raise HTTPException(429, "Ya envió varios reportes en la última hora.")
-    when = (observed_at or datetime.now()).replace(tzinfo=None)
-    if when > datetime.now() + timedelta(minutes=10) or when < datetime.now() - timedelta(days=7):
+    when = as_local_naive(observed_at) if observed_at else local_now()
+    now = local_now()
+    if when > now + timedelta(minutes=10) or when < now - timedelta(days=7):
         raise HTTPException(422, "La fecha de la observación debe ser de los últimos 7 días.")
     o = Observation(community_id=c.id, municipality_id=c.municipality_id, user_id=user.id, kind=kind,
                     description=description, observed_at=when, channel=channel)
@@ -323,6 +349,8 @@ def review_observation(oid: int, body: ReviewIn, user: User = Depends(current_us
     if o is None:
         raise HTTPException(404, "Observación no encontrada.")
     require_representative(db, user, o.community_id)
+    if o.review_status != "sin_revisar":
+        raise HTTPException(409, "Esta observación ya fue revisada.")
     o.review_status, o.reviewed_by = body.status, user.id
     log(db, "observacion_revisada", f"#{o.id}: {body.status}", user.id, o.community_id)
     db.commit()

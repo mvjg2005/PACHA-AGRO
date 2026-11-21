@@ -6,6 +6,7 @@ from datetime import date, datetime, timedelta, timezone
 import httpx
 
 from app.core.config import get_settings
+from app.core.time import local_today
 from app.services.weather.base import Block, DailyValue, ProviderError
 
 SOURCE = "NASA POWER (reanálisis satelital, ~50 km de resolución)"
@@ -26,7 +27,7 @@ def _get(client: httpx.Client, url: str, params: dict) -> dict:
 
 
 def fetch_recent(lat: float, lon: float, client: httpx.Client, today: date | None = None) -> Block:
-    today = today or date.today()
+    today = today or local_today()
     start = today - timedelta(days=14)
     data = _get(client, f"{get_settings().nasa_power_url}/daily/point", {
         "parameters": "T2M_MIN,T2M_MAX,PRECTOTCORR,GWETTOP",
@@ -71,8 +72,8 @@ def parse_climatology(data: dict) -> dict:
     return {
         "available": True, "source": "NASA POWER (climatología)", "kind": "climatologia",
         "period": data.get("header", {}).get("range", ""),
-        "frost_days": {m: p.get("FROST_DAYS", {}).get(m) for m in MONTHS},
-        "precip_mm_day": {m: p.get("PRECTOTCORR", {}).get(m) for m in MONTHS},
+        "frost_days": {m: _v(p.get("FROST_DAYS", {}).get(m)) for m in MONTHS},
+        "precip_mm_day": {m: _v(p.get("PRECTOTCORR", {}).get(m)) for m in MONTHS},
     }
 
 

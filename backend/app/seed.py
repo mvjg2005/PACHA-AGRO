@@ -1,12 +1,13 @@
 """Datos iniciales. Las cuentas y la comunidad de demostración son FICTICIAS y están marcadas is_demo=True."""
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.security import hash_password
-from app.models import Community, Meeting, Membership, Notice, RegionalNotice, User
+from app.core.time import local_now
+from app.models import Community, Meeting, Membership, Notice, RegionalNotice, User, utcnow
 
 DEMO_PASSWORD = "demo1234"
 DEMO_USERS = [
@@ -32,7 +33,7 @@ def seed(db: Session) -> None:
     users = []
     for phone, name, _ in DEMO_USERS:
         u = User(full_name=name, phone=phone, password_hash=hash_password(DEMO_PASSWORD), is_demo=True,
-                 whatsapp_opt_in=True, whatsapp_opt_in_at=datetime.now(), default_municipality_id="or-challapata",
+                 whatsapp_opt_in=True, whatsapp_opt_in_at=utcnow(), default_municipality_id="or-challapata",
                  crop_interests="quinua")
         db.add(u)
         users.append(u)
@@ -43,7 +44,7 @@ def seed(db: Session) -> None:
     db.flush()
     for u, (_, _, role) in zip(users, DEMO_USERS):
         db.add(Membership(user_id=u.id, community_id=c.id, role=role, status="approved"))
-    start = (datetime.now() + timedelta(days=3)).replace(hour=10, minute=0, second=0, microsecond=0)
+    start = (local_now() + timedelta(days=3)).replace(hour=10, minute=0, second=0, microsecond=0)
     db.add(Meeting(community_id=c.id, title="Planificación de siembra de quinua", place="Sede de la comunidad",
                    description="Revisaremos el pronóstico y organizaremos la siembra.", starts_at=start, created_by=users[0].id))
     db.add(Notice(community_id=c.id, title="Bienvenidos a la comunidad demo", category="general", author_id=users[0].id,
@@ -54,7 +55,7 @@ def seed(db: Session) -> None:
 
 def seed_regional_notices(db: Session, author_id: int) -> None:
     """Avisos regionales de DEMOSTRACIÓN (ficticios, basados en los ejemplos de PACHAAGRO)."""
-    exp = datetime.now() + timedelta(days=20)
+    exp = local_now() + timedelta(days=20)
     demo = [
         ("nacional", {}, "aviso", "Actualice sus cultivos de interés",
          "Marque en su perfil qué cultivos produce para recibir solo los avisos que le corresponden."),

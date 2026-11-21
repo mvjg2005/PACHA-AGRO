@@ -39,22 +39,36 @@ Nada se presenta como algo que no es: los datos **simulados**, las **observacion
 
 ## Ejecutar (5 minutos)
 
-Requisitos: Python 3.11+ y Node.js 18+.
+Requisitos: Python 3.11+ y Node.js 18+ para la aplicación. Para ejecutar la suite Playwright se requiere Node.js 22+.
 
-```bash
-cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && cp .env.example .env
+### Windows PowerShell
+
+```powershell
+cd backend
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+Copy-Item .env.example .env
+# Genere una clave y copie el valor en SECRET_KEY dentro de backend/.env:
+py -c "import secrets; print(secrets.token_urlsafe(48))"
+# Edite backend/.env y establezca ADMIN_PASSWORD.
+cd ..\frontend
+npm ci
+npm run build
+cd ..\backend
+.\.venv\Scripts\python.exe -m uvicorn app.main:app --port 8000
 ```
 
-Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). Luego compile el frontend:
+### Linux / macOS
 
 ```bash
-cd frontend && npm install && npm run build
-```
-
-Y arranque todo en un solo proceso (la API sirve también la web compilada):
-
-```bash
-cd backend && .venv/bin/uvicorn app.main:app --port 8000
+cd backend
+python -m venv .venv
+.venv/bin/pip install -r requirements-dev.txt
+cp .env.example .env
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+# Copie el secreto generado a SECRET_KEY y establezca ADMIN_PASSWORD en backend/.env.
+cd ../frontend && npm ci && npm run build
+cd ../backend && .venv/bin/uvicorn app.main:app --port 8000
 ```
 
 Abra <http://localhost:8000>. Documentación interactiva de la API: <http://localhost:8000/docs>.
@@ -66,6 +80,8 @@ cd frontend && npm run dev
 ```
 
 (Vite en <http://localhost:5173> redirige `/api` al backend.)
+
+Use `SEED_DEMO=false` para el funcionamiento normal y en producción. El archivo de ejemplo ya trae ese valor. Para ver las siguientes cuentas ficticias, cambie temporalmente a `SEED_DEMO=true` y utilice una base local desechable; no habilite los datos demo en producción.
 
 ### Cuentas ficticias para pruebas locales (`SEED_DEMO=true`)
 
@@ -102,10 +118,15 @@ cd frontend && npm test
 ```
 
 ```bash
-node e2e/run.cjs http://localhost:8000
+cd e2e
+npm install
+npx playwright install chromium
+npm test -- http://localhost:8000
 ```
 
-Resultados actuales: **98/98** backend, **7/7** unitarias frontend, **26/26** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Para las pruebas E2E, arranque el backend con `SEED_DEMO=true`, `DATABASE_URL` apuntando a una base local desechable, una `SECRET_KEY` aleatoria de al menos 32 caracteres y las credenciales del administrador que usará el runner.
+
+Los resultados **98/98** backend, **7/7** frontend y **26/26** E2E corresponden a la ejecución registrada en `main` antes de esta auditoría. Esta rama añade pruebas de regresión que deben validarse en su pull request; no se consideran aprobadas hasta que CI termine. GitHub Actions ejecuta backend, frontend, compilación y E2E en los pull requests. Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 
