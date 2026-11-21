@@ -174,8 +174,15 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     const bad = []
     for (const r of ['', 'sembrar', 'sembrar/comparar', 'clima', 'comunidad', 'whatsapp', 'aprender', 'aprender/granizo', 'aprender/biblioteca', 'aprender/biblioteca/ficha-cultivo-quinua', 'avisos', 'cobertura', 'privacidad', 'terminos', 'ingresar', 'registro']) {
       await p.goto(`${BASE}/#/${r}`); await p.waitForTimeout(600)
-      const w = await p.evaluate(() => document.documentElement.scrollWidth)
-      if (w > 320) bad.push(`${r || 'inicio'}:${w}`)
+      const metrics = await p.evaluate(() => {
+        const nodes = [...document.querySelectorAll('body *')].map(el => {
+          const b = el.getBoundingClientRect()
+          const style = getComputedStyle(el)
+          return { tag: el.tagName.toLowerCase(), cls: String(el.className || '').slice(0, 80), id: el.id, left: Math.round(b.left * 10) / 10, right: Math.round(b.right * 10) / 10, width: Math.round(b.width * 10) / 10, overflow: style.overflowX }
+        }).filter(x => x.right > innerWidth + 0.5 || x.left < -0.5).sort((a, b) => b.right - a.right).slice(0, 5)
+        return { width: document.documentElement.scrollWidth, nodes }
+      })
+      if (metrics.width > 320) bad.push(`${r || 'inicio'}:${metrics.width}:${JSON.stringify(metrics.nodes)}`)
     }
     assert(bad.length === 0, `desborde en ${bad.join(', ')}`)
   })
