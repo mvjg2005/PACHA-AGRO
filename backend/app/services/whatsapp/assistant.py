@@ -14,10 +14,11 @@ from app.services.recommendation.run import recommend
 from app.services.whatsapp.intents import detect
 from app.services.weather.service import get_weather
 
-EMOJI = {"verde": "🟢", "amarillo": "🟡", "rojo": "🔴", "gris": "⚪"}
-MENU = ("👋 Hola, soy el asistente de AgroBolivia.\nEscriba un número o su pregunta:\n"
-        "1️⃣ ¿Cuándo puedo sembrar?\n2️⃣ ¿Hay riesgo de helada? (o CLIMA <municipio>)\n3️⃣ Reunión de mi comunidad\n4️⃣ Avisar granizo o helada\n"
-        "5️⃣ AVISOS de mi zona\n6️⃣ GUIAS para aprender\nCULTIVOS: ver mis cultivos\n"
+# Estado en palabras (mensajes sobrios, sin emoticones)
+STATE_WORD = {"verde": "a favor", "amarillo": "precaución", "rojo": "en contra", "gris": "sin datos"}
+MENU = ("Hola, soy el asistente de AgroBolivia.\nEscriba un número o su pregunta:\n"
+        "1. ¿Cuándo puedo sembrar?\n2. ¿Hay riesgo de helada? (o CLIMA <municipio>)\n3. Reunión de mi comunidad\n4. Avisar granizo o helada\n"
+        "5. AVISOS de mi zona\n6. GUIAS para aprender\nCULTIVOS: ver mis cultivos\n"
         "Escriba BAJA para no recibir más mensajes.")
 
 # Estado de conversación guardado en la base de datos (tabla chat_state): sobrevive a reinicios y
@@ -46,8 +47,7 @@ def _save_state(db: Session, key: str, st: dict) -> None:
     from app.models import ChatState, utcnow
     now = utcnow()
     _STATE_SAVE_COUNT += 1
-    # Las conversaciones anónimas también se guardan para continuidad del diálogo.
-    # Purgar diariamente evita que sesiones abandonadas crezcan indefinidamente.
+    # Purgar periódicamente conversaciones sin actividad para evitar acumulación indefinida.
     if _STATE_SAVE_COUNT % 100 == 0:
         db.query(ChatState).filter(ChatState.updated_at < now - timedelta(days=1)).delete(synchronize_session=False)
     row = db.get(ChatState, key) or ChatState(key=key)
@@ -120,21 +120,21 @@ def _handle(db: Session, st: dict, text: str, user: User | None, mode: str, toda
 
     intent = it["intent"]
     if intent == "unknown" and found:
-        return [f"📍 Listo, usaré {found['name']} ({found['department_name']}). ¿Qué quiere saber?\n"
+        return [f"Listo, usaré {found['name']} ({found['department_name']}). ¿Qué quiere saber?\n"
                 "Escriba CLIMA, AVISOS o «¿cuándo puedo sembrar quinua?»."]
     if intent == "menu" or intent == "unknown":
-        return [MENU] if intent == "menu" else ["No entendí bien 🤔.", MENU]
+        return [MENU] if intent == "menu" else ["No entendí bien.", MENU]
     if intent == "opt_out":
         if user:
             user.whatsapp_opt_in = False
             db.commit()
-        return ["✅ Ya no le enviaremos recordatorios ni avisos. Escriba ALTA si quiere volver a recibirlos."]
+        return ["Ya no le enviaremos recordatorios ni avisos. Escriba ALTA si quiere volver a recibirlos."]
     if intent == "opt_in":
         if not user:
             return ["Para recibir avisos necesita registrarse en AgroBolivia con este número."]
         user.whatsapp_opt_in, user.whatsapp_opt_in_at = True, utcnow()
         db.commit()
-        return ["✅ Aceptó recibir recordatorios y avisos de su comunidad. Escriba BAJA cuando quiera dejar de recibirlos."]
+        return ["Aceptó recibir recordatorios y avisos de su comunidad. Escriba BAJA cuando quiera dejar de recibirlos."]
     if intent in ("yes", "no"):
         return [_attendance(db, user, intent, st)]
     if intent == "meeting":
@@ -147,7 +147,7 @@ def _handle(db: Session, st: dict, text: str, user: User | None, mode: str, toda
         if not user:
             return ["Para guardar sus cultivos necesita una cuenta en AgroBolivia."]
         names = ", ".join(user.crops) if user.crops else "ninguno todavía"
-        return [f"🌾 Sus cultivos de interés: {names}.\nPuede cambiarlos en la web, en Mi cuenta."]
+        return [f"Sus cultivos de interés: {names}.\nPuede cambiarlos en la web, en Mi cuenta."]
     if intent == "notices":
         loc = _user_location(db, user, st)
         return [_notices(db, user, loc)]
@@ -155,7 +155,7 @@ def _handle(db: Session, st: dict, text: str, user: User | None, mode: str, toda
     loc = _user_location(db, user, st)
     if loc is None:
         st["pending"] = {"type": intent, "crop": it.get("crop"), "tomorrow": it.get("tomorrow", False)}
-        return ["📍 ¿En qué municipio está? Ejemplo: Oruro, Challapata, El Alto, Montero."]
+        return ["¿En qué municipio está? Ejemplo: Oruro, Challapata, El Alto, Montero."]
     if intent == "weather":
         return [_weather(loc, it.get("tomorrow", False), mode, today)]
     if intent == "sowing":
@@ -163,7 +163,7 @@ def _handle(db: Session, st: dict, text: str, user: User | None, mode: str, toda
         if not crop:
             st["pending"] = {"type": "sowing"}
             st["await_crop"] = True
-            return ["🌱 ¿Qué quiere sembrar? Quinua, papa, maíz, haba o cebada."]
+            return ["¿Qué quiere sembrar? Quinua, papa, maíz, haba o cebada."]
         return _sowing(db, loc, crop, mode, today)
     return [MENU]
 
@@ -174,23 +174,25 @@ def _weather(loc, tomorrow, mode, today) -> str:
     if not f["available"]:
         fr = wx["frost_risk"]
         extra = f"\nEn este mes suele haber {wx['climatology']['frost_days_month']:.0f} días con helada (historial NASA POWER)." if fr.get("basis") == "climatologia" else ""
-        return f"⚠️ Ahora no tengo pronóstico para {loc['name']}. Intente más tarde.{extra}\nAvisos oficiales: senamhi.gob.bo"
+        return f"Ahora no tengo pronóstico para {loc['name']}. Intente más tarde.{extra}\nAvisos oficiales: senamhi.gob.bo"
     day = f["daily"][1] if tomorrow and len(f["daily"]) > 1 else f["daily"][0]
     t = day["tmin"]
-    risk = "🔴 Riesgo ALTO de helada" if t <= -2 else "🟡 Puede haber helada leve" if t <= 1 else "🟢 No se espera helada"
-    sim = "\n🧪 DATOS SIMULADOS (demostración)" if mode == "simulado" else ""
-    return (f"🌦️ {loc['name']} — {'mañana' if tomorrow else 'hoy'} ({day['date']}){sim}\n"
+    risk = "Riesgo ALTO de helada" if t <= -2 else "Puede haber helada leve" if t <= 1 else "No se espera helada"
+    sim = "\nDATOS SIMULADOS (demostración)" if mode == "simulado" else ""
+    return (f"{loc['name']} — {'mañana' if tomorrow else 'hoy'} ({day['date']}){sim}\n"
             f"Mínima: {t:.0f} °C · Máxima: {day['tmax']:.0f} °C\nLluvia: {day['precip_mm'] or 0:.0f} mm\n{risk}\n"
             f"Fuente: {f['source']} (pronóstico, no es aviso oficial).")
 
 
 def _sowing(db, loc, crop, mode, today) -> list[str]:
     r = recommend(db, loc, Answers(crop, None, "no_se", "secano"), mode, today)
-    lines = [f"{EMOJI[r['status']]} {r['headline']} — {r['crop_name']} en {loc['name']}", r["summary"]]
+    lines = [f"Resultado: {r['headline']} — {r['crop_name']} en {loc['name']}", r["summary"]]
+    if r.get("main_action"):
+        lines.append(f"Qué hacer: {r['main_action']}")
     for c in r["criteria"][:4]:
-        lines.append(f"{EMOJI[c['status']]} {c['label']}: {c['explanation']}")
+        lines.append(f"• {c['label']} ({STATE_WORD[c['status']]}): {c['explanation']}")
     if r["scenario_status"] == "demo":
-        lines.append("ℹ️ Reglas de demostración, no validadas.")
+        lines.append("Nota: reglas de demostración, no validadas.")
     lines.append("Supuse que no tiene riego y no sabe la humedad. Para un análisis completo use la web: “¿Cuándo puedo sembrar?”")
     return ["\n".join(lines)]
 
@@ -201,13 +203,16 @@ def _next_meeting(db, user, st: dict) -> str:
     comms = _user_communities(db, user)
     if not comms:
         return "Aún no es miembro aprobado de ninguna comunidad."
-    mt = db.scalar(select(Meeting).where(Meeting.community_id.in_([c.id for c in comms]), Meeting.cancelled.is_(False),
-                                         Meeting.starts_at >= local_now() - timedelta(hours=2)).order_by(Meeting.starts_at))
+    mt = db.scalar(select(Meeting).where(
+        Meeting.community_id.in_([c.id for c in comms]),
+        Meeting.cancelled.is_(False),
+        Meeting.starts_at >= local_now() - timedelta(hours=2),
+    ).order_by(Meeting.starts_at))
     if not mt:
         return "No hay reuniones programadas en su comunidad."
     st["pending_meeting_id"] = mt.id
     c = db.get(Community, mt.community_id)
-    return (f"📅 Próxima reunión — {c.name}\n{mt.title}\nDía: {mt.starts_at:%d/%m/%Y} a las {mt.starts_at:%H:%M}\n"
+    return (f"Próxima reunión — {c.name}\n{mt.title}\nDía: {mt.starts_at:%d/%m/%Y} a las {mt.starts_at:%H:%M}\n"
             f"Lugar: {mt.place}\n¿Va a asistir? Responda SI o NO.")
 
 
@@ -230,8 +235,8 @@ def _attendance(db, user, intent, st: dict | None = None) -> str:
             st.pop("pending_meeting_id", None)
             return "La reunión que consultó ya no está disponible. Vuelva a preguntar por la próxima reunión."
     else:
-        # Tras un reinicio o vencimiento del estado, solo se acepta una respuesta
-        # asociada a un recordatorio persistido para una reunión vigente.
+        # Tras reiniciar el proceso o vencer el estado, solo aceptar un recordatorio
+        # persistido y verificable de una reunión vigente.
         last = None
         if community_ids:
             last = db.scalar(
@@ -256,7 +261,7 @@ def _attendance(db, user, intent, st: dict | None = None) -> str:
     db.commit()
     st.pop("pending_meeting_id", None)
     choice = "SÍ" if intent == "yes" else "NO"
-    return f"✅ Gracias. Registramos que {choice} asistirá a: {mt.title} ({mt.starts_at:%d/%m %H:%M})."
+    return f"Gracias. Registramos que {choice} asistirá a: {mt.title} ({mt.starts_at:%d/%m %H:%M})."
 
 
 def _start_report(db, user, kind, text, st) -> list[str]:
@@ -283,8 +288,8 @@ def _save_report(db, user, pending) -> str:
         create_observation(db, c, user, pending["kind"], f"Vía WhatsApp: {pending['text'][:200]}", None, channel="whatsapp_sim")
         db.commit()
     except HTTPException as e:
-        return f"⚠️ {e.detail}"
-    return "✅ Gracias. Su reporte quedó registrado como observación comunitaria. Su representante lo verá."
+        return f"{e.detail}"
+    return "Gracias. Su reporte quedó registrado como observación comunitaria. Su representante lo verá."
 
 
 def _notices(db, user, loc) -> str:
@@ -294,8 +299,8 @@ def _notices(db, user, loc) -> str:
     rows = matching_notices(db, ctx)[:3]
     where = f" para {loc['name']}" if loc else " nacionales (dígame su municipio para ver los de su zona)"
     if not rows:
-        return f"📢 No hay avisos vigentes{where}."
-    lines = [f"📢 Avisos de la plataforma{where}:"]
+        return f"No hay avisos vigentes{where}."
+    lines = [f"Avisos de la plataforma{where}:"]
     for n in rows:
         lines.append(f"• {n.title}{' (DEMO)' if n.is_demo else ''} — {scope_label(n)}")
     lines.append("No son avisos oficiales. Oficiales: senamhi.gob.bo")
@@ -306,6 +311,6 @@ def _library(crop) -> str:
     from app.routers.education import _library as lib
 
     items = [i for i in lib()["items"] if not crop or i["crop"] in (None, crop)][:4]
-    lines = ["📚 Guías para aprender:"] + [f"• {i['title']} ({i['reading_minutes']} min)" for i in items]
+    lines = ["Guías para aprender:"] + [f"• {i['title']} ({i['reading_minutes']} min)" for i in items]
     lines.append("Léalas en la web, sección Aprender → Biblioteca.")
     return "\n".join(lines)
