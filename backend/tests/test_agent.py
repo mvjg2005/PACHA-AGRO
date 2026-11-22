@@ -111,7 +111,7 @@ def test_validation(app_client, msg):
 
 @pytest.mark.parametrize("msg,expected", [
     ("hola te amo", "cariño"),
-    ("hola hola como estas", "Muy bien, gracias por preguntar"),
+    ("hola hola como estas", "muy bien, gracias por preguntar"),
     ("gracias", "Con mucho gusto"),
     ("chau", "Hasta pronto"),
     ("¿eres humano?", "no una persona"),
@@ -125,3 +125,16 @@ def test_local_engine_converses_naturally(app_client, msg, expected):
 def test_repeated_greeting_is_short(app_client):
     d = chat(app_client, "hola", history=[{"role": "user", "content": "hola"}, {"role": "assistant", "content": "¡Hola!"}])
     assert d["reply"].startswith("¡Hola de nuevo")
+
+
+def test_questions_to_pacha_and_no_repetition(app_client):
+    h = []
+    replies = []
+    for q in ["Todo bien?", "O sea tu estas bien ?"]:
+        d = chat(app_client, q, municipality_id="or-oruro", history=h)
+        replies.append(d["reply"])
+        h += [{"role": "user", "content": q}, {"role": "assistant", "content": d["reply"]}]
+    assert all("gracias" in r.lower() for r in replies)  # responde que está bien, no «¡Qué bueno!»
+    assert replies[0] != replies[1]
+    d = chat(app_client, "estoy bien", municipality_id="or-oruro")
+    assert "Me alegra" in d["reply"]
