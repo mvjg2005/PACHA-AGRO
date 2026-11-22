@@ -65,11 +65,12 @@ export default function Home() {
         <ForecastCard weather={weather} />
       </div>
 
+      <div className="mt-8"><GanadoCta /></div>
+
       {!user && !onboarded() && myCrops.length === 0 ? <SetupInvite /> : <div className="mt-6 rounded-2xl bg-white px-5 py-4 shadow-sm"><MyCrops crops={myCrops} compact /></div>}
 
       <Indicators weather={weather} />
 
-      <div className="mt-8"><GanadoCta /></div>
       <div className="mt-8"><SenasCta /></div>
       <div className="mt-8"><DiagnoseCta /></div>
 
@@ -133,6 +134,7 @@ function MobileQuick() {
     <div className="mobile-quick mt-5 grid w-full gap-2">
       <a href="#/sembrar" className="btn-primary !normal-case !tracking-normal !text-[.95rem]">Consultar condiciones de siembra <Icon name="arrowRight" size={18} /></a>
       <a href="#/clima" className="btn-soft !normal-case !tracking-normal !text-[.95rem]"><Icon name="cloudSun" size={18} />{m ? `Clima de ${m.name}` : 'Elegir municipio'}</a>
+      <a href="#/ganado" className="btn-soft !normal-case !tracking-normal !text-[.95rem]" data-testid="quick-ganado"><Icon name="alert" size={18} />Proteger mi rebaño</a>
     </div>
   )
 }

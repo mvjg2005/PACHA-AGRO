@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { BottomNav } from './components/BottomNav'
 import { PachaIA } from './components/PachaIA'
+import { UpdateBanner } from './components/UpdateBanner'
 import { SiteFooter, SiteHeader } from './components/SiteChrome'
 import { Loading } from './components/ui'
 import { useRoute } from './lib/router'
@@ -105,6 +106,7 @@ export default function App() {
       <a href="#main" onClick={event => { event.preventDefault(); document.getElementById('main')?.focus() }} className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-30 focus:bg-papel focus:p-2">Ir al contenido</a>
       <SiteHeader current={nav} />
       <OfflineBanner />
+      <UpdateBanner />
       <main id="main" tabIndex={-1} className={`site-main ${wide ? 'site-main-wide' : ''}`}>
         <Suspense fallback={<Loading />}>{user?.must_change_password ? <ForcedPassword /> : <Page parts={parts} />}</Suspense>
       </main>
