@@ -10,8 +10,8 @@ import { LogoMark } from './Logo'
 /* Pacha IA: asistente flotante por voz y texto. Basado en el prototipo hecho con Antigravity;
    ahora usa el clima real, muestra el formato sin asteriscos y ofrece técnicos del directorio. */
 
-interface Msg { id: string; role: 'user' | 'assistant' | 'system'; content: string; speech?: string; time: string; sources?: string[]; suggestions?: string[]; experts?: ExpertT[] }
-interface Reply { reply: string; speech_text: string; provider: string; sources: string[]; suggested_questions: string[]; experts: ExpertT[]; location: { name: string; department_name: string } }
+interface Msg { id: string; role: 'user' | 'assistant' | 'system'; content: string; speech?: string; time: string; sources?: string[]; suggestions?: string[]; experts?: ExpertT[]; aiError?: string | null }
+interface Reply { reply: string; speech_text: string; provider: string; ai_error: string | null; sources: string[]; suggested_questions: string[]; experts: ExpertT[]; location: { name: string; department_name: string } }
 
 const VOICE_KEY = 'agb_agent_voice'
 const now = () => new Date().toLocaleTimeString('es-BO', { hour: '2-digit', minute: '2-digit' })
@@ -84,7 +84,7 @@ export function PachaIA() {
         message: q, municipality_id: municipalityId, lat: gps && gps.municipalityId === municipalityId ? gps.lat : null,
         lon: gps && gps.municipalityId === municipalityId ? gps.lon : null, crop: user?.crops[0] ?? null, history } })
       const id = `a${Date.now()}`
-      setMsgs(p => [...p, { id, role: 'assistant', content: r.reply, speech: r.speech_text, time: now(), sources: r.sources, suggestions: r.suggested_questions, experts: r.experts }])
+      setMsgs(p => [...p, { id, role: 'assistant', content: r.reply, speech: r.speech_text, time: now(), sources: r.sources, suggestions: r.suggested_questions, experts: r.experts, aiError: r.ai_error }])
       if (voiceOn && isSpeechSynthesisSupported()) { setSpeakingId(id); speakText(r.speech_text, { onEnd: () => setSpeakingId(null), onError: () => setSpeakingId(null) }) }
     } catch (e) {
       setMsgs(p => [...p, { id: `e${Date.now()}`, role: 'system', content: (e as Error).message || 'No se pudo conectar con Pacha IA. Intente de nuevo.', time: now() }])
@@ -185,6 +185,7 @@ export function PachaIA() {
                       )}
                     </div>
                     {x.sources && x.sources.length > 0 && <p className="mt-1 text-[10px] text-musgo">Fuente: {x.sources.join(' · ')}</p>}
+                    {x.aiError && <p className="mt-1 text-[11px] text-rojo" data-testid="pacha-ai-error">{user?.role === 'admin' ? `La IA no respondió: ${x.aiError}` : 'La IA no está disponible en este momento; se usó la respuesta automática.'}</p>}
                   </div>
                   {x.suggestions && x.suggestions.length > 0 && x.id === msgs[msgs.length - 1]?.id && (
                     <div className="mt-2 flex max-w-[95%] flex-wrap gap-1.5">

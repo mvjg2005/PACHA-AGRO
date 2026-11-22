@@ -138,3 +138,23 @@ def test_questions_to_pacha_and_no_repetition(app_client):
     assert replies[0] != replies[1]
     d = chat(app_client, "estoy bien", municipality_id="or-oruro")
     assert "Me alegra" in d["reply"]
+
+
+def test_ai_error_is_explained_without_leaking_key(app_client, monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    monkeypatch.setattr(get_settings(), "gemini_api_key", "SECRETO123")
+
+    class Client:
+        def __init__(self, **kw): pass
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+
+        def post(self, url, json, headers):
+            return httpx.Response(404, json={"error": {"message": "models/gemini-x is not found. key SECRETO123"}})
+    monkeypatch.setattr(agent.httpx, "Client", Client)
+    d = chat(app_client, "hola")
+    assert d["provider"] == "local" and "404" in d["ai_error"] and "GEMINI_MODEL" in d["ai_error"]
+    assert "SECRETO123" not in d["ai_error"]
+    st = app_client.get("/api/ai/agent/status").json()
+    assert st["provider"] == "gemini" and "404" in st["last_error"] and "SECRETO123" not in str(st)

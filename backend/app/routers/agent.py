@@ -18,6 +18,8 @@ def status():
     s = get_settings()
     return {"status": "ready", "agent_name": "Pacha IA",
             "provider": "claude" if s.anthropic_api_key else "gemini" if s.gemini_api_key else "local",
+            "model": s.assistant_model if s.anthropic_api_key else s.gemini_model if s.gemini_api_key else None,
+            "last_error": (agent.LAST_ERROR["claude"] if s.anthropic_api_key else agent.LAST_ERROR["gemini"]),
             "voice": "navegador (Web Speech API)"}
 
 

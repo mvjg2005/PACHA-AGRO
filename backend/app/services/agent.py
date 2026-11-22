@@ -22,6 +22,25 @@ from app.services.textnorm import normalize
 
 logger = logging.getLogger("agrobolivia.agent")
 DEFAULT_MUNICIPALITY_ID = "or-challapata"
+# Último error de cada proveedor de IA (sin datos secretos), para diagnosticar desde la app.
+LAST_ERROR: dict[str, str | None] = {"claude": None, "gemini": None}
+
+ERROR_HELP = {
+    400: "la clave no es válida o la solicitud fue rechazada",
+    401: "la clave no es válida",
+    403: "la clave no tiene permiso (revise que la API esté habilitada para esa clave)",
+    404: "el modelo no existe: cambie el modelo en la variable de entorno",
+    429: "se agotó la cuota o el saldo de la clave",
+}
+
+
+def _explain(provider: str, status: int, detail: str = "") -> str:
+    help_ = ERROR_HELP.get(status, "error del servicio, intente más tarde" if status >= 500 else "error desconocido")
+    model_var = "ASSISTANT_MODEL" if provider == "claude" else "GEMINI_MODEL"
+    msg = f"{'Claude' if provider == 'claude' else 'Gemini'} respondió {status}: {help_}"
+    if status == 404:
+        msg += f" ({model_var})"
+    return msg + (f". Detalle: {detail[:160]}" if detail else "")
 
 SYSTEM_PROMPT = """Eres Pacha IA, el asistente agroclimático de PACHA-AGRO (AgroBolivia) para productoras y productores de Bolivia.
 
@@ -169,11 +188,16 @@ def ask_claude(message: str, context: str, history: list[dict]) -> str | None:
             output_config={"effort": "low"}, system=SYSTEM_PROMPT,
             messages=[*_history(history), {"role": "user", "content": f"{context}\n\nConsulta: {message}"}],
         )
-    except (anthropic.APIStatusError, anthropic.APIConnectionError) as e:
-        logger.warning("Pacha IA (Claude) no disponible: %s", type(e).__name__)
+    except anthropic.APIStatusError as e:
+        LAST_ERROR["claude"] = _explain("claude", e.status_code)
+        logger.warning("Pacha IA: %s", LAST_ERROR["claude"])
+        return None
+    except anthropic.APIConnectionError:
+        LAST_ERROR["claude"] = "No se pudo conectar con Claude (red del servidor)."
         return None
     if r.stop_reason == "refusal":
         return None
+    LAST_ERROR["claude"] = None
     return "".join(b.text for b in r.content if b.type == "text").strip() or None
 
 
@@ -184,18 +208,29 @@ def ask_gemini(message: str, context: str, history: list[dict]) -> str | None:
     turns = [{"role": "model" if h["role"] == "assistant" else "user", "parts": [{"text": h["content"]}]} for h in _history(history)]
     payload = {"contents": [*turns, {"role": "user", "parts": [{"text": f"{context}\n\nConsulta: {message}"}]}],
                "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
-               "generationConfig": {"temperature": 0.4, "maxOutputTokens": 800}}
+               "generationConfig": {"temperature": 0.4, "maxOutputTokens": 2048}}
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{s.gemini_model}:generateContent"
     try:
         with httpx.Client(timeout=20.0) as c:
             res = c.post(url, json=payload, headers={"x-goog-api-key": s.gemini_api_key})
         if res.status_code != 200:
-            logger.warning("Pacha IA (Gemini) respondió %s", res.status_code)
+            try:
+                detail = str(res.json().get("error", {}).get("message", ""))
+            except ValueError:
+                detail = ""
+            LAST_ERROR["gemini"] = _explain("gemini", res.status_code, detail.replace(s.gemini_api_key, "***"))
+            logger.warning("Pacha IA: %s", LAST_ERROR["gemini"])
             return None
         parts = res.json()["candidates"][0]["content"]["parts"]
-        return "".join(p.get("text", "") for p in parts).strip() or None
-    except (httpx.HTTPError, KeyError, IndexError, ValueError):
-        logger.warning("Pacha IA (Gemini) no disponible", exc_info=True)
+        text = "".join(p.get("text", "") for p in parts if not p.get("thought")).strip()
+        LAST_ERROR["gemini"] = None if text else "Gemini respondió sin texto (revise GEMINI_MODEL)."
+        return text or None
+    except httpx.HTTPError:
+        LAST_ERROR["gemini"] = "No se pudo conectar con Gemini (red del servidor)."
+        return None
+    except (KeyError, IndexError, ValueError):
+        LAST_ERROR["gemini"] = "Gemini respondió en un formato inesperado (posible bloqueo de seguridad o modelo no compatible)."
+        logger.warning("Pacha IA (Gemini) respuesta inesperada", exc_info=True)
         return None
 
 
@@ -350,6 +385,10 @@ def chat(db: Session, message: str, municipality_id: str | None, lat: float | No
     sources = ["Motor local de PACHA-AGRO"] if provider == "local" else [f"Pacha IA ({'Claude' if provider == 'claude' else 'Gemini'})"]
     if w.get("available") or w.get("frost_level") not in (None, "desconocido"):
         sources.append(w.get("source") or "NASA POWER (promedio histórico)")
-    return {"reply": reply, "speech_text": clean_for_speech(reply), "provider": provider, "sources": sources,
+    s = get_settings()
+    ai_error = None
+    if provider == "local" and (s.anthropic_api_key or s.gemini_api_key):
+        ai_error = " · ".join(e for k, key in (("claude", s.anthropic_api_key), ("gemini", s.gemini_api_key)) if key and (e := LAST_ERROR[k])) or None
+    return {"reply": reply, "speech_text": clean_for_speech(reply), "provider": provider, "ai_error": ai_error, "sources": sources,
             "suggested_questions": suggestions(topics, location), "experts": experts,
             "location": {"id": location["id"], "name": location["name"], "department_name": location["department_name"]}}
