@@ -26,6 +26,7 @@ logger = logging.getLogger("agrobolivia.agent")
 DEFAULT_MUNICIPALITY_ID = "or-challapata"
 # Último error de cada proveedor de IA (sin datos secretos), para diagnosticar desde la app.
 LAST_ERROR: dict[str, str | None] = {"groq": None}
+VISION_ERROR: dict[str, str | None] = {"groq": None}  # revisión de fotos, aparte del chat
 NAMES = {"groq": ("Groq", "GROQ_MODEL")}
 OPENAI_COMPAT_URL = {"groq": "https://api.groq.com/openai/v1/chat/completions"}
 
@@ -41,7 +42,8 @@ MODEL_OVERRIDE: dict[str, str | None] = {"text": None, "vision": None}
 AVAILABLE_MODELS: list[str] = []
 SKIP_MODELS = ("whisper", "tts", "guard", "embed", "playai", "orpheus", "safeguard", "prompt-guard")
 PREFER = {"text": ("versatile", "70b", "gpt-oss-120b", "gpt-oss", "llama", "qwen", "kimi", "deepseek", "gemma"),
-          "vision": ("scout", "maverick", "vision", "llama-4")}
+          # Modelos que leen imágenes. «qwen3.» toma Qwen 3.5 en adelante (multimodales); no Qwen3-32B, que solo lee texto.
+          "vision": ("scout", "maverick", "vision", "llama-4", "-vl", "omni", "pixtral", "llava", "gemma-3", "gemma-4", "qwen3.")}
 
 
 def provider_model(name: str, s=None, kind: str = "text") -> str:
@@ -91,9 +93,11 @@ def key_hint(key: str) -> str:
     return f"{key[:4]}… ({len(key)} caracteres)"
 
 
-def _explain(provider: str, status: int, detail: str = "") -> str:
+def _explain(provider: str, status: int, detail: str = "", kind: str = "text") -> str:
     help_ = ERROR_HELP.get(status, "error del servicio, intente más tarde" if status >= 500 else "error desconocido")
     name, model_var = NAMES[provider]
+    if kind == "vision":
+        model_var = "GROQ_VISION_MODEL"
     msg = f"{name} respondió {status}: {help_}"
     key = provider_keys()[provider]
     if status in (400, 401, 403) and key and not key.startswith(EXPECTED_PREFIX[provider]):
@@ -256,6 +260,7 @@ def groq_chat(system: str, messages: list[dict], max_tokens: int = 1500, json_mo
     """Llamada a Groq (formato de chat de OpenAI), con reintentos si está saturado.
     Lo usan Pacha IA, la Asesoría y la revisión de plantas. Devuelve None si no hay clave o si falla."""
     key = provider_keys()["groq"]
+    errs = VISION_ERROR if kind == "vision" else LAST_ERROR
     if not key:
         return None
     if budget is not None:
@@ -282,7 +287,7 @@ def groq_chat(system: str, messages: list[dict], max_tokens: int = 1500, json_mo
                 if res.status_code == 200:
                     text = (res.json()["choices"][0]["message"].get("content") or "")
                     text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()  # razonamiento interno (Qwen)
-                    LAST_ERROR["groq"] = None if text else "Groq respondió sin texto."
+                    errs["groq"] = None if text else "Groq respondió sin texto."
                     return text or None
                 if res.status_code in RETRY_STATUS and attempt < 3 and _time_left() > 8:
                     time.sleep(1.5 * attempt)
@@ -292,13 +297,13 @@ def groq_chat(system: str, messages: list[dict], max_tokens: int = 1500, json_mo
                     detail = str(err.get("message", "") if isinstance(err, dict) else err or res.json().get("message", ""))
                 except ValueError:
                     detail = ""
-                LAST_ERROR["groq"] = _explain("groq", res.status_code, detail.replace(key, "***"))
+                errs["groq"] = _explain("groq", res.status_code, detail.replace(key, "***"), kind)
                 break
     except httpx.HTTPError:
-        LAST_ERROR["groq"] = "No se pudo conectar con Groq (red del servidor)."
+        errs["groq"] = "No se pudo conectar con Groq (red del servidor)."
     except (KeyError, IndexError, ValueError):
-        LAST_ERROR["groq"] = "Groq respondió en un formato inesperado."
-    logger.warning("IA (Groq): %s", LAST_ERROR["groq"])
+        errs["groq"] = "Groq respondió en un formato inesperado."
+    logger.warning("IA (Groq%s): %s", " imágenes" if kind == "vision" else "", errs["groq"])
     return None
 
 

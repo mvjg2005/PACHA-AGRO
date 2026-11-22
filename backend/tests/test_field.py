@@ -150,3 +150,30 @@ def test_deleting_account_removes_plots(app_client):
     assert c.request("DELETE", "/api/auth/me", json={"password": "clave123"}, headers=h).status_code == 200
     with dbmod.SessionLocal() as db:
         assert db.query(Plot).count() == 0 and db.query(FieldRecord).count() == 0
+
+
+def test_retired_vision_model_switches_to_available_multimodal_model(app_client, fake_groq, monkeypatch):
+    from app.services import agent
+    monkeypatch.setattr(agent, "VISION_ERROR", {"groq": None})
+    # Lista real de una cuenta gratuita sin Llama 4 Scout (noviembre de 2026)
+    fake_groq.models = ["allam-2-7b", "meta-llama/llama-prompt-guard-2-22m", "openai/gpt-oss-120b", "openai/gpt-oss-20b",
+                        "openai/gpt-oss-safeguard-20b", "qwen/qwen3.8-27b", "whisper-large-v3"]
+    fake_groq.error(404, "The model `meta-llama/llama-4-scout-17b-16e-instruct` does not exist or you do not have access to it.")
+    fake_groq.reply(json.dumps(AI_BODY))
+    d = diag(app_client, crop="papa").json()
+    assert d["mode"] == "ia"
+    posts = [c for c in fake_groq.calls if not c.get("get")]
+    assert posts[1]["json"]["model"] == "qwen/qwen3.8-27b"
+    st = app_client.get("/api/ai/agent/status").json()
+    assert st["vision_model"] == "qwen/qwen3.8-27b" and st["vision_error"] is None
+
+
+def test_vision_error_does_not_mark_the_chat_as_broken(app_client, fake_groq, monkeypatch):
+    from app.services import agent
+    monkeypatch.setattr(agent, "VISION_ERROR", {"groq": None})
+    monkeypatch.setattr(agent, "LAST_ERROR", {"groq": None})
+    fake_groq.models = ["openai/gpt-oss-120b"]
+    fake_groq.error(404, "The model `meta-llama/llama-4-scout-17b-16e-instruct` does not exist.")
+    assert diag(app_client).json()["mode"] == "guia"
+    st = app_client.get("/api/ai/agent/status").json()
+    assert st["last_error"] is None and "GROQ_VISION_MODEL" in st["vision_error"]

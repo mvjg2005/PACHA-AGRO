@@ -173,6 +173,8 @@ def test_choose_model_preferences():
     assert choose_model(["qwen/qwen3-32b", "llama-3.1-8b-instant", "llama-3.3-70b-versatile"], "text") == "llama-3.3-70b-versatile"
     assert choose_model(["whisper-large-v3", "playai-tts"], "text") is None
     assert choose_model(["llama-3.1-8b-instant"], "vision") is None
+    assert choose_model(["qwen/qwen3-32b", "openai/gpt-oss-120b"], "vision") is None  # Qwen3-32B solo lee texto
+    assert choose_model(["openai/gpt-oss-120b", "qwen/qwen3.8-27b"], "vision") == "qwen/qwen3.8-27b"
 
 
 def test_reasoning_tags_are_removed(app_client, fake_groq):

@@ -4,7 +4,7 @@ Resultados del 22-11-2026. El backend usa fixtures. La suite de navegador usa el
 
 | Suite | Comando | Resultado |
 |---|---|---|
-| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **171/171** aprobadas |
+| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **173/173** aprobadas |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **18/18** aprobadas |
 | Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `npm run test:e2e -- http://localhost:8000` | **38 casos** (38/38 aprobados en local el 22-11-2026) (ejecutar en local o CI dedicado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |

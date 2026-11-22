@@ -20,7 +20,7 @@ def status():
     return {"status": "ready", "agent_name": "Pacha IA",
             "provider": prov,
             "model": agent.provider_model(prov) if active else None,
-            "last_error": agent.LAST_ERROR.get(prov),
+            "last_error": agent.LAST_ERROR.get(prov), "vision_error": agent.VISION_ERROR.get("groq"),
             "backup": active[1:],
             "backup_errors": {p: agent.LAST_ERROR[p] for p in active[1:]},
             "key_hint": {p: agent.key_hint(keys[p]) for p in active},
