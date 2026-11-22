@@ -1,4 +1,7 @@
 """Uywa · Ganado en riesgo."""
+import json
+from functools import lru_cache
+from pathlib import Path
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -101,3 +104,31 @@ def report(municipality_id: str = Query(max_length=60), campaign: int | None = N
 def weekly_bulletin(municipality_id: str = Query(max_length=60)):
     """SMS corto y texto para radio con el pronóstico de la semana (para quien no tiene internet)."""
     return bulletin.build(_muni(municipality_id))
+
+
+@lru_cache
+def _businesses() -> dict:
+    return json.loads((Path(__file__).resolve().parent.parent / "data" / "businesses.json").read_text(encoding="utf-8"))
+
+
+@router.get("/negocios")
+def businesses(municipality_id: str | None = Query(None, max_length=60), service: str | None = Query(None, max_length=20)):
+    """Negocios agropecuarios de un directorio público (con fuente y aviso de que no están verificados)."""
+    d = _businesses()
+    m = get_municipality(municipality_id) if municipality_id else None
+    items = d["items"]
+    if service:
+        items = [i for i in items if service in i["services"]]
+    out = []
+    for i in items:
+        bm = get_municipality(i["municipality_id"])
+        same = bool(m and i["municipality_id"] == m["id"])
+        near = bool(m and bm and bm["department_id"] == m["department_id"])
+        if m and not near:
+            continue
+        digits = i["phone"].lstrip("+")
+        out.append({**i, "municipality": f"{bm['name']}, {bm['department_name']}" if bm else "", "same_municipality": same,
+                    "whatsapp_url": f"https://wa.me/{digits}", "service_labels": [d["services"][x] for x in i["services"]]})
+    order = {i["id"]: k for k, i in enumerate(d["items"])}  # el archivo ya está ordenado por relevancia
+    out.sort(key=lambda x: (not x["same_municipality"], order[x["id"]]))
+    return {"note": d["note"], "source": d["source"], "services": d["services"], "items": out}

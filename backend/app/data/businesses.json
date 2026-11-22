@@ -1,0 +1,19 @@
+{
+  "note": "Negocios tomados de un directorio público de empresas (BoliviaHub, «Agropecuarios y veterinarias rurales»). PACHA-AGRO no los verificó ni tiene relación con ellos: confirme por teléfono qué ofrecen, precios y disponibilidad antes de ir.",
+  "source": {"name": "BoliviaHub", "url": "https://boliviahub.com/categoria/oruro/challapata-ff3/agropecuarios-y-veterinarias-rurales", "retrieved": "2026-11-22"},
+  "services": {"veterinaria": "Servicios veterinarios", "agronomia": "Consultoría en agronomía", "forraje": "Forraje", "insumos": "Insumos y abonos", "construccion": "Construcción (cobertizos, muros)"},
+  "items": [
+    {"id": "fertialtiplano", "name": "FERTIALTIPLANO", "kind": "Empresa unipersonal", "municipality_id": "or-challapata",
+     "address": "Calle Ladislao Cabrera s/n, Challapata", "phone": "+59168313350",
+     "offers": "Venta de agroquímicos y abonos orgánicos; servicios veterinarios y consultorías en agronomía.",
+     "services": ["veterinaria", "agronomia", "insumos"], "url": "https://boliviahub.com/empresa/fertialtiplano-tkg"},
+    {"id": "daisy-condori-aguilar", "name": "Daisy Condori Aguilar", "kind": "Empresa unipersonal", "municipality_id": "or-challapata",
+     "address": "Challapata", "phone": "+59174116115",
+     "offers": "Agricultura, abastecimiento de forraje, crianza de bovinos y venta de leche.",
+     "services": ["forraje"], "url": "https://boliviahub.com/empresa/daisy-condori-aguilar-v66"},
+    {"id": "adrian-cruz-choque", "name": "Adrian Cruz Choque", "kind": "Empresa unipersonal", "municipality_id": "or-challapata",
+     "address": "Challapata", "phone": "+59174757582",
+     "offers": "Agricultura, construcción de obras civiles y consultoría en obras de ingeniería.",
+     "services": ["construccion"], "url": "https://boliviahub.com/empresa/adrian-cruz-choque-l41"}
+  ]
+}

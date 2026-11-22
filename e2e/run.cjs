@@ -628,6 +628,8 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     await p.waitForFunction(() => { const i = document.querySelector('img[src="/img/historia/forraje.jpg"]'); return i && i.complete && i.naturalWidth > 0 }, null, { timeout: 15000 })
     await p.getByTestId('ganado-nights').locator('ul, [role=alert], .border-l-\\[3px\\]').first().waitFor({ timeout: 90000 })
     await p.getByTestId('ganado-winter').getByRole('tab').first().waitFor({ timeout: 90000 })
+    await p.getByTestId('local-businesses').waitFor()
+    assert((await p.getByTestId('local-businesses').innerText()).includes('FERTIALTIPLANO'), 'faltan los negocios de la zona')
     await p.getByLabel('Cantidad de ovejas').fill('20')
     await p.getByLabel('Forraje guardado').fill('500'); await p.getByLabel('Unidad de forraje').selectOption('kg')
     const res = await p.getByTestId('forage-result').innerText()

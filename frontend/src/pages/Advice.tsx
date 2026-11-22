@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Icon } from '../components/Icon'
+import { LocalBusinesses } from '../components/LocalBusinesses'
 import { MunicipalitySelect } from '../components/SiteChrome'
 import { Button, ErrorBox, Loading, PageTitle, inputCls } from '../components/ui'
 import { api } from '../lib/api'
@@ -61,6 +62,7 @@ export default function Advice({ presetCrop }: { presetCrop?: string }) {
       {err && <ErrorBox message={err} />}
       {res && <AdviceResult r={res} question={q} />}
 
+      <LocalBusinesses municipalityId={municipalityId} />
       {all && <ResourceDirectory data={all} />}
     </div>
   )

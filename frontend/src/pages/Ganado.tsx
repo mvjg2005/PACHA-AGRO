@@ -3,6 +3,7 @@ import { Icon } from '../components/Icon'
 import { Listen } from '../components/Listen'
 import { MunicipalitySelect } from '../components/SiteChrome'
 import { Bulletin } from '../components/Bulletin'
+import { LocalBusinesses } from '../components/LocalBusinesses'
 import { Button, ErrorBox, Loading, Notice, inputCls } from '../components/ui'
 import { api } from '../lib/api'
 import { HERD, bs, forage, num, type HerdKind } from '../lib/calc'
@@ -44,6 +45,7 @@ export default function Ganado({ sub }: { sub?: string }) {
       </>}
       <Forage />
       <NoRoof />
+      <LocalBusinesses municipalityId={m?.id ?? null} title="Veterinaria, forraje y construcción en la zona" />
       {m && <Losses municipalityId={m.id} name={m.name} />}
     </div>
   )

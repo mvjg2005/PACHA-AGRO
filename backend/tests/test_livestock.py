@@ -130,3 +130,13 @@ def test_bulletin_without_forecast(app_client, monkeypatch):
     from app.services.weather import service
     monkeypatch.setattr(service, "_forecast", lambda *a, **k: Block(available=False, source="x", kind="pronostico", error="sin red"))
     assert app_client.get("/api/ganado/boletin?municipality_id=or-challapata").json()["available"] is False
+
+
+def test_public_businesses_with_source_and_filters(app_client):
+    d = app_client.get("/api/ganado/negocios?municipality_id=or-challapata").json()
+    assert {i["name"] for i in d["items"]} == {"FERTIALTIPLANO", "Daisy Condori Aguilar", "Adrian Cruz Choque"}
+    assert "no los verificó" in d["note"] and d["source"]["url"].startswith("https://boliviahub.com/")
+    vet = app_client.get("/api/ganado/negocios?municipality_id=or-oruro&service=veterinaria").json()["items"]
+    assert [i["name"] for i in vet] == ["FERTIALTIPLANO"] and vet[0]["same_municipality"] is False
+    assert vet[0]["whatsapp_url"] == "https://wa.me/59168313350" and "nit" not in str(vet[0]).lower()
+    assert app_client.get("/api/ganado/negocios?municipality_id=lp-el-alto").json()["items"] == []  # otro departamento
