@@ -72,6 +72,13 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 
 Nada se presenta como algo que no es: los datos **simulados**, las **observaciones comunitarias**, los **datos ingresados por el agricultor** y los **pronósticos** llevan etiquetas distintas en la interfaz y en la API.
 
+### Estado del prototipo
+
+- **Con datos reales:** clima (Open-Meteo con respaldo MET Norway), historial y climatología NASA POWER, y medición de señas.
+- **En modo demostración:** WhatsApp, algunas reglas de papa/maíz y los datos de ejemplo con `SEED_DEMO=true`.
+- **Experimental:** umbrales y calendarios agronómicos, pendientes de validación por agrónomos.
+- **No integrado:** avisos oficiales del SENAMHI; la app enlaza a su sitio.
+
 ### Mi campo
 
 - **Revisión por foto:** posibles causas, qué verificar y primeras medidas sin químicos; la foto no se guarda y nunca se indican productos ni dosis.
