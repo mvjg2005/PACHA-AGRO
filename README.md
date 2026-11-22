@@ -74,13 +74,30 @@ Nada se presenta como algo que no es: los datos **simulados**, las **observacion
 
 ## Ejecutar (5 minutos)
 
-Requisitos: Python 3.11+, Node.js 18+ y npm. Para la suite E2E también se instala Chromium mediante Playwright.
+Requisitos: **Python 3.12** (probado; 3.11 compatible), **Node.js 22** (probado; 18+ sirve para desarrollo) y npm. El Docker de Render usa Node 20 para compilar el frontend. Para la suite E2E también se instala Chromium mediante Playwright.
 
 ```bash
 cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && cp .env.example .env
 ```
 
-Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). Luego compile el frontend:
+Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). Para generar una clave segura:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+En producción use `ENVIRONMENT=production` y una `SECRET_KEY` de 32 caracteres o más. La base de datos es SQLite por defecto en desarrollo; para PostgreSQL configure `DATABASE_URL`.
+
+La IA es opcional. Con una clave gratuita de Groq se activan Pacha IA, la asesoría y la revisión de plantas por foto; sin `GROQ_API_KEY` la app sigue funcionando con el motor local y una guía por síntomas.
+
+```bash
+# Opcional, en backend/.env
+GROQ_API_KEY=
+GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_VISION_MODEL=meta-llama/llama-4-scout-17b-16e-instruct
+```
+
+Luego compile el frontend:
 
 ```bash
 cd frontend && npm install && npm run build
