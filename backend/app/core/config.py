@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    @field_validator("anthropic_api_key", "xai_api_key", "gemini_api_key", mode="before")
+    @field_validator("anthropic_api_key", "xai_api_key", "groq_api_key", "gemini_api_key", mode="before")
     @classmethod
     def clean_key(cls, v):
         """Quita espacios, comillas y un «Bearer » pegado por error al copiar la clave."""
@@ -47,6 +47,9 @@ class Settings(BaseSettings):
     # Grok (xAI) para Pacha IA (opcional). Se usa si no hay clave de Anthropic.
     xai_api_key: str = ""
     xai_model: str = "grok-4"
+    # Groq (groq.com, claves «gsk_»), con plan gratuito (opcional).
+    groq_api_key: str = ""
+    groq_model: str = "llama-3.3-70b-versatile"
     # Alternativa para Pacha IA si no hay clave de Anthropic (opcional).
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.8-flash"

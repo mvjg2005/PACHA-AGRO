@@ -2,7 +2,6 @@
 from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 
-from app.core.config import get_settings
 from app.core.ratelimit import chat_limiter, client_key
 from app.db import get_db
 from app.deps import optional_user
@@ -15,15 +14,16 @@ router = APIRouter(prefix="/api/ai/agent", tags=["pacha ia"])
 
 @router.get("/status")
 def status():
-    s = get_settings()
-    prov = "claude" if s.anthropic_api_key else "grok" if s.xai_api_key else "gemini" if s.gemini_api_key else "local"
+    keys = agent.provider_keys()
+    active = [p for p, k in keys.items() if k]
+    prov = active[0] if active else "local"
     return {"status": "ready", "agent_name": "Pacha IA",
             "provider": prov,
-            "model": {"claude": s.assistant_model, "grok": s.xai_model, "gemini": s.gemini_model}.get(prov),
+            "model": agent.provider_model(prov) if active else None,
             "last_error": agent.LAST_ERROR.get(prov),
-            "backup": [p for p, k in (("grok", s.xai_api_key), ("gemini", s.gemini_api_key)) if k and p != prov],
-            "backup_errors": {p: agent.LAST_ERROR[p] for p, k in (("grok", s.xai_api_key), ("gemini", s.gemini_api_key)) if k and p != prov},
-            "key_hint": {p: agent.key_hint(k) for p, k in (("claude", s.anthropic_api_key), ("grok", s.xai_api_key), ("gemini", s.gemini_api_key)) if k},
+            "backup": active[1:],
+            "backup_errors": {p: agent.LAST_ERROR[p] for p in active[1:]},
+            "key_hint": {p: agent.key_hint(keys[p]) for p in active},
             "voice": "navegador (Web Speech API)"}
 
 

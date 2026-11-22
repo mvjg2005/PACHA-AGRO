@@ -260,20 +260,36 @@ def test_grok_error_explained_then_gemini(app_client, monkeypatch):
     assert "400" in agent.LAST_ERROR["grok"] and "xai-secreto" not in agent.LAST_ERROR["grok"]
 
 
-def test_groq_key_in_grok_variable_is_detected(app_client, monkeypatch):
+def test_groq_key_in_xai_variable_is_used_as_groq(app_client, monkeypatch):
     from app.core.config import get_settings
     from app.services import agent
     s = get_settings()
     monkeypatch.setattr(s, "xai_api_key", "gsk_clavedegroq123")
     monkeypatch.setattr(s, "gemini_api_key", "AIzaX")
-    monkeypatch.setattr(agent.time, "sleep", lambda x: None)
     _GrokClient.calls = []
-    _GrokClient.responses = [httpx.Response(400, json={"error": "Incorrect API key provided"}),
-                             httpx.Response(503, json={"error": {"message": "high demand"}}),
-                             httpx.Response(503, json={"error": {"message": "high demand"}}),
-                             httpx.Response(503, json={"error": {"message": "high demand"}})]
+    _GrokClient.responses = [httpx.Response(200, json={"choices": [{"message": {"content": "¡Hola desde Groq!"}}]})]
     monkeypatch.setattr(agent.httpx, "Client", _GrokClient)
     d = chat(app_client, "hola")
-    assert d["provider"] == "local" and "Groq" in d["ai_error"] and "503" in d["ai_error"]
+    assert d["provider"] == "groq" and d["sources"][0] == "Pacha IA (Groq)"
+    call = _GrokClient.calls[0]
+    assert call["url"] == "https://api.groq.com/openai/v1/chat/completions" and call["json"]["model"] == s.groq_model
     st = app_client.get("/api/ai/agent/status").json()
-    assert "503" in st["backup_errors"]["gemini"] and st["key_hint"]["grok"].startswith("gsk_") and "clavedegroq" not in str(st)
+    assert st["provider"] == "groq" and st["backup"] == ["gemini"] and st["key_hint"]["groq"].startswith("gsk_")
+    assert "clavedegroq" not in str(st)
+
+
+def test_groq_error_then_gemini_error_both_reported(app_client, monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    s = get_settings()
+    monkeypatch.setattr(s, "groq_api_key", "gsk_x")
+    monkeypatch.setattr(s, "gemini_api_key", "AIzaX")
+    monkeypatch.setattr(agent.time, "sleep", lambda x: None)
+    _GrokClient.calls = []
+    busy = lambda: httpx.Response(503, json={"error": {"message": "high demand"}})  # noqa: E731
+    _GrokClient.responses = [httpx.Response(401, json={"error": {"message": "Invalid API Key"}}), busy(), busy(), busy()]
+    monkeypatch.setattr(agent.httpx, "Client", _GrokClient)
+    d = chat(app_client, "hola")
+    assert d["provider"] == "local" and "Groq respondió 401" in d["ai_error"] and "503" in d["ai_error"]
+    st = app_client.get("/api/ai/agent/status").json()
+    assert "503" in st["backup_errors"]["gemini"]

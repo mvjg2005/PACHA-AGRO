@@ -24,8 +24,24 @@ from app.services.textnorm import normalize
 logger = logging.getLogger("agrobolivia.agent")
 DEFAULT_MUNICIPALITY_ID = "or-challapata"
 # Último error de cada proveedor de IA (sin datos secretos), para diagnosticar desde la app.
-LAST_ERROR: dict[str, str | None] = {"claude": None, "grok": None, "gemini": None}
-NAMES = {"claude": ("Claude", "ASSISTANT_MODEL"), "grok": ("Grok", "XAI_MODEL"), "gemini": ("Gemini", "GEMINI_MODEL")}
+LAST_ERROR: dict[str, str | None] = {"claude": None, "grok": None, "groq": None, "gemini": None}
+NAMES = {"claude": ("Claude", "ASSISTANT_MODEL"), "grok": ("Grok", "XAI_MODEL"), "groq": ("Groq", "GROQ_MODEL"),
+         "gemini": ("Gemini", "GEMINI_MODEL")}
+OPENAI_COMPAT_URL = {"grok": "https://api.x.ai/v1/chat/completions", "groq": "https://api.groq.com/openai/v1/chat/completions"}
+
+
+def provider_keys(s=None) -> dict[str, str]:
+    """Claves por proveedor, en orden de preferencia. Una clave de Groq («gsk_») puesta por error en
+    XAI_API_KEY se reconoce como Groq."""
+    s = s or get_settings()
+    xai = s.xai_api_key
+    groq = s.groq_api_key or (xai if xai.startswith("gsk_") else "")
+    return {"claude": s.anthropic_api_key, "grok": "" if xai.startswith("gsk_") else xai, "groq": groq, "gemini": s.gemini_api_key}
+
+
+def provider_model(name: str, s=None) -> str:
+    s = s or get_settings()
+    return {"claude": s.assistant_model, "grok": s.xai_model, "groq": s.groq_model, "gemini": s.gemini_model}[name]
 
 ERROR_HELP = {
     400: "la clave no es válida o la solicitud fue rechazada",
@@ -36,7 +52,7 @@ ERROR_HELP = {
 }
 
 
-EXPECTED_PREFIX = {"claude": "sk-ant-", "grok": "xai-", "gemini": "AIza"}
+EXPECTED_PREFIX = {"claude": "sk-ant-", "grok": "xai-", "groq": "gsk_", "gemini": "AIza"}
 
 
 def key_hint(key: str) -> str:
@@ -48,7 +64,7 @@ def _explain(provider: str, status: int, detail: str = "") -> str:
     help_ = ERROR_HELP.get(status, "error del servicio, intente más tarde" if status >= 500 else "error desconocido")
     name, model_var = NAMES[provider]
     msg = f"{name} respondió {status}: {help_}"
-    key = {"claude": get_settings().anthropic_api_key, "grok": get_settings().xai_api_key, "gemini": get_settings().gemini_api_key}[provider]
+    key = provider_keys()[provider]
     if status in (400, 401, 403) and key and not key.startswith(EXPECTED_PREFIX[provider]):
         msg += f". La clave configurada no empieza con «{EXPECTED_PREFIX[provider]}»: parece de otro servicio"
         if provider == "grok" and key.startswith("gsk_"):
@@ -272,22 +288,22 @@ def ask_gemini(message: str, context: str, history: list[dict]) -> str | None:
     return None
 
 
-def ask_grok(message: str, context: str, history: list[dict]) -> str | None:
-    """Grok (xAI), API compatible con el formato de chat de OpenAI. Reintenta si está saturado."""
-    s = get_settings()
-    if not s.xai_api_key:
+def _ask_openai_compatible(provider: str, message: str, context: str, history: list[dict]) -> str | None:
+    """Grok (xAI) y Groq usan el formato de chat de OpenAI. Reintenta si el servicio está saturado."""
+    key = provider_keys()[provider]
+    if not key:
         return None
-    payload = {"model": s.xai_model, "temperature": 0.4, "max_tokens": 1500,
+    name = NAMES[provider][0]
+    payload = {"model": provider_model(provider), "temperature": 0.4, "max_tokens": 1500,
                "messages": [{"role": "system", "content": SYSTEM_PROMPT}, *_history(history),
                             {"role": "user", "content": f"{context}\n\nConsulta: {message}"}]}
     try:
         with httpx.Client(timeout=30.0) as c:
             for attempt in range(3):
-                res = c.post("https://api.x.ai/v1/chat/completions", json=payload,
-                             headers={"Authorization": f"Bearer {s.xai_api_key}"})
+                res = c.post(OPENAI_COMPAT_URL[provider], json=payload, headers={"Authorization": f"Bearer {key}"})
                 if res.status_code == 200:
                     text = (res.json()["choices"][0]["message"].get("content") or "").strip()
-                    LAST_ERROR["grok"] = None if text else "Grok respondió sin texto."
+                    LAST_ERROR[provider] = None if text else f"{name} respondió sin texto."
                     return text or None
                 if res.status_code in RETRY_STATUS and attempt < 2:
                     time.sleep(1.5 * (attempt + 1))
@@ -297,14 +313,22 @@ def ask_grok(message: str, context: str, history: list[dict]) -> str | None:
                     detail = str(err.get("message", "") if isinstance(err, dict) else err or res.json().get("message", ""))
                 except ValueError:
                     detail = ""
-                LAST_ERROR["grok"] = _explain("grok", res.status_code, detail.replace(s.xai_api_key, "***"))
+                LAST_ERROR[provider] = _explain(provider, res.status_code, detail.replace(key, "***"))
                 break
     except httpx.HTTPError:
-        LAST_ERROR["grok"] = "No se pudo conectar con Grok (red del servidor)."
+        LAST_ERROR[provider] = f"No se pudo conectar con {name} (red del servidor)."
     except (KeyError, IndexError, ValueError):
-        LAST_ERROR["grok"] = "Grok respondió en un formato inesperado."
-    logger.warning("Pacha IA: %s", LAST_ERROR["grok"])
+        LAST_ERROR[provider] = f"{name} respondió en un formato inesperado."
+    logger.warning("Pacha IA: %s", LAST_ERROR[provider])
     return None
+
+
+def ask_grok(message: str, context: str, history: list[dict]) -> str | None:
+    return _ask_openai_compatible("grok", message, context, history)
+
+
+def ask_groq(message: str, context: str, history: list[dict]) -> str | None:
+    return _ask_openai_compatible("groq", message, context, history)
 
 
 GREETINGS = ("hola", "holi", "ola", "buenos dias", "buen dia", "buenas tardes", "buenas noches", "buenas", "saludos", "hey",
@@ -451,7 +475,7 @@ def chat(db: Session, message: str, municipality_id: str | None, lat: float | No
     context = _context(location, w, crop, experts, resources, meetings)
 
     reply, provider = None, "local"
-    for name, ask in (("claude", ask_claude), ("grok", ask_grok), ("gemini", ask_gemini)):
+    for name, ask in (("claude", ask_claude), ("grok", ask_grok), ("groq", ask_groq), ("gemini", ask_gemini)):
         if reply := ask(message, context, history):
             provider = name
             break
@@ -462,7 +486,7 @@ def chat(db: Session, message: str, municipality_id: str | None, lat: float | No
         sources.append(w.get("source") or "NASA POWER (promedio histórico)")
     s = get_settings()
     ai_error = None
-    keys = {"claude": s.anthropic_api_key, "grok": s.xai_api_key, "gemini": s.gemini_api_key}
+    keys = provider_keys(s)
     if provider == "local" and any(keys.values()):
         ai_error = " · ".join(e for k, key in keys.items() if key and (e := LAST_ERROR[k])) or None
     return {"reply": reply, "speech_text": clean_for_speech(reply), "provider": provider, "ai_error": ai_error, "sources": sources,
