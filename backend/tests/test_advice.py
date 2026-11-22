@@ -1,6 +1,4 @@
 """Asesoría: directorio de técnicos, recursos externos y asistente con IA (Claude simulado)."""
-from types import SimpleNamespace
-
 import pytest
 
 from tests.conftest import admin_headers, register
@@ -79,56 +77,22 @@ def test_basic_mode_without_api_key_recommends_resources(app_client):
     assert "senamhi" in [x["id"] for x in clima["resources"]]
 
 
-class FakeAnthropic:
-    """Cliente simulado: guarda la solicitud y devuelve una respuesta fija."""
-    calls = []
-    reply = SimpleNamespace(stop_reason="end_turn", content=[SimpleNamespace(type="text", text="Respuesta de prueba de la IA.")])
-    raise_exc = None
-
-    def __init__(self, **kw):
-        self.beta = SimpleNamespace(messages=SimpleNamespace(create=self._create))
-
-    def _create(self, **kw):
-        FakeAnthropic.calls.append(kw)
-        if FakeAnthropic.raise_exc:
-            raise FakeAnthropic.raise_exc
-        return FakeAnthropic.reply
-
-
-@pytest.fixture
-def fake_ai(monkeypatch):
-    import anthropic
-
-    from app.core.config import get_settings
-    monkeypatch.setattr(get_settings(), "anthropic_api_key", "clave-de-prueba")
-    monkeypatch.setattr(anthropic, "Anthropic", FakeAnthropic)
-    FakeAnthropic.calls, FakeAnthropic.raise_exc = [], None
-    FakeAnthropic.reply = SimpleNamespace(stop_reason="end_turn", content=[SimpleNamespace(type="text", text="Respuesta de prueba de la IA.")])
-    return FakeAnthropic
-
-
-def test_ai_answer_uses_claude_with_fallbacks_and_never_sees_phone_numbers(app_client, fake_ai):
-    c = app_client
-    add_expert(c)
-    r = ask(c, "Las hojas de mi papa tienen manchas", "lp-el-alto")
+def test_ai_answer_uses_groq_and_never_sees_phone_numbers(app_client, fake_groq):
+    add_expert(app_client)
+    fake_groq.reply("Respuesta de prueba de la IA.")
+    r = ask(app_client, "Mi papa tiene manchas", "lp-el-alto")
     assert r["mode"] == "ia" and r["answer"] == "Respuesta de prueba de la IA." and r["ai_available"] is True
-    call = fake_ai.calls[0]
-    assert call["model"] == "claude-opus-5-5"
-    assert call["fallbacks"] == "default" and "server-side-fallback-2026-07-01" in call["betas"]
-    assert call["output_config"] == {"effort": "low"}
-    prompt = call["messages"][0]["content"]
-    assert "Rosa Mamani" in prompt and "71112233" not in prompt and "+591" not in prompt  # el teléfono nunca va a la IA
-    assert "Nunca escribas teléfonos" in call["system"]
-    assert r["experts"][0]["phone"] == "+59171112233"  # el contacto lo entrega el servidor
+    call = fake_groq.calls[0]
+    assert call["url"].startswith("https://api.groq.com/") and call["headers"]["Authorization"] == "Bearer gsk_prueba"
+    prompt = call["json"]["messages"][-1]["content"]
+    assert "Rosa Mamani" in prompt and "71112233" not in prompt and "+591" not in prompt
+    assert "dosis" in call["json"]["messages"][0]["content"]
 
 
-def test_ai_refusal_or_network_error_falls_back_to_basic(app_client, fake_ai):
-    import anthropic
-    c = app_client
-    fake_ai.reply = SimpleNamespace(stop_reason="refusal", content=[])
-    assert ask(c, "¿Cómo mejoro mi suelo?")["mode"] == "basico"
-    fake_ai.raise_exc = anthropic.APIConnectionError(request=None)
-    assert ask(c, "¿Cómo mejoro mi suelo?")["mode"] == "basico"
+def test_ai_error_falls_back_to_basic(app_client, fake_groq):
+    fake_groq.error(401, "Invalid API Key")
+    assert ask(app_client, "hay helada?")["mode"] == "basico"
+    assert ask(app_client, "hay helada?")["mode"] == "basico"  # sin respuestas: error de red
 
 
 def test_assistant_input_validation(app_client):

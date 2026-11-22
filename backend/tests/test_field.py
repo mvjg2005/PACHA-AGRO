@@ -2,7 +2,6 @@
 import base64
 import json
 from datetime import datetime, timezone
-from types import SimpleNamespace
 
 import pytest
 
@@ -15,31 +14,10 @@ def diag(c, **kw):
     return c.post("/api/diagnosis", json={"image": JPEG, "media_type": "image/jpeg", **kw})
 
 
-class FakeAnthropic:
-    calls: list = []
-    reply = None
-
-    def __init__(self, **kw):
-        self.beta = SimpleNamespace(messages=SimpleNamespace(create=self._create))
-
-    def _create(self, **kw):
-        FakeAnthropic.calls.append(kw)
-        return FakeAnthropic.reply
-
-
-@pytest.fixture
-def fake_ai(monkeypatch):
-    import anthropic
-
-    from app.core.config import get_settings
-    monkeypatch.setattr(get_settings(), "anthropic_api_key", "clave-de-prueba")
-    monkeypatch.setattr(anthropic, "Anthropic", FakeAnthropic)
-    FakeAnthropic.calls = []
-    body = {"is_plant": True, "image_quality": "buena", "summary": "Hojas con manchas oscuras.",
-            "candidates": [{"name": "Tizón tardío", "kind": "hongo", "confidence": "media", "signs": "Manchas oscuras con borde claro"}] * 4,
-            "verify": ["Revise el envés"], "actions": ["Retire hojas afectadas"], "urgency": "alta"}
-    FakeAnthropic.reply = SimpleNamespace(stop_reason="end_turn", content=[SimpleNamespace(type="text", text=json.dumps(body))])
-    return FakeAnthropic
+AI_BODY = {"is_plant": True, "image_quality": "buena", "summary": "Hojas con manchas oscuras.",
+           "candidates": [{"name": "Tizón tardío", "kind": "hongo", "confidence": "media", "signs": "Manchas oscuras con borde claro"}] * 4
+           + [{"name": "Raro", "kind": "inventado", "confidence": "segura", "signs": "x"}],
+           "verify": ["Revise el envés"], "actions": ["Retire hojas afectadas"], "urgency": "altísima"}
 
 
 def test_diagnosis_without_ai_offers_symptom_guide_and_does_not_store_photo(app_client):
@@ -62,19 +40,22 @@ def test_diagnosis_rejects_invalid_images(app_client):
     assert c.post("/api/diagnosis", json={"image": JPEG, "media_type": "image/gif"}).status_code == 422
 
 
-def test_diagnosis_with_ai_sends_image_and_schema_and_limits_candidates(app_client, fake_ai):
+def test_diagnosis_with_ai_sends_image_and_validates_output(app_client, fake_groq):
+    from app.core.config import get_settings
+    fake_groq.reply(json.dumps(AI_BODY))
     d = diag(app_client, crop="papa", notes="Apareció después de la lluvia").json()
-    assert d["mode"] == "ia" and d["guide"] is None
-    assert len(d["result"]["candidates"]) == 3 and d["result"]["candidates"][0]["kind_label"] == "Hongo"
-    call = fake_ai.calls[0]
-    assert call["output_config"]["format"]["type"] == "json_schema" and call["fallbacks"] == "default"
-    content = call["messages"][0]["content"]
-    assert content[0]["type"] == "image" and content[0]["source"]["media_type"] == "image/jpeg"
-    assert "Papa" in content[1]["text"] and "dosis" in call["system"]
+    assert d["mode"] == "ia" and d["guide"] is None and d["ai_available"] is True
+    cands = d["result"]["candidates"]
+    assert len(cands) == 3 and cands[0]["kind_label"] == "Hongo" and d["result"]["urgency"] == "media"  # valor inválido corregido
+    call = fake_groq.calls[0]["json"]
+    assert call["model"] == get_settings().groq_vision_model and call["response_format"] == {"type": "json_object"}
+    content = call["messages"][1]["content"]
+    assert content[1]["image_url"]["url"].startswith("data:image/jpeg;base64,") and "Papa" in content[0]["text"]
+    assert "dosis" in call["messages"][0]["content"]
 
 
-def test_diagnosis_ai_refusal_falls_back_to_guide(app_client, fake_ai):
-    fake_ai.reply = SimpleNamespace(stop_reason="refusal", content=[])
+def test_diagnosis_ai_bad_json_falls_back_to_guide(app_client, fake_groq):
+    fake_groq.reply("esto no es json")
     assert diag(app_client).json()["mode"] == "guia"
 
 

@@ -2,7 +2,7 @@
 
 Reglas de diseño:
   * La foto NO se guarda: se usa solo para esta consulta y se descarta.
-  * Con ANTHROPIC_API_KEY, Claude observa la foto y devuelve JSON con un esquema fijo
+  * Con GROQ_API_KEY, un modelo de visión de Groq (gratuito) observa la foto y devuelve JSON
     (posibles problemas, qué verificar en campo, primeras medidas sin químicos).
   * Nunca se entregan dosis ni mezclas de productos: para tratamientos se conecta con técnicos
     (elegidos por el servidor, igual que en la Asesoría) y con PlantwisePlus/INIAF.
@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from app.core.config import get_settings
 from app.data.catalog import crops_config, get_municipality
 from app.services import advisor
+from app.services.agent import provider_keys
 
 logger = logging.getLogger("agrobolivia.diagnosis")
 
@@ -121,46 +122,54 @@ KIND_LABEL = {"hongo": "Hongo", "bacteria": "Bacteria", "virus": "Virus", "insec
               "nutricion": "Nutrición", "agua": "Agua o riego", "clima": "Clima (helada, granizo, calor)", "otro": "Otro"}
 
 
-def ai_diagnosis(image_b64: str, media_type: str, crop_name: str | None, location: str | None, notes: str | None) -> dict | None:
-    s = get_settings()
-    if not s.anthropic_api_key:
-        return None
-    import anthropic
+JSON_INSTRUCTIONS = """Responde SOLO con un objeto JSON con estas claves:
+{"is_plant": true|false, "image_quality": "buena"|"regular"|"insuficiente", "summary": "texto",
+ "candidates": [{"name": "texto", "kind": "hongo"|"bacteria"|"virus"|"insecto"|"acaro"|"nutricion"|"agua"|"clima"|"otro",
+                 "confidence": "alta"|"media"|"baja", "signs": "texto"}],
+ "verify": ["texto"], "actions": ["texto"], "urgency": "alta"|"media"|"baja"}"""
+ENUMS = {"image_quality": {"buena", "regular", "insuficiente"}, "urgency": {"alta", "media", "baja"}}
 
+
+def _clean_result(data: dict) -> dict | None:
+    """Valida la respuesta de la IA: solo se aceptan los campos y valores esperados."""
+    if not isinstance(data, dict) or not isinstance(data.get("summary"), str):
+        return None
+    out = {"is_plant": bool(data.get("is_plant", True)), "summary": data["summary"][:600],
+           "image_quality": data.get("image_quality") if data.get("image_quality") in ENUMS["image_quality"] else "regular",
+           "urgency": data.get("urgency") if data.get("urgency") in ENUMS["urgency"] else "media"}
+    cands = []
+    for c in (data.get("candidates") or [])[:3]:
+        if not isinstance(c, dict) or not isinstance(c.get("name"), str):
+            continue
+        kind = c.get("kind") if c.get("kind") in KIND_LABEL else "otro"
+        conf = c.get("confidence") if c.get("confidence") in ("alta", "media", "baja") else "baja"
+        cands.append({"name": c["name"][:120], "kind": kind, "kind_label": KIND_LABEL[kind], "confidence": conf,
+                      "signs": str(c.get("signs", ""))[:300]})
+    out["candidates"] = cands
+    out["verify"] = [str(x)[:200] for x in (data.get("verify") or [])[:5]]
+    out["actions"] = [str(x)[:200] for x in (data.get("actions") or [])[:5]]
+    return out
+
+
+def ai_diagnosis(image_b64: str, media_type: str, crop_name: str | None, location: str | None, notes: str | None) -> dict | None:
+    """Revisión de la foto con un modelo de visión de Groq (gratuito). None si no hay clave o si falla."""
+    from app.services.agent import groq_chat
     context = [f"Cultivo indicado: {crop_name or 'no indicado'}", f"Zona: {location or 'no indicada'} (Bolivia)"]
     if notes:
         context.append(f"Notas de la persona: {notes}")
-    client = anthropic.Anthropic(api_key=s.anthropic_api_key, timeout=60.0, max_retries=1)
+    text = groq_chat(f"{SYSTEM_PROMPT}\n\n{JSON_INSTRUCTIONS}",
+                     [{"role": "user", "content": [
+                         {"type": "text", "text": "\n".join(context)},
+                         {"type": "image_url", "image_url": {"url": f"data:{media_type};base64,{image_b64}"}},
+                     ]}],
+                     max_tokens=1500, json_mode=True, model=get_settings().groq_vision_model, budget=40)
+    if not text:
+        return None
     try:
-        response = client.beta.messages.create(
-            model=s.assistant_model,
-            max_tokens=4000,
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",
-            output_config={"effort": "medium", "format": {"type": "json_schema", "schema": SCHEMA}},
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": [
-                {"type": "image", "source": {"type": "base64", "media_type": media_type, "data": image_b64}},
-                {"type": "text", "text": "\n".join(context)},
-            ]}],
-        )
-    except anthropic.APIStatusError as e:
-        logger.warning("Diagnóstico IA: error %s", e.status_code)
-        return None
-    except anthropic.APIConnectionError:
-        logger.warning("Diagnóstico IA: sin conexión con la API")
-        return None
-    if response.stop_reason in ("refusal", "max_tokens"):
-        return None
-    text = next((b.text for b in response.content if b.type == "text"), "")
-    try:
-        data = json.loads(text)
+        return _clean_result(json.loads(text))
     except ValueError:
+        logger.warning("Diagnóstico IA: la respuesta no es JSON")
         return None
-    data["candidates"] = [{**c, "kind_label": KIND_LABEL.get(c["kind"], "Otro")} for c in data.get("candidates", [])[:3]]
-    data["verify"] = data.get("verify", [])[:5]
-    data["actions"] = data.get("actions", [])[:5]
-    return data
 
 
 def diagnose(db: Session, image: str, media_type: str, crop: str | None, municipality_id: str | None, notes: str | None) -> dict:
@@ -174,7 +183,7 @@ def diagnose(db: Session, image: str, media_type: str, crop: str | None, municip
     res = [r for r in advisor.resources()["items"] if r["id"] in ("plantwise", "croplife", "iniaf")]
     return {
         "mode": "ia" if result else "guia",
-        "ai_available": bool(get_settings().anthropic_api_key),
+        "ai_available": bool(provider_keys()["groq"]),
         "result": result,
         "guide": None if result else SYMPTOM_GUIDE,
         "crop": crop, "location": location,

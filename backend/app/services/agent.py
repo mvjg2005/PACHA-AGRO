@@ -3,7 +3,7 @@
 Cómo decide la respuesta:
   1. Reúne contexto REAL: municipio, clima (pronóstico, helada, fumigación), técnicos del directorio y
      recursos útiles. Los contactos y enlaces los elige el servidor, nunca el modelo.
-  2. Redacta con Claude (ANTHROPIC_API_KEY), Grok (XAI_API_KEY) o Gemini (GEMINI_API_KEY), en ese orden.
+  2. Redacta con Groq (GROQ_API_KEY, plan gratuito).
   3. Sin claves o si el proveedor falla, responde el motor local con los mismos datos reales.
 Formato: Markdown simple (**negritas** y listas con «- »), que la interfaz muestra con estilo.
 """
@@ -25,24 +25,20 @@ from app.services.textnorm import normalize
 logger = logging.getLogger("agrobolivia.agent")
 DEFAULT_MUNICIPALITY_ID = "or-challapata"
 # Último error de cada proveedor de IA (sin datos secretos), para diagnosticar desde la app.
-LAST_ERROR: dict[str, str | None] = {"claude": None, "grok": None, "groq": None, "gemini": None}
-NAMES = {"claude": ("Claude", "ASSISTANT_MODEL"), "grok": ("Grok", "XAI_MODEL"), "groq": ("Groq", "GROQ_MODEL"),
-         "gemini": ("Gemini", "GEMINI_MODEL")}
-OPENAI_COMPAT_URL = {"grok": "https://api.x.ai/v1/chat/completions", "groq": "https://api.groq.com/openai/v1/chat/completions"}
+LAST_ERROR: dict[str, str | None] = {"groq": None}
+NAMES = {"groq": ("Groq", "GROQ_MODEL")}
+OPENAI_COMPAT_URL = {"groq": "https://api.groq.com/openai/v1/chat/completions"}
 
 
 def provider_keys(s=None) -> dict[str, str]:
-    """Claves por proveedor, en orden de preferencia. Una clave de Groq («gsk_») puesta por error en
-    XAI_API_KEY se reconoce como Groq."""
+    """Clave de Groq (gratuita). Se acepta también en XAI_API_KEY si empieza con «gsk_» (configuración anterior)."""
     s = s or get_settings()
-    xai = s.xai_api_key
-    groq = s.groq_api_key or (xai if xai.startswith("gsk_") else "")
-    return {"claude": s.anthropic_api_key, "grok": "" if xai.startswith("gsk_") else xai, "groq": groq, "gemini": s.gemini_api_key}
+    return {"groq": s.groq_api_key or (s.xai_api_key if s.xai_api_key.startswith("gsk_") else "")}
 
 
 def provider_model(name: str, s=None) -> str:
-    s = s or get_settings()
-    return {"claude": s.assistant_model, "grok": s.xai_model, "groq": s.groq_model, "gemini": s.gemini_model}[name]
+    return (s or get_settings()).groq_model
+
 
 ERROR_HELP = {
     400: "la clave no es válida o la solicitud fue rechazada",
@@ -53,7 +49,7 @@ ERROR_HELP = {
 }
 
 
-EXPECTED_PREFIX = {"claude": "sk-ant-", "grok": "xai-", "groq": "gsk_", "gemini": "AIza"}
+EXPECTED_PREFIX = {"groq": "gsk_"}
 
 
 def key_hint(key: str) -> str:
@@ -68,8 +64,6 @@ def _explain(provider: str, status: int, detail: str = "") -> str:
     key = provider_keys()[provider]
     if status in (400, 401, 403) and key and not key.startswith(EXPECTED_PREFIX[provider]):
         msg += f". La clave configurada no empieza con «{EXPECTED_PREFIX[provider]}»: parece de otro servicio"
-        if provider == "grok" and key.startswith("gsk_"):
-            msg += " (Groq, que es distinto de Grok de xAI)"
     if status == 404 or "model" in detail.lower():
         msg += f" ({model_var})"
     return msg + (f". Detalle: {detail[:160]}" if detail else "")
@@ -208,31 +202,6 @@ def _history(history: list[dict]) -> list[dict]:
     return out
 
 
-def ask_claude(message: str, context: str, history: list[dict]) -> str | None:
-    s = get_settings()
-    if not s.anthropic_api_key:
-        return None
-    import anthropic
-    client = anthropic.Anthropic(api_key=s.anthropic_api_key, timeout=_timeout(), max_retries=1)
-    try:
-        r = client.beta.messages.create(
-            model=s.assistant_model, max_tokens=2000, betas=["server-side-fallback-2026-07-01"], fallbacks="default",
-            output_config={"effort": "low"}, system=SYSTEM_PROMPT,
-            messages=[*_history(history), {"role": "user", "content": f"{context}\n\nConsulta: {message}"}],
-        )
-    except anthropic.APIStatusError as e:
-        LAST_ERROR["claude"] = _explain("claude", e.status_code)
-        logger.warning("Pacha IA: %s", LAST_ERROR["claude"])
-        return None
-    except anthropic.APIConnectionError:
-        LAST_ERROR["claude"] = "No se pudo conectar con Claude (red del servidor)."
-        return None
-    if r.stop_reason == "refusal":
-        return None
-    LAST_ERROR["claude"] = None
-    return "".join(b.text for b in r.content if b.type == "text").strip() or None
-
-
 RETRY_STATUS = {429, 500, 502, 503, 504}  # saturación o fallas pasajeras del servicio
 AI_BUDGET_S = 28.0  # tiempo máximo para conseguir respuesta de la IA; luego responde el motor local
 _req = threading.local()
@@ -247,78 +216,26 @@ def _timeout() -> float:
     return max(3.0, min(15.0, _time_left()))
 
 
-def _gemini_once(c: httpx.Client, model: str, payload: dict, key: str) -> tuple[str | None, int | None, str]:
-    """Una llamada a Gemini. Devuelve (texto, código de error, detalle)."""
-    res = c.post(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
-                 json=payload, headers={"x-goog-api-key": key})
-    if res.status_code != 200:
-        try:
-            detail = str(res.json().get("error", {}).get("message", ""))
-        except ValueError:
-            detail = ""
-        return None, res.status_code, detail.replace(key, "***")
-    parts = res.json()["candidates"][0]["content"]["parts"]
-    text = "".join(p.get("text", "") for p in parts if not p.get("thought")).strip()
-    return (text or None), (None if text else 0), ""
-
-
-def ask_gemini(message: str, context: str, history: list[dict]) -> str | None:
-    """Gemini con reintentos: si el modelo está saturado (503/429), espera y reintenta, y luego prueba
-    los modelos de respaldo de GEMINI_FALLBACK_MODELS (separados por coma)."""
-    s = get_settings()
-    if not s.gemini_api_key:
-        return None
-    turns = [{"role": "model" if h["role"] == "assistant" else "user", "parts": [{"text": h["content"]}]} for h in _history(history)]
-    payload = {"contents": [*turns, {"role": "user", "parts": [{"text": f"{context}\n\nConsulta: {message}"}]}],
-               "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
-               "generationConfig": {"temperature": 0.4, "maxOutputTokens": 2048}}
-    models = [s.gemini_model] + [m.strip() for m in s.gemini_fallback_models.split(",") if m.strip() and m.strip() != s.gemini_model]
-    errors = []
-    try:
-        with httpx.Client(timeout=_timeout()) as c:
-            for model in models:
-                if _time_left() < 4:
-                    errors.append(f"{model}: no se intentó, se acabó el tiempo de espera")
-                    break
-                for attempt in range(3 if model == models[0] else 2):
-                    try:
-                        text, code, detail = _gemini_once(c, model, payload, s.gemini_api_key)
-                    except (KeyError, IndexError, ValueError):
-                        logger.warning("Pacha IA (Gemini) respuesta inesperada", exc_info=True)
-                        text, code, detail = None, 0, "formato inesperado (posible bloqueo de seguridad)"
-                    if text:
-                        LAST_ERROR["gemini"] = None
-                        return text
-                    if code in RETRY_STATUS and attempt < 2 and _time_left() > 8:
-                        time.sleep(1.5 * (attempt + 1))  # 1,5 s y 3 s
-                        continue
-                    break
-                errors.append(f"{model}: " + (_explain("gemini", code, detail) if code else "respuesta sin texto"))
-                if code not in RETRY_STATUS and code != 404:
-                    break  # clave inválida, sin permiso…: otro modelo no lo arregla
-    except httpx.HTTPError:
-        errors.append("No se pudo conectar con Gemini (red del servidor).")
-    LAST_ERROR["gemini"] = " | ".join(errors) or "Gemini no respondió."
-    logger.warning("Pacha IA: %s", LAST_ERROR["gemini"])
-    return None
-
-
-def _ask_openai_compatible(provider: str, message: str, context: str, history: list[dict]) -> str | None:
-    """Grok (xAI) y Groq usan el formato de chat de OpenAI. Reintenta si el servicio está saturado."""
-    key = provider_keys()[provider]
+def groq_chat(system: str, messages: list[dict], max_tokens: int = 1500, json_mode: bool = False,
+              model: str | None = None, budget: float | None = None) -> str | None:
+    """Llamada a Groq (formato de chat de OpenAI), con reintentos si está saturado.
+    Lo usan Pacha IA, la Asesoría y la revisión de plantas. Devuelve None si no hay clave o si falla."""
+    key = provider_keys()["groq"]
     if not key:
         return None
-    name = NAMES[provider][0]
-    payload = {"model": provider_model(provider), "temperature": 0.4, "max_tokens": 1500,
-               "messages": [{"role": "system", "content": SYSTEM_PROMPT}, *_history(history),
-                            {"role": "user", "content": f"{context}\n\nConsulta: {message}"}]}
+    if budget is not None:
+        _req.deadline = time.monotonic() + budget
+    payload = {"model": model or provider_model("groq"), "temperature": 0.4, "max_tokens": max_tokens,
+               "messages": [{"role": "system", "content": system}, *messages]}
+    if json_mode:
+        payload["response_format"] = {"type": "json_object"}
     try:
         with httpx.Client(timeout=_timeout()) as c:
             for attempt in range(3):
-                res = c.post(OPENAI_COMPAT_URL[provider], json=payload, headers={"Authorization": f"Bearer {key}"})
+                res = c.post(OPENAI_COMPAT_URL["groq"], json=payload, headers={"Authorization": f"Bearer {key}"})
                 if res.status_code == 200:
                     text = (res.json()["choices"][0]["message"].get("content") or "").strip()
-                    LAST_ERROR[provider] = None if text else f"{name} respondió sin texto."
+                    LAST_ERROR["groq"] = None if text else "Groq respondió sin texto."
                     return text or None
                 if res.status_code in RETRY_STATUS and attempt < 2 and _time_left() > 8:
                     time.sleep(1.5 * (attempt + 1))
@@ -328,22 +245,18 @@ def _ask_openai_compatible(provider: str, message: str, context: str, history: l
                     detail = str(err.get("message", "") if isinstance(err, dict) else err or res.json().get("message", ""))
                 except ValueError:
                     detail = ""
-                LAST_ERROR[provider] = _explain(provider, res.status_code, detail.replace(key, "***"))
+                LAST_ERROR["groq"] = _explain("groq", res.status_code, detail.replace(key, "***"))
                 break
     except httpx.HTTPError:
-        LAST_ERROR[provider] = f"No se pudo conectar con {name} (red del servidor)."
+        LAST_ERROR["groq"] = "No se pudo conectar con Groq (red del servidor)."
     except (KeyError, IndexError, ValueError):
-        LAST_ERROR[provider] = f"{name} respondió en un formato inesperado."
-    logger.warning("Pacha IA: %s", LAST_ERROR[provider])
+        LAST_ERROR["groq"] = "Groq respondió en un formato inesperado."
+    logger.warning("IA (Groq): %s", LAST_ERROR["groq"])
     return None
 
 
-def ask_grok(message: str, context: str, history: list[dict]) -> str | None:
-    return _ask_openai_compatible("grok", message, context, history)
-
-
 def ask_groq(message: str, context: str, history: list[dict]) -> str | None:
-    return _ask_openai_compatible("groq", message, context, history)
+    return groq_chat(SYSTEM_PROMPT, [*_history(history), {"role": "user", "content": f"{context}\n\nConsulta: {message}"}])
 
 
 GREETINGS = ("hola", "holi", "ola", "buenos dias", "buen dia", "buenas tardes", "buenas noches", "buenas", "saludos", "hey",
@@ -491,7 +404,7 @@ def chat(db: Session, message: str, municipality_id: str | None, lat: float | No
 
     reply, provider = None, "local"
     _req.deadline = time.monotonic() + AI_BUDGET_S
-    for name, ask in (("claude", ask_claude), ("grok", ask_grok), ("groq", ask_groq), ("gemini", ask_gemini)):
+    for name, ask in (("groq", ask_groq),):
         if _time_left() < 4:
             LAST_ERROR[name] = LAST_ERROR.get(name) if not provider_keys()[name] else f"{NAMES[name][0]} no se intentó: se acabó el tiempo de espera."
             continue

@@ -3,7 +3,7 @@
 Diseño a prueba de invenciones:
   * Los CONTACTOS y ENLACES que ve la persona los elige este módulo desde la base de datos y
     `data/resources.json`. Nunca salen del modelo, así que la IA no puede inventar teléfonos ni sitios.
-  * Claude (si hay ANTHROPIC_API_KEY) solo redacta la respuesta usando ese contexto.
+  * La IA (Groq, si hay GROQ_API_KEY) solo redacta la respuesta usando ese contexto.
   * Sin clave, o si la API falla, responde en «modo básico» con plantillas. La interfaz lo indica.
 """
 import json
@@ -142,36 +142,10 @@ def basic_answer(topics: set[str], ctx: dict) -> str:
 
 
 def ai_answer(question: str, ctx: dict) -> str | None:
-    """Respuesta redactada por Claude. Devuelve None si no hay clave o si la API falla."""
-    s = get_settings()
-    if not s.anthropic_api_key:
-        return None
-    import anthropic
-
-    client = anthropic.Anthropic(api_key=s.anthropic_api_key, timeout=30.0, max_retries=1)
-    try:
-        response = client.beta.messages.create(
-            model=s.assistant_model,
-            max_tokens=2000,
-            betas=["server-side-fallback-2026-07-01"],
-            fallbacks="default",  # si el modelo declina, el servidor reintenta con un modelo alternativo
-            output_config={"effort": "low"},  # preguntas cortas de chat: esfuerzo bajo, respuesta rápida
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": f"{_context_text(ctx)}\n\nPregunta: {question}"}],
-        )
-    except anthropic.RateLimitError:
-        logger.warning("IA: límite de solicitudes; se usa el modo básico")
-        return None
-    except anthropic.APIStatusError as e:
-        logger.warning("IA: error %s; se usa el modo básico", e.status_code)
-        return None
-    except anthropic.APIConnectionError:
-        logger.warning("IA: sin conexión con la API; se usa el modo básico")
-        return None
-    if response.stop_reason == "refusal":
-        return None
-    text = "".join(b.text for b in response.content if b.type == "text").strip()
-    return text or None
+    """Respuesta redactada por la IA (Groq, gratuita). Devuelve None si no hay clave o si falla."""
+    from app.services.agent import groq_chat
+    return groq_chat(SYSTEM_PROMPT, [{"role": "user", "content": f"{_context_text(ctx)}\n\nPregunta: {question}"}],
+                     max_tokens=800, budget=25)
 
 
 def advise(db: Session, question: str, municipality_id: str | None, crop: str | None) -> dict:
