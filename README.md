@@ -177,15 +177,6 @@ render.yaml    Blueprint de Render
 | Agricultora | 70000002 | demo1234 |
 | Administrador | el de `ADMIN_PHONE` | el de `ADMIN_PASSWORD` |
 
-### Guion de demostración para el jurado (≈4 min)
-1. **Inicio → Consultar condiciones de siembra** Oruro → Challapata → Quinua → Pandela → Sí, húmedo → Depende de la lluvia. Resultado en 7 toques, con el *porqué* de cada criterio y su fuente.
-2. **Clima**: pronóstico real, riesgo de helada, historial NASA POWER, enlace a SENAMHI. Si el pronóstico no responde, se muestra el estado y se puede reintentar.
-3. **Comunidad** (representante 70000001): convocar reunión → "Recordar" (genera recordatorios *simulados* solo para quienes aceptaron WhatsApp).
-4. **WhatsApp** (agricultora 70000002): "¿Cuándo es la reunión de mi comunidad?" → "SI" → la asistencia se registra. "Quiero avisar que cayó granizo en mi zona." → queda como *observación comunitaria*.
-5. **Aprender**: lección "¿Qué es una helada?" con pregunta.
-6. **Señas** (Challapata, campaña 2015–2016 y luego 2024–2025): lo que anunciaron las señas frente a lo que midió el satélite, el Pachagrama de la campaña y la tabla «¿Las señas aciertan?» con la marca del azar.
-7. **Mi campo**: foto de una planta, calculadora de ganancia en quintales y cuaderno de una parcela.
-
 ## Desplegar
 
 Use `SEED_DEMO=false` en producción. En **Sembrar → Comparar condiciones** puede evaluar dos niveles de humedad para quinua en el municipio seleccionado.
@@ -257,10 +248,6 @@ No suba `.env`, claves, bases de datos locales ni fotos de usuarios.
 ## Licencia
 
 MIT © 2026 JEHOSEBA GABRIELA MUÑOZ VALDEZ. Ver [LICENSE](LICENSE).
-
-## Créditos
-
-Varias funciones se adaptaron del proyecto hermano **PACHAAGRO** ([Z0M3I/PACHAAGRO](https://github.com/Z0M3I/PACHAAGRO), licencia MIT, © 2026 Z0M3I): segmentación de avisos por alcance, cultivos de interés, biblioteca y sus guías, contrato de fuente meteorológica oficial, comandos y plantillas de WhatsApp, registro de estados de entrega, páginas de privacidad y términos, cobertura nacional, manifiesto web y CI. Se reescribieron para React + FastAPI; no se copió código de Next.js ni de Supabase.
 
 ## Aviso
 
