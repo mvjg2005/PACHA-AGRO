@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import sys
@@ -88,6 +89,7 @@ class FakeGroq:
     def __init__(self):
         self.calls: list[dict] = []
         self.responses: list = []
+        self.models: list[str] = []  # lo que devuelve GET /models
 
     def reply(self, text: str):
         self.responses.append(httpx.Response(200, json={"choices": [{"message": {"content": text}}]}))
@@ -102,8 +104,12 @@ class FakeGroq:
             def __enter__(self): return self
             def __exit__(self, *a): return False
 
+            def get(self, url, headers):
+                fake.calls.append({"url": url, "get": True})
+                return httpx.Response(200, json={"data": [{"id": m, "active": True} for m in fake.models]})
+
             def post(self, url, json, headers):
-                fake.calls.append({"url": url, "json": json, "headers": headers})
+                fake.calls.append({"url": url, "json": copy.deepcopy(json), "headers": headers})
                 if not fake.responses:
                     raise httpx.ConnectError("sin respuestas simuladas")
                 r = fake.responses.pop(0)
@@ -121,4 +127,5 @@ def fake_groq(monkeypatch):
     monkeypatch.setattr(agent.time, "sleep", lambda s: None)
     fake = FakeGroq()
     monkeypatch.setattr(agent.httpx, "Client", fake.client)
+    monkeypatch.setattr(agent, "MODEL_OVERRIDE", {"text": None, "vision": None})
     return fake

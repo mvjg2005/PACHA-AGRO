@@ -24,6 +24,8 @@ def status():
             "backup": active[1:],
             "backup_errors": {p: agent.LAST_ERROR[p] for p in active[1:]},
             "key_hint": {p: agent.key_hint(keys[p]) for p in active},
+            "vision_model": agent.provider_model("groq", kind="vision") if active else None,
+            "models_available": agent.AVAILABLE_MODELS[:20],
             "voice": "navegador (Web Speech API)"}
 
 

@@ -15,7 +15,6 @@ import logging
 
 from sqlalchemy.orm import Session
 
-from app.core.config import get_settings
 from app.data.catalog import crops_config, get_municipality
 from app.services import advisor
 from app.services.agent import provider_keys
@@ -162,7 +161,7 @@ def ai_diagnosis(image_b64: str, media_type: str, crop_name: str | None, locatio
                          {"type": "text", "text": "\n".join(context)},
                          {"type": "image_url", "image_url": {"url": f"data:{media_type};base64,{image_b64}"}},
                      ]}],
-                     max_tokens=1500, json_mode=True, model=get_settings().groq_vision_model, budget=40)
+                     max_tokens=1500, json_mode=True, kind="vision", budget=40)
     if not text:
         return None
     try:

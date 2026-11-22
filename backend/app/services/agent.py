@@ -36,8 +36,42 @@ def provider_keys(s=None) -> dict[str, str]:
     return {"groq": s.groq_api_key or (s.xai_api_key if s.xai_api_key.startswith("gsk_") else "")}
 
 
-def provider_model(name: str, s=None) -> str:
-    return (s or get_settings()).groq_model
+# Modelo elegido automáticamente cuando el configurado no existe para la cuenta (Groq retira modelos seguido).
+MODEL_OVERRIDE: dict[str, str | None] = {"text": None, "vision": None}
+AVAILABLE_MODELS: list[str] = []
+SKIP_MODELS = ("whisper", "tts", "guard", "embed", "playai", "orpheus", "safeguard", "prompt-guard")
+PREFER = {"text": ("versatile", "70b", "gpt-oss-120b", "gpt-oss", "llama", "qwen", "kimi", "deepseek", "gemma"),
+          "vision": ("scout", "maverick", "vision", "llama-4")}
+
+
+def provider_model(name: str, s=None, kind: str = "text") -> str:
+    s = s or get_settings()
+    return MODEL_OVERRIDE[kind] or (s.groq_vision_model if kind == "vision" else s.groq_model)
+
+
+def choose_model(ids: list[str], kind: str) -> str | None:
+    """Elige el mejor modelo disponible para chat ('text') o imágenes ('vision')."""
+    usable = [i for i in ids if not any(x in i.lower() for x in SKIP_MODELS)]
+    for pref in PREFER[kind]:
+        for i in usable:
+            if pref in i.lower():
+                return i
+    return usable[0] if usable and kind == "text" else None
+
+
+def _discover_model(c: httpx.Client, key: str, kind: str) -> str | None:
+    """Pide a Groq la lista de modelos de la cuenta y elige uno. Se guarda para las próximas consultas."""
+    try:
+        r = c.get("https://api.groq.com/openai/v1/models", headers={"Authorization": f"Bearer {key}"})
+        ids = [m["id"] for m in r.json().get("data", []) if m.get("active", True)] if r.status_code == 200 else []
+    except (httpx.HTTPError, ValueError, KeyError, TypeError):
+        ids = []
+    AVAILABLE_MODELS[:] = sorted(ids)
+    chosen = choose_model(ids, kind)
+    if chosen:
+        MODEL_OVERRIDE[kind] = chosen
+        logger.warning("IA (Groq): se usará el modelo disponible %s (%s)", chosen, kind)
+    return chosen
 
 
 ERROR_HELP = {
@@ -217,7 +251,7 @@ def _timeout() -> float:
 
 
 def groq_chat(system: str, messages: list[dict], max_tokens: int = 1500, json_mode: bool = False,
-              model: str | None = None, budget: float | None = None) -> str | None:
+              kind: str = "text", budget: float | None = None) -> str | None:
     """Llamada a Groq (formato de chat de OpenAI), con reintentos si está saturado.
     Lo usan Pacha IA, la Asesoría y la revisión de plantas. Devuelve None si no hay clave o si falla."""
     key = provider_keys()["groq"]
@@ -225,20 +259,31 @@ def groq_chat(system: str, messages: list[dict], max_tokens: int = 1500, json_mo
         return None
     if budget is not None:
         _req.deadline = time.monotonic() + budget
-    payload = {"model": model or provider_model("groq"), "temperature": 0.4, "max_tokens": max_tokens,
+    payload = {"model": provider_model("groq", kind=kind), "temperature": 0.4, "max_tokens": max_tokens,
                "messages": [{"role": "system", "content": system}, *messages]}
     if json_mode:
         payload["response_format"] = {"type": "json_object"}
     try:
         with httpx.Client(timeout=_timeout()) as c:
-            for attempt in range(3):
+            discovered = False
+            attempt = 0
+            while attempt < 3:
+                attempt += 1
                 res = c.post(OPENAI_COMPAT_URL["groq"], json=payload, headers={"Authorization": f"Bearer {key}"})
+                model_gone = res.status_code == 404 or (res.status_code == 400 and "decommission" in res.text.lower())
+                if model_gone and not discovered:
+                    discovered = True
+                    new = _discover_model(c, key, kind)
+                    if new and new != payload["model"]:
+                        payload["model"] = new
+                        attempt -= 1  # el reintento con el modelo nuevo no cuenta
+                        continue
                 if res.status_code == 200:
                     text = (res.json()["choices"][0]["message"].get("content") or "").strip()
                     LAST_ERROR["groq"] = None if text else "Groq respondió sin texto."
                     return text or None
-                if res.status_code in RETRY_STATUS and attempt < 2 and _time_left() > 8:
-                    time.sleep(1.5 * (attempt + 1))
+                if res.status_code in RETRY_STATUS and attempt < 3 and _time_left() > 8:
+                    time.sleep(1.5 * attempt)
                     continue
                 try:
                     err = res.json().get("error", "")

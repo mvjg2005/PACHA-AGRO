@@ -146,3 +146,28 @@ def test_time_budget_falls_back_to_local_quickly(app_client, monkeypatch):
     monkeypatch.setattr(agent.httpx, "Client", lambda **kw: (_ for _ in ()).throw(AssertionError("no debe llamar a la IA")))
     d = chat(app_client, "hola")
     assert d["provider"] == "local" and "tiempo" in d["ai_error"]
+
+
+def test_retired_model_is_replaced_automatically(app_client, fake_groq):
+    from app.services import agent
+    fake_groq.models = ["whisper-large-v3", "llama-guard-4-12b", "openai/gpt-oss-120b", "meta-llama/llama-4-scout-17b-16e-instruct"]
+    fake_groq.error(404, "The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.")
+    fake_groq.reply("¡Hola! Ya funciono con otro modelo.")
+    d = chat(app_client, "hola")
+    assert d["provider"] == "groq" and d["ai_error"] is None
+    posts = [c for c in fake_groq.calls if not c.get("get")]
+    assert posts[0]["json"]["model"] == "llama-3.3-70b-versatile" and posts[1]["json"]["model"] == "openai/gpt-oss-120b"
+    st = app_client.get("/api/ai/agent/status").json()
+    assert st["model"] == "openai/gpt-oss-120b" and "openai/gpt-oss-120b" in st["models_available"]
+    # Las siguientes consultas usan directamente el modelo elegido
+    fake_groq.reply("Otra respuesta")
+    chat(app_client, "gracias por todo")
+    assert fake_groq.calls[-1]["json"]["model"] == "openai/gpt-oss-120b"
+    assert agent.choose_model(fake_groq.models, "vision") == "meta-llama/llama-4-scout-17b-16e-instruct"
+
+
+def test_choose_model_preferences():
+    from app.services.agent import choose_model
+    assert choose_model(["qwen/qwen3-32b", "llama-3.1-8b-instant", "llama-3.3-70b-versatile"], "text") == "llama-3.3-70b-versatile"
+    assert choose_model(["whisper-large-v3", "playai-tts"], "text") is None
+    assert choose_model(["llama-3.1-8b-instant"], "vision") is None
