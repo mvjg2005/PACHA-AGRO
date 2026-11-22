@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { Icon } from '../components/Icon'
 import { Listen } from '../components/Listen'
 import { MunicipalitySelect } from '../components/SiteChrome'
+import { Bulletin } from '../components/Bulletin'
 import { Button, ErrorBox, Loading, Notice, inputCls } from '../components/ui'
 import { api } from '../lib/api'
 import { HERD, bs, forage, num, type HerdKind } from '../lib/calc'
@@ -36,6 +37,8 @@ export default function Ganado({ sub }: { sub?: string }) {
       </section>
       {!m ? <Notice tone="info">Elija el municipio donde está su rebaño para ver las alertas.</Notice> : <>
         <Nights municipalityId={m.id} name={m.name} />
+        <Bulletin municipalityId={m.id} compact />
+        <a href="#/sin-internet" className="btn-soft" data-testid="go-offline"><Icon name="offline" size={18} />¿Su familia no tiene internet? Guarde la semana en el celular</a>
         <Drought municipalityId={m.id} />
         <WinterPanel municipalityId={m.id} name={m.name} />
       </>}

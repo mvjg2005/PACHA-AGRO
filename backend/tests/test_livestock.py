@@ -111,3 +111,22 @@ def test_losses_summary_report_and_privacy(app_client, hist, monkeypatch):
 def test_catalog(app_client):
     d = app_client.get("/api/ganado/catalogo").json()
     assert "nevada" in d["causes"] and "llama" in d["species"] and len(d["no_roof"]) >= 5
+
+
+def test_bulletin_sms_is_ascii_and_short(app_client, monkeypatch):
+    from app.services import livestock
+    from app.services.weather import service
+    days = [DailyValue(date=f"2026-11-{23 + i}", tmin=t, tmax=14, precip_mm=p, weather_code=0)
+            for i, (t, p) in enumerate([(-9, 0), (-7, 0), (-1, 6), (3, 0), (1, 0), (-3, 0), (2, 0)])]
+    blk = Block(available=True, source="Prueba", kind="pronostico", daily=days, extra={})
+    monkeypatch.setattr(service, "_forecast", lambda *a, **k: blk)
+    d = app_client.get("/api/ganado/boletin?municipality_id=or-challapata").json()
+    assert d["available"] and d["sms"].isascii() and len(d["sms"]) <= 306
+    assert "Helada fuerte lun 23 (-9C), mar 24 (-7C)" in d["sms"] and "Nevada probable mie 25" in d["sms"] and "crias" in d["sms"]
+    assert "miércoles 25" in d["radio"] and "posible nevada" in d["radio"] and "SENAMHI" in d["radio"]
+
+
+def test_bulletin_without_forecast(app_client, monkeypatch):
+    from app.services.weather import service
+    monkeypatch.setattr(service, "_forecast", lambda *a, **k: Block(available=False, source="x", kind="pronostico", error="sin red"))
+    assert app_client.get("/api/ganado/boletin?municipality_id=or-challapata").json()["available"] is False

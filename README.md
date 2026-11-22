@@ -36,6 +36,8 @@ Nace de la familia de una integrante del equipo, criadora de ovejas en la **comu
 - **Cómo proteger al rebaño sin techo**: muros contra el viento, dormidero, cama seca, depredadores, planificación de pariciones.
 - **Pérdidas de la comunidad e informe para autoridades**: cada familia registra sus pérdidas (especie, causa, comunidad); se publican solo totales. El informe imprimible junta pérdidas + datos del invierno para pedir forraje, materiales para cobertizos y asistencia técnica.
 
+- **Sin internet** (`#/sin-internet`): en el campo no siempre hay datos ni luz. Con señal se **guarda la semana** (pronóstico, noches peligrosas, alerta de año seco, boletín) y luego se ve sin conexión, con la fecha en que se guardó; la app se **instala** en el celular (ícono propio) y se abre sin internet; y un **boletín por SMS** sin tildes (160 caracteres por mensaje en vez de 70: cuesta menos) o para leer en la **radio comunitaria** se envía con un toque.
+
 ![Los inviernos en Challapata según el satélite: invierno 2025 con 4 posibles nevadas](docs/img/ganado-invierno-2025.png)
 
 ## Lo nuevo: «Señas que se miden»
@@ -54,7 +56,7 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 | Criterio | Qué aporta PACHA-AGRO |
 |---|---|
 | **Innovación (40)** | Mide el acierto de los bioindicadores andinos con datos satelitales, con la vara del azar, y los usa como alerta temprana de año seco para el ganado. Se suman la revisión de plantas por foto con IA y la asesoría con técnicos reales. |
-| **Viabilidad técnica (30)** | Funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 161 pruebas de backend y 18 de frontend, más 35 casos E2E. Desplegable en Render con un archivo. |
+| **Viabilidad técnica (30)** | Funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 163 pruebas de backend y 18 de frontend, más 36 casos E2E. Desplegable en Render con un archivo. |
 | **Impacto (30)** | Parte de un problema real y documentado (pérdida de ganado en Huayñacagua). Productoras, productores y familias criadoras del Altiplano, valles y llanos: decidir cuándo sembrar, revisar plantas, hacer cuentas, organizarse en comunidad y valorar su propio saber. Funciona en celulares sencillos, con poca señal, lectura en voz alta y sin registrarse para lo esencial. |
 
 ## Qué funciona hoy
@@ -216,7 +218,7 @@ npx playwright install chromium
 npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **161/161** backend y **18/18** unitarias frontend. La suite E2E tiene **35 casos** (35/35 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **163/163** backend y **18/18** unitarias frontend. La suite E2E tiene **36 casos** (36/36 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Auditoría y presentación
 

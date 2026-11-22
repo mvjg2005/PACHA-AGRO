@@ -4,9 +4,9 @@ Resultados del 22-11-2026. El backend usa fixtures. La suite de navegador usa el
 
 | Suite | Comando | Resultado |
 |---|---|---|
-| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **161/161** aprobadas |
+| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **163/163** aprobadas |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **18/18** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `npm run test:e2e -- http://localhost:8000` | **35 casos** (35/35 aprobados en local el 22-11-2026) (ejecutar en local o CI dedicado) |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `npm run test:e2e -- http://localhost:8000` | **36 casos** (36/36 aprobados en local el 22-11-2026) (ejecutar en local o CI dedicado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
 
 ## Preparación de la suite E2E
@@ -43,6 +43,7 @@ El servidor debe estar iniciado con el frontend compilado y `SEED_DEMO=true`, co
 | Mi campo: calculadoras | Conversión de quintal (46 kg) y arroba (11,5 kg); ganancia, rendimiento requerido, precio sin pérdida, presupuesto y mezcla por mochila; datos imposibles rechazados; área GPS de un cuadrado de 100 m ≈ 1 ha | Sí | `calc.test.ts`, e2e |
 | Mi campo: fumigación | Viento fuerte, lluvia en 2 h o calor = no recomendado; sin viento o aire seco = moderado; mejor ventana de día; la serie por hora no se expone | Sí | `test_field` |
 | Mi campo: parcelas | Crear, editar, anotar, borrar; resumen de gastos, ventas, balance, cosecha y rendimiento; otra cuenta no ve ni modifica; al eliminar la cuenta se borran parcelas y cuaderno | Sí | `test_field`, e2e |
+| Sin internet | Guardar la semana con señal; sin conexión se abren Ganado y Clima con aviso; SMS solo con caracteres que no encarecen el mensaje (≤ 2 SMS); boletín para radio | Sí | `test_livestock`, e2e |
 | Ganado en riesgo | Niveles de noche (helada, nevada, viento); nevada probable por precipitación con helada; pronóstico caído se dice; año seco con señas + temporada pasada; inviernos con nevadas detectadas; pérdidas validadas y publicadas sin nombres ni notas; solo se borra lo propio; informe; calculadora de forraje | Sí | `test_livestock`, `calc.test.ts`, e2e |
 | Señas que se miden | Terciles con serie diaria desde 2001 (El Niño 2015 = seco); campaña actual pendiente con fecha; validación (seña, lectura, fecha futura, duplicados, nombre en «otra»); notas privadas; acierto frente al azar; Pachagrama de 52 semanas con señas; solo se borra lo propio | Sí | `test_senas`, e2e |
 | Bienvenida | 4 pasos, se guarda y no vuelve a aparecer | Sí | e2e |

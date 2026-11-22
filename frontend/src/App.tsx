@@ -27,6 +27,7 @@ const CropSheet = lazy(() => import('./pages/CropSheet'))
 const Onboarding = lazy(() => import('./pages/Onboarding'))
 const Senas = lazy(() => import('./pages/Senas'))
 const Ganado = lazy(() => import('./pages/Ganado'))
+const Offline = lazy(() => import('./pages/Offline'))
 const Legal = lazy(() => import('./pages/Legal'))
 const Auth = lazy(() => import('./pages/Auth').then(m => ({ default: m.Login })))
 const Register = lazy(() => import('./pages/Auth').then(m => ({ default: m.Register })))
@@ -60,6 +61,7 @@ function Page({ parts }: { parts: string[] }) {
       return <Field />
     case 'cultivos': return b ? <CropSheet id={b} /> : <Field />
     case 'senas': return <Senas />
+    case 'sin-internet': return <Offline />
     case 'ganado': return <Ganado key={b ?? 'inicio'} sub={b} />
     case 'bienvenida': return <Onboarding key={b ?? 'inicio'} step={b} />
     case 'cobertura': return <Coverage />
@@ -88,7 +90,8 @@ function OfflineBanner() {
   const when = cachedAt ? new Date(cachedAt).toLocaleString('es-BO', { dateStyle: 'short', timeStyle: 'short' }) : null
   return (
     <div role="status" data-testid="offline-banner" className="border-b-2 border-ocre bg-sol-50 px-4 py-2 text-center font-semibold text-sol-ink">
-      Sin conexión.{cachedAt !== null ? ` Mostrando datos guardados${when ? ` (${when})` : ''}` : ' Se mostrarán los últimos datos guardados.'}
+      Sin conexión.{cachedAt !== null ? ` Mostrando datos guardados${when ? ` (${when})` : ''}` : ' Se mostrarán los últimos datos guardados.'}{' '}
+      <a href="#/sin-internet" className="underline">Qué puedo ver sin internet</a>
     </div>
   )
 }

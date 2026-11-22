@@ -1,11 +1,13 @@
 /* AgroBolivia — funcionamiento sin conexión.
  * - La app (HTML, JS, CSS) queda guardada para abrir sin señal.
- * - Clima, avisos, biblioteca, ubicaciones y cultivos: primero la red; si falla, la última copia guardada,
+ * - Clima, ganado, boletín, señas, avisos, biblioteca, ubicaciones y cultivos: primero la red; si falla, la última copia guardada,
  *   marcada con la cabecera x-agb-offline y la fecha en que se guardó.
  * - No se guardan respuestas con sesión iniciada (datos personales) ni peticiones que no sean GET. */
 const VERSION = 'agb-v1'
 const SHELL = ['/', '/index.html', '/favicon.svg', '/manifest.webmanifest']
-const API_CACHEABLE = /^\/api\/(weather|notices|education|locations|crops|locate)/
+const API_CACHEABLE = /^\/api\/(weather|notices|education|locations|crops|locate|ganado\/(noches|sequia|catalogo|boletin)|senas$|senas\/zona|pachagrama)/
+// Datos públicos (iguales para todos): se guardan aunque haya sesión iniciada.
+const API_PUBLIC = /^\/api\/(weather|education|locations|crops|locate|ganado\/(noches|sequia|catalogo|boletin)|senas$|pachagrama)/
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(VERSION).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()))
@@ -32,14 +34,14 @@ self.addEventListener('fetch', event => {
     event.respondWith(fetch(req).catch(() => caches.match('/index.html')))
     return
   }
-  if (url.pathname.startsWith('/assets/')) {
+  if (url.pathname.startsWith('/assets/') || url.pathname.startsWith('/img/')) {
     event.respondWith(caches.match(req).then(hit => hit || fetch(req).then(res => {
       if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)) }
       return res
     })))
     return
   }
-  if (API_CACHEABLE.test(url.pathname) && !req.headers.get('Authorization')) {
+  if (API_CACHEABLE.test(url.pathname) && (API_PUBLIC.test(url.pathname) || !req.headers.get('Authorization'))) {
     event.respondWith((async () => {
       const cache = await caches.open(VERSION)
       try {

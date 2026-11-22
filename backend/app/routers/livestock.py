@@ -12,7 +12,7 @@ from app.db import get_db
 from app.deps import current_user
 from app.models import LivestockLoss, User
 from app.schemas import LivestockLossIn
-from app.services import livestock, senas
+from app.services import bulletin, livestock, senas
 
 router = APIRouter(prefix="/api/ganado", tags=["ganado"])
 loss_limiter = RateLimiter(max_calls=30, per_seconds=3600)
@@ -95,3 +95,9 @@ def delete_loss(loss_id: int, user: User = Depends(current_user), db: Session = 
 @router.get("/informe")
 def report(municipality_id: str = Query(max_length=60), campaign: int | None = None, db: Session = Depends(get_db)):
     return livestock.report(db, _muni(municipality_id), _campaign(campaign))
+
+
+@router.get("/boletin")
+def weekly_bulletin(municipality_id: str = Query(max_length=60)):
+    """SMS corto y texto para radio con el pronóstico de la semana (para quien no tiene internet)."""
+    return bulletin.build(_muni(municipality_id))

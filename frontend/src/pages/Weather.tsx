@@ -97,6 +97,9 @@ export default function Weather() {
           <StormCard wx={wx} />
           {wx.recent.available && <RecentCard wx={wx} />}
 
+          <a href="#/sin-internet" className="flex min-h-12 items-center justify-between rounded-md border border-linea bg-white px-4 py-3 font-semibold text-bosque" data-testid="weather-offline-link">
+            <span>Sin internet: guardar la semana o enviarla por SMS</span><span aria-hidden="true">→</span>
+          </a>
           <a href="#/avisos" className="flex min-h-12 items-center justify-between rounded-md border border-linea bg-white px-4 py-3 font-semibold text-bosque">
             <span>Avisos de la plataforma para su zona</span><span aria-hidden="true">→</span>
           </a>
