@@ -1,4 +1,4 @@
-# AgroBolivia
+# AgroBolivia (PACHA-AGRO)
 
 **Plataforma inteligente de asistencia agroclimática y comunicación comunitaria para agricultores de Bolivia.**
 
@@ -6,7 +6,18 @@
 
 Prototipo funcional para hackatón universitaria. Integra los tracks **Comunicación** (comunidades, reuniones, avisos, reportes y WhatsApp) y **Educación** (lecciones breves para interpretar el clima y reducir riesgos).
 
-Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea propios, sin emoticones; cada bloque muestra datos reales con su fuente):
+> **PACHA-AGRO** es el nombre de marca que aparece en la interfaz; **AgroBolivia** es el nombre técnico del prototipo.
+
+| | |
+|---|---|
+| **Demo en vivo** | <https://agrobolivia.onrender.com> |
+| **Backend** | FastAPI + Python 3.12 |
+| **Frontend** | React 18 + TypeScript + Vite |
+| **Base de datos** | SQLite en desarrollo · PostgreSQL en producción |
+| **Despliegue** | Render |
+| **Licencia** | MIT |
+
+Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea propios; cada bloque muestra datos reales con su fuente):
 
 ![Portada en escritorio](docs/img/inicio-escritorio.png)
 
@@ -16,7 +27,7 @@ Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea 
 
 ## Lo nuevo: «Señas que se miden»
 
-Las comunidades andinas anticipan el año con **señas** (bioindicadores): las Pléyades (*Qutu*) en la madrugada de San Juan, el nido del *leque leque*, el aullido del zorro, la floración de la t'ola. Las apps agrícolas las ignoran y los programas tradicionales las anotan en papel. **PACHA-AGRO las registra y, al terminar cada temporada, mide si acertaron** con la lluvia y las heladas medidas por satélite en ese mismo municipio. No conocemos otra herramienta que lo haga de forma abierta y comunitaria.
+Las comunidades andinas anticipan el año con **señas** (bioindicadores): las Pléyades (*Qutu*) en la madrugada de San Juan, el nido del *leque leque*, el aullido del zorro, la floración de la t'ola. Las apps agrícolas las ignoran y los programas tradicionales las anotan en papel. **PACHA-AGRO las registra y, al terminar cada temporada, mide si acertaron** con la lluvia y las heladas medidas por satélite en ese mismo municipio. Hasta donde sabemos, no encontramos otra herramienta abierta y comunitaria que lo haga.
 
 - **Dos saberes lado a lado.** Lo que anuncian las señas de la comunidad (votos por año seco, normal o lluvioso) junto a lo que realmente pasó, medido con NASA POWER.
 - **Medición rigurosa.** La temporada se ubica por **terciles** frente a todas las temporadas desde 2001, el método usual de los pronósticos estacionales. Por construcción, adivinar al azar acierta 1 de cada 3 veces, y cada seña se compara contra esa vara. Con datos reales, Challapata da: 2015–16 (El Niño) **seca**, 2023–24 **normal**, 2024–25 **lluviosa** y 2025–26 **seca**.
@@ -30,7 +41,7 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 | Criterio | Qué aporta PACHA-AGRO |
 |---|---|
 | **Innovación (40)** | Mide el acierto de los bioindicadores andinos con datos satelitales, con la vara del azar. Se suman la revisión de plantas por foto con IA y la asesoría con técnicos reales. |
-| **Viabilidad técnica (30)** | Todo funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 127 pruebas de backend, 12 de frontend y 33 en navegador de celular. Desplegable en Render con un archivo. |
+| **Viabilidad técnica (30)** | Funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 150 pruebas de backend y 16 de frontend verificadas por CI, más 34 casos E2E. Desplegable en Render con un archivo. |
 | **Impacto (30)** | Productoras y productores del Altiplano, valles y llanos: decidir cuándo sembrar, revisar plantas, hacer cuentas, organizarse en comunidad y valorar su propio saber. Funciona en celulares sencillos, con poca señal, lectura en voz alta y sin registrarse para lo esencial. |
 
 ## Qué funciona hoy
@@ -51,25 +62,65 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 | Cultivos de interés en el perfil (filtran los avisos que recibe cada persona) | Sí |
 | Biblioteca filtrable por cultivo, tipo y departamento (8 guías con nota de fuente) | Sí |
 | Cobertura nacional (mapa de municipios y qué hay en cada departamento), privacidad y términos | Sí |
-| **Mi campo** (inspirado en apps como Plantix y FieldMargin): revisar una planta con una **foto** (posibles causas, qué verificar, primeras medidas sin químicos y técnicos de la zona), **calculadoras** (ganancia, rendimiento requerido, precio sin pérdida, presupuesto de insumos, mezcla según la etiqueta; con quintales y arrobas), **condiciones para fumigar** hora por hora, **fichas de cultivo con lectura en voz alta** y **parcelas con cuaderno de campo** (superficie medida caminando con GPS, gastos, cosecha, ventas, balance y rendimiento) | Sí. La revisión por foto usa un modelo de visión de Groq (gratuito) con `GROQ_API_KEY`; sin ella ofrece una guía por síntomas. La foto no se guarda. Nunca se indican productos ni dosis |
+| **Mi campo**: revisión por foto, calculadoras, fumigación, fichas y parcelas | Sí; ver detalle abajo |
 | Bienvenida en la primera visita (cultivos, perfil y ubicación) | Sí; se puede saltar |
-| **Señas que se miden** y **Pachagrama digital**: registro de bioindicadores andinos, comparación con lluvia y heladas medidas por satélite (terciles desde 2001), tabla de aciertos frente al azar por departamento | Sí, con datos reales de NASA POWER. Los registros de ejemplo solo aparecen con `SEED_DEMO=true` y están marcados |
-| **Pacha IA**: asistente flotante por **voz y texto** en todas las pantallas (micrófono y lectura en voz alta del navegador), con el clima real del municipio, técnicos del directorio con WhatsApp y respuestas con formato | Sí. Redacta con Groq (`GROQ_API_KEY`, plan gratuito); sin clave responde el motor local con los mismos datos reales. Integrado desde el prototipo hecho con Antigravity |
-| **Asesoría con IA**: responde preguntas del campo y recomienda técnicos/ingenieros agrónomos (WhatsApp, llamada, correo) y sitios especializados (SENAMHI, INIAF, FAO Ecocrop, PlantwisePlus, EOSDA, OneSoil, Windy, Meteoblue…) | Sí: con `GROQ_API_KEY` (gratuita) usa IA; sin ella, respuesta automática básica. Los contactos los elige el servidor del directorio (solo técnicos con consentimiento, cargados por el administrador); la IA nunca inventa teléfonos ni enlaces |
+| **Señas que se miden** y **Pachagrama digital**: registro, comparación con satélite y tabla de aciertos por departamento | Sí, con datos reales de NASA POWER |
+| **Pacha IA**: asistente flotante por voz y texto en todas las pantallas | Sí; usa Groq o el motor local |
+| **Asesoría**: respuestas del campo y directorio de técnicos/agrónomos | Sí; con contactos cargados con consentimiento |
 | Adaptador para fuente meteorológica oficial con contrato normalizado | Sí: listo; se activa con `OFFICIAL_WEATHER_URL` |
 | Avisos oficiales SENAMHI | No: no integrados (ver [docs/FUENTES_DATOS.md](docs/FUENTES_DATOS.md)); se enlaza al sitio oficial |
 
 Nada se presenta como algo que no es: los datos **simulados**, las **observaciones comunitarias**, los **datos ingresados por el agricultor** y los **pronósticos** llevan etiquetas distintas en la interfaz y en la API.
 
+### Estado del prototipo
+
+- **Con datos reales:** clima (Open-Meteo con respaldo MET Norway), historial y climatología NASA POWER, y medición de señas.
+- **En modo demostración:** WhatsApp, algunas reglas de papa/maíz y los datos de ejemplo con `SEED_DEMO=true`.
+- **Experimental:** umbrales y calendarios agronómicos, pendientes de validación por agrónomos.
+- **No integrado:** avisos oficiales del SENAMHI; la app enlaza a su sitio.
+
+### Mi campo
+
+- **Revisión por foto:** posibles causas, qué verificar y primeras medidas sin químicos; la foto no se guarda y nunca se indican productos ni dosis.
+- **Calculadoras:** ganancia, rendimiento requerido, precio sin pérdida, presupuesto de insumos y mezcla según la etiqueta; acepta quintales y arrobas.
+- **Fumigación:** condiciones hora por hora según viento, lluvia, temperatura y humedad.
+- **Fichas de cultivo** con lectura en voz alta.
+- **Parcelas:** superficie medida caminando con GPS, gastos, cosecha, ventas, balance y rendimiento.
+
+La revisión por foto usa un modelo de visión de Groq (gratuito) con `GROQ_API_KEY`. Sin clave ofrece una guía por síntomas.
+
+### Pacha IA y Asesoría
+
+- **Pacha IA** es el asistente flotante de toda la app: entiende voz y texto, usa el clima real del municipio y responde con Groq o con el motor local.
+- **Asesoría** es el espacio para preguntas del campo y el directorio de técnicos/ingenieros agrónomos con WhatsApp, llamada o correo.
+- Los contactos los elige el servidor del directorio: solo técnicos con consentimiento, cargados por el administrador. La IA nunca inventa teléfonos ni enlaces.
+
 ## Ejecutar (5 minutos)
 
-Requisitos: Python 3.11+, Node.js 18+ y npm. Para la suite E2E también se instala Chromium mediante Playwright.
+Requisitos: **Python 3.12** (probado; 3.11 compatible), **Node.js 22** (probado; 18+ sirve para desarrollo) y npm. El Docker de Render usa Node 20 para compilar el frontend. Para la suite E2E también se instala Chromium mediante Playwright.
 
 ```bash
 cd backend && python -m venv .venv && .venv/bin/pip install -r requirements-dev.txt && cp .env.example .env
 ```
 
-Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). Luego compile el frontend:
+Edite `backend/.env` (al menos `SECRET_KEY` y `ADMIN_PASSWORD`). Para generar una clave segura:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+En producción use `ENVIRONMENT=production` y una `SECRET_KEY` de 32 caracteres o más. La base de datos es SQLite por defecto en desarrollo; para PostgreSQL configure `DATABASE_URL`.
+
+La IA es opcional. Con una clave gratuita de Groq se activan Pacha IA, la asesoría y la revisión de plantas por foto; sin `GROQ_API_KEY` la app sigue funcionando con el motor local y una guía por síntomas.
+
+```bash
+# Opcional, en backend/.env
+GROQ_API_KEY=
+GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_VISION_MODEL=meta-llama/llama-4-scout-17b-16e-instruct
+```
+
+Luego compile el frontend:
 
 ```bash
 cd frontend && npm install && npm run build
@@ -90,6 +141,33 @@ cd frontend && npm run dev
 ```
 
 (Vite en <http://localhost:5173> redirige `/api` al backend.)
+
+### Variables de entorno principales
+
+| Variable | Uso | Obligatoria |
+|---|---|---|
+| `SECRET_KEY` | Firma los tokens de sesión. Debe tener 32+ caracteres en producción | Sí en producción |
+| `DATABASE_URL` | SQLite en desarrollo; PostgreSQL en producción | Recomendada |
+| `ADMIN_PHONE` / `ADMIN_PASSWORD` | Cuenta administradora inicial | Sí para administrar |
+| `SEED_DEMO` | Carga cuentas y datos ficticios. Use `false` en producción | No |
+| `OPEN_METEO_API_KEY` | Plan pagado de Open-Meteo si se agotan las consultas gratuitas | No |
+| `GROQ_API_KEY` | Pacha IA, asesoría y revisión de plantas por foto | No |
+| `WHATSAPP_ENABLED` y `WHATSAPP_*` | Conectar WhatsApp Cloud API; sin ellas se usa el simulador | No |
+| `OFFICIAL_WEATHER_URL` | Fuente meteorológica oficial con contrato normalizado | No |
+
+El archivo completo está en [`backend/.env.example`](backend/.env.example).
+
+### Estructura del repositorio
+
+```text
+backend/       API FastAPI, servicios de clima y recomendación, pruebas
+frontend/      React + TypeScript + Vite
+e2e/           Pruebas de navegador con Playwright
+docs/          Arquitectura, algoritmo, fuentes, despliegue y límites
+api/           Entrada para Vercel
+Dockerfile     Imagen única para Render
+render.yaml    Blueprint de Render
+```
 
 ### Cuentas ficticias para pruebas locales (`SEED_DEMO=true`)
 
@@ -134,7 +212,7 @@ npx playwright install chromium
 npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **137/137** backend, **16/16** unitarias frontend, **34/34** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **150/150** backend y **16/16** unitarias frontend verificadas por CI. La suite E2E tiene **34 casos** y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Auditoría y presentación
 
@@ -154,6 +232,31 @@ Resultados actuales: **137/137** backend, **16/16** unitarias frontend, **34/34*
 ## Uso real
 
 Además de las funciones, AgroBolivia incluye lo necesario para operar fuera de una demo: clima con caché persistente y último dato disponible, ubicación por GPS, modo sin conexión, recuperación de clave sin SMS, eliminación de cuenta, modo producción que no arranca con configuración insegura y chequeo de salud. Lo que todavía depende del equipo (base de datos duradera, validación agronómica, WhatsApp de Meta, responsable de datos, piloto) está en **[docs/PUESTA_EN_MARCHA.md](docs/PUESTA_EN_MARCHA.md)**.
+
+## Contribuir
+
+1. Cree una rama desde `main`:
+   ```bash
+   git switch main && git pull
+   git switch -c mi-cambio
+   ```
+2. Ejecute las pruebas que correspondan:
+   ```bash
+   cd backend && .venv/bin/python -m pytest
+   cd ../frontend && npm test && npm run build
+   ```
+3. Para cambios de interfaz, ejecute también E2E:
+   ```bash
+   npm install && npx playwright install chromium
+   npm run test:e2e -- http://localhost:8000
+   ```
+4. Abra un Pull Request describiendo el cambio, las pruebas ejecutadas y cualquier dato que siga pendiente de validación.
+
+No suba `.env`, claves, bases de datos locales ni fotos de usuarios.
+
+## Licencia
+
+MIT © 2026 JEHOSEBA GABRIELA MUÑOZ VALDEZ. Ver [LICENSE](LICENSE).
 
 ## Créditos
 
