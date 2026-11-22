@@ -112,23 +112,27 @@ def _businesses() -> dict:
 
 
 @router.get("/negocios")
-def businesses(municipality_id: str | None = Query(None, max_length=60), service: str | None = Query(None, max_length=20)):
-    """Negocios agropecuarios de un directorio público (con fuente y aviso de que no están verificados)."""
+def businesses(municipality_id: str | None = Query(None, max_length=60), service: str | None = Query(None, max_length=20),
+               limit: int = Query(9, ge=1, le=60)):
+    """Negocios agropecuarios y veterinarios de un directorio público, del departamento del municipio elegido.
+    Primero los del mismo municipio. Se muestran con su fuente y el aviso de que no están verificados."""
     d = _businesses()
     m = get_municipality(municipality_id) if municipality_id else None
-    items = d["items"]
+    if not m:
+        return {"note": d["note"], "source": d["source"], "services": d["services"], "items": [], "total": 0}
+    items = [i for i in d["items"] if i.get("department_id") == m["department_id"]]
+    counts = {k: sum(1 for i in items if k in i["services"]) for k in d["services"]}
     if service:
         items = [i for i in items if service in i["services"]]
+    order = {i["id"]: k for k, i in enumerate(d["items"])}  # el archivo ya viene ordenado por relevancia
+    items.sort(key=lambda i: (i.get("municipality_id") != m["id"], order[i["id"]]))
     out = []
-    for i in items:
-        bm = get_municipality(i["municipality_id"])
-        same = bool(m and i["municipality_id"] == m["id"])
-        near = bool(m and bm and bm["department_id"] == m["department_id"])
-        if m and not near:
-            continue
+    for i in items[:limit]:
+        bm = get_municipality(i["municipality_id"]) if i.get("municipality_id") else None
         digits = i["phone"].lstrip("+")
-        out.append({**i, "municipality": f"{bm['name']}, {bm['department_name']}" if bm else "", "same_municipality": same,
-                    "whatsapp_url": f"https://wa.me/{digits}", "service_labels": [d["services"][x] for x in i["services"]]})
-    order = {i["id"]: k for k, i in enumerate(d["items"])}  # el archivo ya está ordenado por relevancia
-    out.sort(key=lambda x: (not x["same_municipality"], order[x["id"]]))
-    return {"note": d["note"], "source": d["source"], "services": d["services"], "items": out}
+        out.append({**i, "municipality": f"{bm['name']}, {bm['department_name']}" if bm else i.get("municipality_name", ""),
+                    "same_municipality": i.get("municipality_id") == m["id"],
+                    "whatsapp_url": f"https://wa.me/{digits}" if i.get("mobile") else None,
+                    "service_labels": [d["services"][x] for x in i["services"]]})
+    return {"note": d["note"], "source": d["source"], "services": d["services"], "counts": counts,
+            "items": out, "total": len(items)}

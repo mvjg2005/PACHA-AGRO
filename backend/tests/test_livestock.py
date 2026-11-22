@@ -132,11 +132,18 @@ def test_bulletin_without_forecast(app_client, monkeypatch):
     assert app_client.get("/api/ganado/boletin?municipality_id=or-challapata").json()["available"] is False
 
 
-def test_public_businesses_with_source_and_filters(app_client):
-    d = app_client.get("/api/ganado/negocios?municipality_id=or-challapata").json()
-    assert {i["name"] for i in d["items"]} == {"FERTIALTIPLANO", "Daisy Condori Aguilar", "Adrian Cruz Choque"}
-    assert "no los verificó" in d["note"] and d["source"]["url"].startswith("https://boliviahub.com/")
-    vet = app_client.get("/api/ganado/negocios?municipality_id=or-oruro&service=veterinaria").json()["items"]
-    assert [i["name"] for i in vet] == ["FERTIALTIPLANO"] and vet[0]["same_municipality"] is False
-    assert vet[0]["whatsapp_url"] == "https://wa.me/59168313350" and "nit" not in str(vet[0]).lower()
-    assert app_client.get("/api/ganado/negocios?municipality_id=lp-el-alto").json()["items"] == []  # otro departamento
+def test_public_businesses_by_department_with_source_and_filters(app_client):
+    d = app_client.get("/api/ganado/negocios?municipality_id=or-challapata&limit=60").json()
+    names = [i["name"] for i in d["items"]]
+    assert names[:3] == ["FERTIALTIPLANO", "Daisy Condori Aguilar", "Adrian Cruz Choque"]  # primero su municipio
+    assert all(i["same_municipality"] for i in d["items"][:3]) and not d["items"][3]["same_municipality"]
+    assert "no los verificó" in d["note"] and d["source"]["url"].startswith("https://boliviahub.com")
+    assert d["counts"]["veterinaria"] >= 3 and d["total"] == len(d["items"])
+    vet = app_client.get("/api/ganado/negocios?municipality_id=or-oruro&service=veterinaria").json()
+    assert all("Veterinaria" in " ".join(i["service_labels"]) for i in vet["items"])
+    for dep_muni in ("sc-montero", "cb-cochabamba"):
+        r = app_client.get(f"/api/ganado/negocios?municipality_id={dep_muni}").json()
+        assert r["total"] >= 10, dep_muni  # también Santa Cruz y Cochabamba
+        assert all(i["phone"].startswith("+591") for i in r["items"])
+    assert app_client.get("/api/ganado/negocios").json()["items"] == []
+    assert all("nit" not in i for i in d["items"]) and "3549742016" not in str(d)  # nunca el NIT

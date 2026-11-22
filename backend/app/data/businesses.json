@@ -1,19 +1,3420 @@
 {
-  "note": "Negocios tomados de un directorio público de empresas (BoliviaHub, «Agropecuarios y veterinarias rurales»). PACHA-AGRO no los verificó ni tiene relación con ellos: confirme por teléfono qué ofrecen, precios y disponibilidad antes de ir.",
-  "source": {"name": "BoliviaHub", "url": "https://boliviahub.com/categoria/oruro/challapata-ff3/agropecuarios-y-veterinarias-rurales", "retrieved": "2026-11-22"},
-  "services": {"veterinaria": "Servicios veterinarios", "agronomia": "Consultoría en agronomía", "forraje": "Forraje", "insumos": "Insumos y abonos", "construccion": "Construcción (cobertizos, muros)"},
-  "items": [
-    {"id": "fertialtiplano", "name": "FERTIALTIPLANO", "kind": "Empresa unipersonal", "municipality_id": "or-challapata",
-     "address": "Calle Ladislao Cabrera s/n, Challapata", "phone": "+59168313350",
-     "offers": "Venta de agroquímicos y abonos orgánicos; servicios veterinarios y consultorías en agronomía.",
-     "services": ["veterinaria", "agronomia", "insumos"], "url": "https://boliviahub.com/empresa/fertialtiplano-tkg"},
-    {"id": "daisy-condori-aguilar", "name": "Daisy Condori Aguilar", "kind": "Empresa unipersonal", "municipality_id": "or-challapata",
-     "address": "Challapata", "phone": "+59174116115",
-     "offers": "Agricultura, abastecimiento de forraje, crianza de bovinos y venta de leche.",
-     "services": ["forraje"], "url": "https://boliviahub.com/empresa/daisy-condori-aguilar-v66"},
-    {"id": "adrian-cruz-choque", "name": "Adrian Cruz Choque", "kind": "Empresa unipersonal", "municipality_id": "or-challapata",
-     "address": "Challapata", "phone": "+59174757582",
-     "offers": "Agricultura, construcción de obras civiles y consultoría en obras de ingeniería.",
-     "services": ["construccion"], "url": "https://boliviahub.com/empresa/adrian-cruz-choque-l41"}
-  ]
+ "note": "Negocios tomados de un directorio público de empresas (BoliviaHub: «Agropecuarios y veterinarias rurales» y «Veterinarias»). PACHA-AGRO no los verificó ni tiene relación con ellos: confirme por teléfono qué ofrecen, precios y disponibilidad antes de ir. Los servicios (veterinaria, forraje, etc.) se asignaron automáticamente según lo que cada negocio declara.",
+ "source": {
+  "name": "BoliviaHub",
+  "url": "https://boliviahub.com/",
+  "retrieved": "2026-11-22"
+ },
+ "services": {
+  "veterinaria": "Veterinaria",
+  "agronomia": "Asistencia técnica / agronomía",
+  "forraje": "Forraje y alimento para ganado",
+  "insumos": "Semillas e insumos",
+  "ganaderia": "Ganadería",
+  "construccion": "Construcción (cobertizos, muros)"
+ },
+ "items": [
+  {
+   "id": "agrismart-dqw",
+   "name": "Agrismart",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "",
+   "phone": "+59172842612",
+   "mobile": true,
+   "offers": "Servicios veterinarios Consultoría en Agronomía Consultores de servicios profesionales y técnicos Suministro de maquinaria agrícola con operadores Alquiler de maquinaria y equipo agropecuario sin operador Venta por mayor…",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrismart-dqw"
+  },
+  {
+   "id": "agrocampo-hed",
+   "name": "Agrocampo",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "",
+   "phone": "+59170262074",
+   "mobile": true,
+   "offers": "Venta de insumos veterinarios y alimentos para animales",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrocampo-hed"
+  },
+  {
+   "id": "agroindustria-de-alimentos-nutri-master-srl-pbp",
+   "name": "Agroindustria de Alimentos Nutri Master S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "",
+   "phone": "+59171143418",
+   "mobile": true,
+   "offers": "El objeto de la sociedad será: Elaborar y comercializar alimentos para animales; comercializar materias primas agropecuarias y animales vivos. Servicio de veterinaria para animales domésticos, comercialización de product…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agroindustria-de-alimentos-nutri-master-srl-pbp"
+  },
+  {
+   "id": "agromtco-servicios-agropecuarios-srl-dxk",
+   "name": "Agromtco Servicios Agropecuarios S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "",
+   "phone": "+59169377376",
+   "mobile": true,
+   "offers": "La Sociedad de Responsabilidad Limitada \"AGROMTCO SERVICIOS AGROPECUARIOS S.R.L.\" tendrá como Actividad Comercial u Objeto Social: 4.1. PRINCIPAL. Producción y Comercialización de: Alimento Balanceado para animales bovin…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agromtco-servicios-agropecuarios-srl-dxk"
+  },
+  {
+   "id": "agropesir-tqx",
+   "name": "Agropesir",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "",
+   "phone": "+59171034996",
+   "mobile": true,
+   "offers": "Venta y alquiler de maquinaria e implementos agropecuarios. Comercialización de semillas hortícolas, forrajeras y forestales. Servicios veterinarios y agropecuarios. Venta de materiales de construcción y artículos de fer…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropesir-tqx"
+  },
+  {
+   "id": "carlos-arturo-vargas-salces-qq2",
+   "name": "Carlos Arturo Vargas Salces",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "",
+   "phone": "+59170276533",
+   "mobile": true,
+   "offers": "Servicios veterinarios compra y venta de productos, servicios de asesoramiento, venta de núcleos y premix para la preparación de de alientos balanceados venta de raciones terminadas, venta de semillas para el agro, venta…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/carlos-arturo-vargas-salces-qq2"
+  },
+  {
+   "id": "carmelina-monteverde-roca-lyr",
+   "name": "Carmelina Monteverde Roca",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "",
+   "phone": "+59170266019",
+   "mobile": true,
+   "offers": "Comercializacion de productos veterinarios como ser: vitaminas desparacitantes, balanceados, vacunas, sales minerales y monturas",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/carmelina-monteverde-roca-lyr"
+  },
+  {
+   "id": "inno-agro-innovaciones-agropecuarias-wfs",
+   "name": "Inno Agro Innovaciones Agropecuarias",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "ADOLFO VELASCO AVILA Nro. Sin número",
+   "phone": "+59172832337",
+   "mobile": true,
+   "offers": "Venta de insumos veterinarios, agroquimi cos servicio deasesoramiento tecnico venta de semoviente bovino, equino, porcinos,aves",
+   "services": [
+    "veterinaria",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/inno-agro-innovaciones-agropecuarias-wfs"
+  },
+  {
+   "id": "jesus-paul-avaroma-gutierrez-g9v",
+   "name": "Jesus Paul Avaroma Gutierrez",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "Piraquina Nro. 43",
+   "phone": "+59174728922",
+   "mobile": true,
+   "offers": "Servicios agropecuarios, veterinarios, Alimenticios, comercio de productos veterinarios y consultoría ganadera y agronomía",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/jesus-paul-avaroma-gutierrez-g9v"
+  },
+  {
+   "id": "jobramvet-lj3",
+   "name": "Jobramvet",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "6 Nro. S/N",
+   "phone": "+59178659987",
+   "mobile": true,
+   "offers": "Actividades veterinarias. consultoria en agronomia y servicios ganaderos",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/jobramvet-lj3"
+  },
+  {
+   "id": "agustin-mendez-callau-yc8",
+   "name": "Agustin Mendez Callau",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": null,
+   "municipality_name": "Reyes",
+   "address": "",
+   "phone": "+59173901616",
+   "mobile": true,
+   "offers": "Crianza y venta de ganado y sus derivados",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agustin-mendez-callau-yc8"
+  },
+  {
+   "id": "comercio-y-logistica-import-export-gomizel-z3l",
+   "name": "Comercio y Logistica Import Export Gomizel",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": null,
+   "municipality_name": "Guayaramerin",
+   "address": "",
+   "phone": "+59163546333",
+   "mobile": true,
+   "offers": "Servicio de alquiler de maquinaria y equipo agrícola. Importación y exportación de maquinaria pesada para agricultura y minería como ser tractor de rueda, tractor oruga, motoniveladora, excavadora, retroexcavadora, camio…",
+   "services": [
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/comercio-y-logistica-import-export-gomizel-z3l"
+  },
+  {
+   "id": "empresa-ganadera-asbhiz-srl-cby",
+   "name": "Empresa Ganadera Asbhiz S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-san-borja",
+   "municipality_name": "San Borja",
+   "address": "SAN BORJA A ESTANCIAS ESPIRITU Nro. S/N",
+   "phone": "+59172153554",
+   "mobile": true,
+   "offers": "Comercializacion, crianza y engorde de ganado bovino",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/empresa-ganadera-asbhiz-srl-cby"
+  },
+  {
+   "id": "empresa-idara-srl-ksd",
+   "name": "Empresa Idara S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "Rafael Arteaga Nro. 95",
+   "phone": "+59168967960",
+   "mobile": true,
+   "offers": "venta al por mayor de materias primas agropecuarias y animales vivos, cría y preproducción de ganado bovino y búfalos pudiendo para el efecto, realizar trabajos de evaluación de proyectos, estudios de factibilidad, propo…",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/empresa-idara-srl-ksd"
+  },
+  {
+   "id": "estancias-ganaderas-alsacia-srl-khj",
+   "name": "Estancias Ganaderas \"alsacia\" S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "CALLE FELIX SATTORI Nro. 459 Ed. S/N. Piso S/N.",
+   "phone": "+5914628121",
+   "mobile": false,
+   "offers": "Cria de ganado vacuno recria de ganado vacuno engorde de ganadovacuno",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/estancias-ganaderas-alsacia-srl-khj"
+  },
+  {
+   "id": "estancias-popayan-sa-ukg",
+   "name": "Estancias Popayan S.A.",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-trinidad",
+   "municipality_name": "Trinidad",
+   "address": "AV. CIPRIANO BARACE Nro. 571",
+   "phone": "+5914621408",
+   "mobile": false,
+   "offers": "Actividades agropecuarias en general cria, recria y engorde de ganadovacuno venta y comercializacion de ganado vacun o",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/estancias-popayan-sa-ukg"
+  },
+  {
+   "id": "agropecuaria-el-arqueno-63k",
+   "name": "Agropecuaria El Arqueño",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": null,
+   "municipality_name": "San Andres",
+   "address": "",
+   "phone": "+59171386293",
+   "mobile": true,
+   "offers": "Venta por mayor de abonos y productos químicos de uso agrícola",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropecuaria-el-arqueno-63k"
+  },
+  {
+   "id": "agropecuaria-miazumi-fpp",
+   "name": "Agropecuaria Miazumi",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": null,
+   "municipality_name": "San Andres",
+   "address": "",
+   "phone": "+59177675210",
+   "mobile": true,
+   "offers": "Venta de insumos agrícolas y semillas. Venta de repuestos de maquinaria agrícola.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropecuaria-miazumi-fpp"
+  },
+  {
+   "id": "angheloty-mod",
+   "name": "Angheloty",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-san-borja",
+   "municipality_name": "San Borja",
+   "address": "",
+   "phone": "+59167170479",
+   "mobile": true,
+   "offers": "Ofrecemos una gama completa de servicios y productos, incluyendo: Viveros y plantines. Instalación de invernaderos, secaderos y galpones para pollos. Corrales y consultoría y asistencia agropecuaria. Venta de productos a…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/angheloty-mod"
+  },
+  {
+   "id": "multiservicios-cadegsum-jqj",
+   "name": "Multiservicios \"cadegsum\"",
+   "kind": "Negocio registrado",
+   "department_id": "beni",
+   "municipality_id": "bn-riberalta",
+   "municipality_name": "Riberalta",
+   "address": "",
+   "phone": "+59167368900",
+   "mobile": true,
+   "offers": "CONSTRUCCION DE EDIFICIOS completos o de partes de edificios; obras de ingeniería civil. TRANSPORTE DE CARGA interdepartamental y larga distancia. VENTA POR MAYOR de abonos y productos químicos de uso agrícola. CULTIVO D…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/multiservicios-cadegsum-jqj"
+  },
+  {
+   "id": "agropcons-agropecuaria-consultora-yja",
+   "name": "Agropcons Agropecuaria & Consultora",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": "ch-monteagudo",
+   "municipality_name": "Monteagudo",
+   "address": "",
+   "phone": "+59175762059",
+   "mobile": true,
+   "offers": "Venta de productos veterinarios y agroquímicos: vitaminas, sales minerales, antibióticos, semillas, hortalizas, agroquímicos. Venta de maquinaria y equipo agropecuario: molino, arado, fumigadora, rastreas, sembradoras. S…",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropcons-agropecuaria-consultora-yja"
+  },
+  {
+   "id": "comservet-o5v",
+   "name": "Comservet",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": "ch-sucre",
+   "municipality_name": "Sucre",
+   "address": "",
+   "phone": "+59172879373",
+   "mobile": true,
+   "offers": "Importación y comercialización de productos y equipos veterinarios, agropecuarios. insumos y equipos para la alimentación animal. comercialización de semovientes (ganado bovino, ovino, caprino, porcino,equinos, aves). pr…",
+   "services": [
+    "veterinaria",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/comservet-o5v"
+  },
+  {
+   "id": "consultora-agrorural-vfr",
+   "name": "Consultora Agrorural",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": "ch-sucre",
+   "municipality_name": "Sucre",
+   "address": "",
+   "phone": "+59172864527",
+   "mobile": true,
+   "offers": "Elaboracion de estudios de pre inversion productivos, ambientales pecuarios y forestales, ejecucion de proyectos de inversion agricolas, pecuarios, ambientales, sistemas de riego y proyectos productivos, provision de pro…",
+   "services": [
+    "agronomia",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/consultora-agrorural-vfr"
+  },
+  {
+   "id": "filomena-munoz-zorrilla-ihd",
+   "name": "Filomena Muñoz Zorrilla",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": null,
+   "municipality_name": "Presto",
+   "address": "SIN DENOMINACIÓN Nro. Sin número",
+   "phone": "+59174405594",
+   "mobile": true,
+   "offers": "Venta de flores (naturales y artificiales), plantas, semillas, abonos y venta de madera sin desbastar, puertas, ventanas, marcos y productos primarios, consultoria en agronomia, medio ambiente y en gestion forestal. cons…",
+   "services": [
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/filomena-munoz-zorrilla-ihd"
+  },
+  {
+   "id": "empresa-rancagri-8ib",
+   "name": "Empresa Rancagri",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": "ch-sucre",
+   "municipality_name": "Sucre",
+   "address": "SIN DENOMINACION Nro. S/N",
+   "phone": "+59167626217",
+   "mobile": true,
+   "offers": "Construcion de obras de ingenieria civil, instalaciones de gas natural y acometidas, redes de gas primaria y secundaria, cria y comercializacion de ganado bovino, porcino, actividad avicola y apicultura",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/empresa-rancagri-8ib"
+  },
+  {
+   "id": "agro-dalis-5ru",
+   "name": "Agro Dalis",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": "ch-sucre",
+   "municipality_name": "Sucre",
+   "address": "",
+   "phone": "+59176818164",
+   "mobile": true,
+   "offers": "Venta de equipos de riego, tuberías, accesorios de plomería, maquinaria agrícola, semillas, agroquímicos, productos orgánicos y ecológicos, material de hidropónica, bomba de agua, fertilizantes, mallas y mantas térmicas,…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-dalis-5ru"
+  },
+  {
+   "id": "boltrade-sociedad-de-responsabilidad-limitada-gnt",
+   "name": "Boltrade Sociedad de Responsabilidad Limitada",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": "ch-sucre",
+   "municipality_name": "Sucre",
+   "address": "",
+   "phone": "+59168616004",
+   "mobile": true,
+   "offers": "Actividades de industrialización, comercialización y exportación de productos agropecuarios, prestación de servicios a la actividad empre sarial y agropecuaria, asistencia técnica y capacitación, importación y comerciali…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/boltrade-sociedad-de-responsabilidad-limitada-gnt"
+  },
+  {
+   "id": "comercial-agropecuaria-soliz-bdx",
+   "name": "Comercial Agropecuaria Soliz",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": "ch-sucre",
+   "municipality_name": "Sucre",
+   "address": "",
+   "phone": "+59172874158",
+   "mobile": true,
+   "offers": "Venta de insumos agricolas, semillas pla guicidas, insecticidas,fertilizantes, h erramientas agricolas: palas, picos, ras trillos,sembradoras, fumigadoras",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/comercial-agropecuaria-soliz-bdx"
+  },
+  {
+   "id": "comercial-qhispich-e-industrial-2li",
+   "name": "Comercial Qhispich e Industrial",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": "ch-sucre",
+   "municipality_name": "Sucre",
+   "address": "",
+   "phone": "+59172864761",
+   "mobile": true,
+   "offers": "Consultora y constructora de obras de ingeniería civil, venta por mayor de abonos y productos químicos de uso agrícola, plantines de frutales y forestales y semillas, venta por mayor y menor de productos de ferretería, f…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/comercial-qhispich-e-industrial-2li"
+  },
+  {
+   "id": "franz-lazaro-mamani-choque-keh",
+   "name": "Franz Lazaro Mamani Choque",
+   "kind": "Negocio registrado",
+   "department_id": "chuquisaca",
+   "municipality_id": "ch-sucre",
+   "municipality_name": "Sucre",
+   "address": "NATANIEL AGUIRRE Nro. 470",
+   "phone": "+59168634847",
+   "mobile": true,
+   "offers": "Venta de productos agroquímicos, plantas, semillas, abonos foliares, fertilizantes, fungicidas, insecticidas y herramientas agrícolas.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/franz-lazaro-mamani-choque-keh"
+  },
+  {
+   "id": "agro-veterinaria-el-sicuri-tqy",
+   "name": "Agro-veterinaria \"el Sicuri\"",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+59173972882",
+   "mobile": true,
+   "offers": "SERVICIOS DE VETERINARIA Y AGRONOMÍA Servicio de Veterinaria y Agronomía",
+   "services": [
+    "veterinaria",
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-veterinaria-el-sicuri-tqy"
+  },
+  {
+   "id": "agrofarvet-srl-2mx",
+   "name": "Agrofarvet S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+5914429394",
+   "mobile": false,
+   "offers": "Importación y/o exportación de productos veterinarios, agrícolas, productos elaborados en general para su comercialización al por mayor y/o menor.",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/agrofarvet-srl-2mx"
+  },
+  {
+   "id": "agroveterinaria-tropical-chapare-agri-trop-chapare-icf",
+   "name": "Agroveterinaria Tropical Chapare \"agri Trop Chapare\"",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": null,
+   "municipality_name": "Shinahota",
+   "address": "",
+   "phone": "+59176032902",
+   "mobile": true,
+   "offers": "Venta por mayor de productos químicos industriales básicos, abonos y plaguicidas. (Materiales plásticos en forma primaria, fibras textiles, materiales para reciclar)",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroveterinaria-tropical-chapare-agri-trop-chapare-icf"
+  },
+  {
+   "id": "alex-albaro-santos-espinoza-4wk",
+   "name": "Alex Albaro Santos Espinoza",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-quillacollo",
+   "municipality_name": "Quillacollo",
+   "address": "",
+   "phone": "+59177498279",
+   "mobile": true,
+   "offers": "Ventas de productos de veterinaria y servicios de veterinaria y agronomía.",
+   "services": [
+    "veterinaria",
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/alex-albaro-santos-espinoza-4wk"
+  },
+  {
+   "id": "amipets-srl-exd",
+   "name": "Amipets S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+5914554294",
+   "mobile": false,
+   "offers": "A) La venta de alimentos para perros y servicios de veterinaria. B) La realización de actividades de atención médica y control de animales en establecimientos agropecuarios. C) La realización de actividades y servicios d…",
+   "services": [
+    "veterinaria",
+    "forraje"
+   ],
+   "url": "https://boliviahub.com/empresa/amipets-srl-exd"
+  },
+  {
+   "id": "consorcio-boliviano-agropecuario-coboagro-srl-are",
+   "name": "Consorcio Boliviano Agropecuario Coboagro S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": null,
+   "municipality_name": "Colcapirhua",
+   "address": "",
+   "phone": "+5914318542",
+   "mobile": false,
+   "offers": "Servicios de veterinaria, venta de insumos veterinarios, venta de pet shop, venta de insumos agropecuarios, máquinas y accesorios agrícolas, alimentos balanceados y sales minerales. Importación, elaboración, producción y…",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/consorcio-boliviano-agropecuario-coboagro-srl-are"
+  },
+  {
+   "id": "isv-insumos-y-sanidad-veterinaria-srl-afb",
+   "name": "I.s.v. Insumos y Sanidad Veterinaria S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": null,
+   "municipality_name": "Sacaba",
+   "address": "KHAKERAMA Nro. S/N",
+   "phone": "+5914408039",
+   "mobile": false,
+   "offers": "Importacion, comercializacion, representacion y distribucion de productos veterinarios",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/isv-insumos-y-sanidad-veterinaria-srl-afb"
+  },
+  {
+   "id": "kimberly-sayonara-rivero-caraffa-r6v",
+   "name": "Kimberly Sayonara Rivero Caraffa",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "RAMON RIVERO Nro. 846 Ed. PICASSO Piso 1",
+   "phone": "+59169401429",
+   "mobile": true,
+   "offers": "Servicio de Asesoría Tecnica Veterinaria",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/kimberly-sayonara-rivero-caraffa-r6v"
+  },
+  {
+   "id": "alfredo-paz-servicios-globales-pqw",
+   "name": "Alfredo Paz Servicios Globales",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+59171726577",
+   "mobile": true,
+   "offers": "Servicios de consultoría y asesoramiento a proyectos de desarrollo Enactividades de agronomía",
+   "services": [
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/alfredo-paz-servicios-globales-pqw"
+  },
+  {
+   "id": "adalberto-munoz-miranda-6ts",
+   "name": "Adalberto Muñoz Miranda",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": null,
+   "municipality_name": "Colomi",
+   "address": "",
+   "phone": "+59172748931",
+   "mobile": true,
+   "offers": "Venta al por mayor de abonos orgánicos, humus, abono animal de camelidos, vacunos",
+   "services": [
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/adalberto-munoz-miranda-6ts"
+  },
+  {
+   "id": "agropecuaria-frailita-pkv",
+   "name": "Agropecuaria \"frailita\"",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": null,
+   "municipality_name": "Tarata",
+   "address": "",
+   "phone": "+59173792287",
+   "mobile": true,
+   "offers": "Empresa pecuaria dedicada a la producción de carne con el objetivo de garantizar la seguridad alimentaria.",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agropecuaria-frailita-pkv"
+  },
+  {
+   "id": "felix-marcelo-garabito-cardenas-vn6",
+   "name": "Felix Marcelo Garabito Cardenas",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+59165731637",
+   "mobile": true,
+   "offers": "Elaboración de proyectos sociales y planes de desarrollo económico, así como la elaboración de proyectos pecuarios, agrícolas y de gestión de agua.",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/felix-marcelo-garabito-cardenas-vn6"
+  },
+  {
+   "id": "acuavid-import-and-export-3lg",
+   "name": "Acuavid Import And Export",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+5914368642",
+   "mobile": false,
+   "offers": "Compramos y vendemos bienes como equipos e insumos de agropecuario, decoración e industrial por mayor y menor.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/acuavid-import-and-export-3lg"
+  },
+  {
+   "id": "agricola-senegal-srl-lwf",
+   "name": "Agricola Senegal S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-quillacollo",
+   "municipality_name": "Quillacollo",
+   "address": "",
+   "phone": "+5914350812",
+   "mobile": false,
+   "offers": "Actividad: Agropecuaria, agroindustrial e industrial, así como la comercialización de estos productos químicos, insectos y otros productos para uso agrícola. Pudiendo para ello dedicarse: A) A la producción de semillas y…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agricola-senegal-srl-lwf"
+  },
+  {
+   "id": "agritecco-agricola-tecnica-cochabamba-you",
+   "name": "Agritecco Agricola Tecnica Cochabamba",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+5914229436",
+   "mobile": false,
+   "offers": "Venta de productos químicos, abonos y plaguicidas.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agritecco-agricola-tecnica-cochabamba-you"
+  },
+  {
+   "id": "agro-pocoata-bhe",
+   "name": "Agro - Pocoata",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+5914560284",
+   "mobile": false,
+   "offers": "Venta por mayor de productos químicos, industriales, básicos, abonos y plaguicidas.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-pocoata-bhe"
+  },
+  {
+   "id": "agroamanecer-cky",
+   "name": "Agroamanecer",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-punata",
+   "municipality_name": "Punata",
+   "address": "",
+   "phone": "+59173754719",
+   "mobile": true,
+   "offers": "Importación, exportación, comercialización y distribución de productos en general, ya sea por cuenta propia o asociada a terceros. La comercialización de materia prima o procesada, semillas para todo tipo de cultivo, ins…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroamanecer-cky"
+  },
+  {
+   "id": "agrobolivar-4uq",
+   "name": "Agrobolivar",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+59177967999",
+   "mobile": true,
+   "offers": "Venta de productos agroquímicos, semillas, fertilizantes, fumigadora, maquinaria y herramienta agrícola, productos orgánicos, traje de apicultores.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrobolivar-4uq"
+  },
+  {
+   "id": "agrocorani-agro-industria-foresteria-transportes-y-servicios-de-construcciones-civiles-en-general-y-consultorias-srl-fxf",
+   "name": "Agrocorani, Agro-industria, Foresteria, Transportes y Servicios de Construcciones Civiles en General y Consultorias S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": null,
+   "municipality_name": "Sacaba",
+   "address": "",
+   "phone": "+5914720222",
+   "mobile": false,
+   "offers": "Actividades principales: Producir productos agropecuarios (vegetales – animales) con su respectivo valor agregado y comercializarlos. Extracción, envase y comercialización de abono vegetal de la zona de Corani. Extracció…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrocorani-agro-industria-foresteria-transportes-y-servicios-de-construcciones-civiles-en-general-y-consultorias-srl-fxf"
+  },
+  {
+   "id": "agrodefencivos-crecimiento-7ym",
+   "name": "Agrodefencivos Crecimiento",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": null,
+   "municipality_name": "Shinahota",
+   "address": "",
+   "phone": "+59171735743",
+   "mobile": true,
+   "offers": "Importación, comercialización y distribución de agroquímicos.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrodefencivos-crecimiento-7ym"
+  },
+  {
+   "id": "agropecuaria-sanchez-f2v",
+   "name": "Agropecuaria Sanchez",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+5914223061",
+   "mobile": false,
+   "offers": "Venta de productos agroquímicos, implementos agrícolas, semillas, semisombra, agrofilm",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropecuaria-sanchez-f2v"
+  },
+  {
+   "id": "agroquimicos-luis-choque-calizaya-ll8",
+   "name": "Agroquimicos \"luis Choque Calizaya\"",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": null,
+   "municipality_name": "Puerto Villarroel",
+   "address": "",
+   "phone": "+59172093165",
+   "mobile": true,
+   "offers": "Venta de agroquímicos, herbicidas, insecticidas, fungicidas y fertilizantes.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroquimicos-luis-choque-calizaya-ll8"
+  },
+  {
+   "id": "agrorepublica-8nr",
+   "name": "Agrorepublica",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+59170756791",
+   "mobile": true,
+   "offers": "Venta al por menor de productos agroquímicos, semillas y servicios de defumigación.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrorepublica-8nr"
+  },
+  {
+   "id": "agroselva-srl-yry",
+   "name": "Agroselva S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": null,
+   "municipality_name": "Puerto Villarroel",
+   "address": "Ed. CASA",
+   "phone": "+59175992669",
+   "mobile": true,
+   "offers": "Importación, exportación, comercialización y distribución de agroquímicos, productos de fumigación y fertilización, además de la venta y distribución de herbicidas, fungicidas y pesticidas en todas sus variedades, tipos …",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroselva-srl-yry"
+  },
+  {
+   "id": "agrowth-srl-cxg",
+   "name": "Agrowth S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-cochabamba",
+   "municipality_name": "Cochabamba",
+   "address": "",
+   "phone": "+59175487863",
+   "mobile": true,
+   "offers": "Comercio e importación de productos agroquímicos, plaguicidas, pesticidas, fertilizantes foliares y afines dentro nuestro país.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrowth-srl-cxg"
+  },
+  {
+   "id": "imperium-trading-export-import-tlg",
+   "name": "Imperium Trading Export-import",
+   "kind": "Negocio registrado",
+   "department_id": "cochabamba",
+   "municipality_id": "cb-quillacollo",
+   "municipality_name": "Quillacollo",
+   "address": "CHARLES NICOLLE",
+   "phone": "+59176978444",
+   "mobile": true,
+   "offers": "Exportación y importación de granos, tubérculos secos y frescos, cereales y semillas, así como pieles de burro. venta al por mayor de cerámica y materiales de construcción; exportación e importación de granos tubérculos …",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/imperium-trading-export-import-tlg"
+  },
+  {
+   "id": "exclusivepet-import-srl-h0y",
+   "name": "\"exclusivepet Import\" S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "BUSCH Nro. 1234",
+   "phone": "+59161003023",
+   "mobile": true,
+   "offers": "Servicios veterinarios comercialización de productos veterinarios, asesoramiento en general, importación de productos de higienedomesticas y absorbentes de higiene personal e insumos médicos, comercialización de alimento…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/exclusivepet-import-srl-h0y"
+  },
+  {
+   "id": "abigail-pantigozo-coata-lug",
+   "name": "Abigail Pantigozo Coata",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "Caranavi",
+   "address": "",
+   "phone": "+59177219825",
+   "mobile": true,
+   "offers": "Servicio de Veterinaria y Agronomía",
+   "services": [
+    "veterinaria",
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/abigail-pantigozo-coata-lug"
+  },
+  {
+   "id": "adipharm-srl-3oe",
+   "name": "Adipharm S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+59170548863",
+   "mobile": true,
+   "offers": "Importación y distribución de productos agropecuarios y veterinarios",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/adipharm-srl-3oe"
+  },
+  {
+   "id": "agro-preveer-market-ltda-jlg",
+   "name": "Agro Preveer Market LTDA.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59170614618",
+   "mobile": true,
+   "offers": "A) Importación de productos veterinarios y agropecuarios, fármacos veterinarios, accesorios para animales domésticos, alimentos balanceados, material de laboratorio, equipos de laboratorio, instrumental veterinario, mate…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-preveer-market-ltda-jlg"
+  },
+  {
+   "id": "agrocenter-el-rancho-3k8",
+   "name": "Agrocenter El Rancho",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+5912832609",
+   "mobile": false,
+   "offers": "Servicios de veterinaria y agronomia; venta de productos veterinarios, instrumental y semillas; venta de alimentos balanceados",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "forraje",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrocenter-el-rancho-3k8"
+  },
+  {
+   "id": "amanecer-famgroup-srl-gkb",
+   "name": "Amanecer Famgroup S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+5912424479",
+   "mobile": false,
+   "offers": "La compra, fabricación, almacenamiento, comercialización, importación, exportación, producción, mediación, representación y/o distribucion en la venta al por mayor y por menor de toda clase productos veterinarios, agrope…",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/amanecer-famgroup-srl-gkb"
+  },
+  {
+   "id": "animalissanitas-srl-ppg",
+   "name": "Animalissanitas S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+59173069019",
+   "mobile": true,
+   "offers": "La Sociedad tiene por objeto los servicios médicos veterinarios y zootecnia, para tal efecto podrá realizar: A) Explotar y gestionar las instalaciones Clínico Veterinarios y zootecnia. B) Desarrollar las actividades clín…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/animalissanitas-srl-ppg"
+  },
+  {
+   "id": "brucee-dick-srl-y8d",
+   "name": "Brucee & Dick S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+5912319838",
+   "mobile": false,
+   "offers": "La sociedad se dedicará como actividad principal a la veterinaria, peluquería y/o hotel de mascotas. Incluye actividades de atención médica y control de animales en establecimientos agropecuarios. Las actividades llevada…",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/brucee-dick-srl-y8d"
+  },
+  {
+   "id": "corinvet-srl-go3",
+   "name": "Corinvet S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59167179751",
+   "mobile": true,
+   "offers": "- investigación,fabricación elaboración de fármacos veterinarios , biológicos e insumos veterinarios - importación de productos veterinarios agropecuarios , fármacos veterinarios , accesorios para animales domésticos, al…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/corinvet-srl-go3"
+  },
+  {
+   "id": "cruzvet-ltda-xd9",
+   "name": "Cruzvet LTDA.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59171514475",
+   "mobile": true,
+   "offers": "Importacionde preoductos veterinarios y agropecuarios, farmacos veterinarios, acsesorios para animales domesticos, alimentos balanceados, material de laboratorio,, equipo de laboratorio, instrumental veterinario y matrei…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/cruzvet-ltda-xd9"
+  },
+  {
+   "id": "era-agropet-srl-rrr",
+   "name": "Era Agropet S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "8 Nro. 12 Ed. Orquidea Piso Planta baja",
+   "phone": "+59168051689",
+   "mobile": true,
+   "offers": "La sociedad tiene por objeto principal la importación, exportación, representación, distribución, comercialización mayorista y minorista de productos e insumos veterinarios , tales como fármacos, vacunas, hormonas, alime…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/era-agropet-srl-rrr"
+  },
+  {
+   "id": "flm-konbinetto-ltda-gjg",
+   "name": "Flm Konbinetto LTDA.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "CALLE 28 BARQUETA CALLE D Nro. 85",
+   "phone": "+59161133807",
+   "mobile": true,
+   "offers": "GESTIÓN DE PROYECTOS Diseño, desarrollo, administración, implementación, supervisión, creación, franquicias, capacitación, avaluó, revaluó y evaluación de proyectos: ambientales, industriales, agropecuarios, agroindustri…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/flm-konbinetto-ltda-gjg"
+  },
+  {
+   "id": "ganaderos-nacionales-agropecuarios-ltda-okh",
+   "name": "Ganaderos Nacionales Agropecuarios LTDA.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "CALLE FOURNIER Nro. 3090",
+   "phone": "+5912104386",
+   "mobile": false,
+   "offers": "Comercializacion y distribucion de productos agroveterinarios crianzay venta de animales de granja servicios de medicina veterinaria importacion de productos veterinarios y agropecuarios, farmacos veterinarios accesorios…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/ganaderos-nacionales-agropecuarios-ltda-okh"
+  },
+  {
+   "id": "inserpec-insumos-y-servicios-pecuarios-63s",
+   "name": "Inserpec (insumos y Servicios Pecuarios)",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "CAMINO A VIACHA ENTRE CALLES 122 Y 123 Nro. 729",
+   "phone": "+59176282584",
+   "mobile": true,
+   "offers": "Importacion, y distribucion de productos veterinarios venta ydistribucion de ganado capacitacion y asistencia tecnica en sanidad yreproduccion animal transformacion y produccion de insumos ymateriales para la reproduccio…",
+   "services": [
+    "veterinaria",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/inserpec-insumos-y-servicios-pecuarios-63s"
+  },
+  {
+   "id": "ivan-humberto-quiroga-miranda-pnd",
+   "name": "Ivan Humberto Quiroga Miranda",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "ALFREDO SANJINEZ Nro. 1917",
+   "phone": "+59169052432",
+   "mobile": true,
+   "offers": "Servicios de veterinaria y agronomía e intermediación por comisión, corredores de productos básicos, subastadores, (promoción y comercialización de medicamentos, vacunas, alimentos, sales minerales para animales)",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/ivan-humberto-quiroga-miranda-pnd"
+  },
+  {
+   "id": "layinvet-srl-pfd",
+   "name": "Layinvet S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "ARTURO VALLE Nro. 3094",
+   "phone": "+59176280333",
+   "mobile": true,
+   "offers": "Venta de alimentos de mascotas felinos ,caninos y animales de granja pollos,cerdos, caballos; venta de accesorios de mascotas,felinos ,caninos, pollos ,cerdos;venta de farmacos para animales menores felinos,caninos ,porc…",
+   "services": [
+    "veterinaria",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/layinvet-srl-pfd"
+  },
+  {
+   "id": "luisa-quispe-capquique-tqh",
+   "name": "Luisa Quispe Capquique",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "AVENIDA DEL POLICIA ENTRE CALLE 6 Nro. 144 Piso P/B",
+   "phone": "+59171521919",
+   "mobile": true,
+   "offers": "Venta al por menor de una variedad de productos (alimenticios, de limpieza, higiene persona, bebidas y tabaco) que no reflejan una especialidad (supermercados, distribuidores) telecomunicaciones otras actividades d e inf…",
+   "services": [
+    "veterinaria",
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/luisa-quispe-capquique-tqh"
+  },
+  {
+   "id": "agro-el-buen-sembrador-de-quime-fzx",
+   "name": "Agro El Buen Sembrador de Quime",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59179531333",
+   "mobile": true,
+   "offers": "Comercialización de insumos agrícolas y ganaderos con asistencia técnica.",
+   "services": [
+    "agronomia",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-el-buen-sembrador-de-quime-fzx"
+  },
+  {
+   "id": "agro-ingenieria-9u7",
+   "name": "Agro Ingenieria",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+5912246499",
+   "mobile": false,
+   "offers": "Servicios de Ingeniería, Agronomía y Medio Ambiente",
+   "services": [
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-ingenieria-9u7"
+  },
+  {
+   "id": "agroconsult-srl-off",
+   "name": "Agroconsult S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+59167311421",
+   "mobile": true,
+   "offers": "Servicios de agronomía , consultoría, construcción de sistemas de riego, manejo de cuencas, importación y comercialización de productos del área agronómica.",
+   "services": [
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/agroconsult-srl-off"
+  },
+  {
+   "id": "agroideas-kyf-4sy",
+   "name": "Agroideas_kyf",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+59175840409",
+   "mobile": true,
+   "offers": "Venta de productos agropecuarios. Servicio de consultoria.",
+   "services": [
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/agroideas-kyf-4sy"
+  },
+  {
+   "id": "jaimesagro-ihs",
+   "name": "Jaimesagro",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "Corocoro",
+   "address": "VIACHA - COROCORO Nro. S/N Ed. ESTANCIA",
+   "phone": "+59174902572",
+   "mobile": true,
+   "offers": "Venta de materias primas, productos y servicios agropecuarios, venta de animales, servicios de veterianaria y agronomia",
+   "services": [
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/jaimesagro-ihs"
+  },
+  {
+   "id": "agro-ganadero-vasquez-tha",
+   "name": "Agro Ganadero Vasquez",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "Chacarilla",
+   "address": "",
+   "phone": "+59174159501",
+   "mobile": true,
+   "offers": "Provisión y comercialización de ganados vacuno, ovino, camellidos, semillas certificadas, alimentos balanceados y forrajes.",
+   "services": [
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-ganadero-vasquez-tha"
+  },
+  {
+   "id": "4zconst-srl-yg7",
+   "name": "4zconst S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59167002332",
+   "mobile": true,
+   "offers": "Prestación de servicios de consultoria, estudios, proyectos, diseño, ejecución y supervisión de trabajos, asesoramiento y actividades relacionadas en ingeniería civil, agrícola y pecuaria, medio ambiente, educación y nor…",
+   "services": [
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/4zconst-srl-yg7"
+  },
+  {
+   "id": "agroganadero-fqb-aeo",
+   "name": "Agroganadero Fqb",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "Los Andes",
+   "address": "",
+   "phone": "+59171558039",
+   "mobile": true,
+   "offers": "Cría y comercialización de ganado camélido o auquénido",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agroganadero-fqb-aeo"
+  },
+  {
+   "id": "015-semillas-flora-ch5",
+   "name": "015 Semillas Flora",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-achacachi",
+   "municipality_name": "Achacachi",
+   "address": "",
+   "phone": "+59168185232",
+   "mobile": true,
+   "offers": "Cultivo de semillas Ofrecemos venta al por mayor de diversas categorías de productos, incluyendo: Materias primas agropecuarias y semillas. Materiales de construcción. Muebles y enseres domésticos. Ropa deportiva, pelota…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/015-semillas-flora-ch5"
+  },
+  {
+   "id": "agrarium-srl-ecz",
+   "name": "Agrarium S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59174071665",
+   "mobile": true,
+   "offers": "Venta al por mayor de máquinas agrícolas, materiales y equipos agropecuarios. Venta de plantines, semillas, abonos, fertilizantes y productos de viveros. Venta de materiales de escritorio y oficina.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrarium-srl-ecz"
+  },
+  {
+   "id": "agricola-criar-e2u",
+   "name": "Agricola Criar",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "Caranavi",
+   "address": "",
+   "phone": "+59168054455",
+   "mobile": true,
+   "offers": "Venta de insumos agrícolas",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agricola-criar-e2u"
+  },
+  {
+   "id": "agricola-shalom-ffp",
+   "name": "Agricola Shalom",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+59170142605",
+   "mobile": true,
+   "offers": "Comercialización de agroinsumos químicos y equipos para la agricultura. Actividades solo de importación. Venta por mayor de equipos electrónicos.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agricola-shalom-ffp"
+  },
+  {
+   "id": "agricorp-la-paz-e4n",
+   "name": "Agricorp la Paz",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59173525613",
+   "mobile": true,
+   "offers": "Venta de insumos agrícolas",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agricorp-la-paz-e4n"
+  },
+  {
+   "id": "agriforte-qff",
+   "name": "Agriforte",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+59172535352",
+   "mobile": true,
+   "offers": "Ventas al por mayor de maquinaria agrícola, fumigadoras, podadoras, motosierras, herramientas e insumos.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agriforte-qff"
+  },
+  {
+   "id": "agro-carlitos-x0v",
+   "name": "Agro Carlitos",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59167082010",
+   "mobile": true,
+   "offers": "Venta de fertilizantes",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-carlitos-x0v"
+  },
+  {
+   "id": "agro-flor-la-paz-d6y",
+   "name": "Agro Flor la Paz",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+5912382788",
+   "mobile": false,
+   "offers": "Venta de insumos agrícolas: fertilizantes, semillas, plaguicidas y equipo agrícola.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-flor-la-paz-d6y"
+  },
+  {
+   "id": "agro-fronterizo-kmi",
+   "name": "Agro Fronterizo",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59173250962",
+   "mobile": true,
+   "offers": "Venta de abono químico, fungicidas, insecticidas, fertilizantes foliares y semillas en general.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-fronterizo-kmi"
+  },
+  {
+   "id": "agro-viento-f7y",
+   "name": "Agro Viento",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59176240382",
+   "mobile": true,
+   "offers": "Venta de productos químicos, fertilizantes, abonos y plaguicidas para la comercialización en el mercado interno.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-viento-f7y"
+  },
+  {
+   "id": "agro-semillera-pututu-la-paz-ojn",
+   "name": "Agro. Semillera Pututu la Paz",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59170628953",
+   "mobile": true,
+   "offers": "Venta de agroquímicos",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-semillera-pututu-la-paz-ojn"
+  },
+  {
+   "id": "agroalianzacp-mp8",
+   "name": "Agroalianzacp",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59168157836",
+   "mobile": true,
+   "offers": "Comercialización de semillas, fertilizantes, productos y equipos de uso agrícola. Servicios agrícolas : preparación de suelo, aplicación de abonos y fitosanitarios, cosecha, riego, fumigación y asesoramiento técnico.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroalianzacp-mp8"
+  },
+  {
+   "id": "agroandina-la-paz-ox1",
+   "name": "Agroandina la Paz",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+5912210164",
+   "mobile": false,
+   "offers": "Venta de agroquímicos, herbicidas, fungicidas, abono, fertilizantes, foliares, semillas de verdulería y hortalizas, fumigadoras, productos de uso agrícola.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroandina-la-paz-ox1"
+  },
+  {
+   "id": "agrobonsai-okg",
+   "name": "Agrobonsai",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "Palos Blancos",
+   "address": "",
+   "phone": "+59165121993",
+   "mobile": true,
+   "offers": "Venta al por mayor y menor de agroquímicos, insumos agrícolas, semillas, herramientas y máquinas agrícolas.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrobonsai-okg"
+  },
+  {
+   "id": "agrocrismat-ox5",
+   "name": "Agrocrismat",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59176253442",
+   "mobile": true,
+   "offers": "Consultora técnica en servicios agropecuarios y servicio de construcción de edificios o parte de edificios, así como venta de insumos y equipos agropecuarios. Consultora técnica en servicios agropecuarios y servicio de c…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrocrismat-ox5"
+  },
+  {
+   "id": "agrocultivos-calle-b9k",
+   "name": "Agrocultivos Calle",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": "lp-el-alto",
+   "municipality_name": "El Alto",
+   "address": "",
+   "phone": "+59175271322",
+   "mobile": true,
+   "offers": "Venta al por mayor de productos químicos básicos, fertilizantes, agroquímicos, abonos, plaguicidas y semillas en el mercado interno.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrocultivos-calle-b9k"
+  },
+  {
+   "id": "augusto-mamani-machaca-nj5",
+   "name": "Augusto Mamani Machaca",
+   "kind": "Negocio registrado",
+   "department_id": "la-paz",
+   "municipality_id": null,
+   "municipality_name": "La Paz",
+   "address": "",
+   "phone": "+59173512173",
+   "mobile": true,
+   "offers": "Importación, comercialización de plantines, tuberculos, hortalizas y otros,",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/augusto-mamani-machaca-nj5"
+  },
+  {
+   "id": "apcevet-in3",
+   "name": "Apcevet",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-oruro",
+   "municipality_name": "Oruro",
+   "address": "",
+   "phone": "+59167262160",
+   "mobile": true,
+   "offers": "Comercialización, fraccionamiento, fabricación, importación y exportación de toda clase de productos veterinarios, alimento para animales, servicios de peluquería canina y sus accesorios, agroquímicos, semillas de todas …",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/apcevet-in3"
+  },
+  {
+   "id": "consultores-lucana-wok",
+   "name": "Consultores Lucana",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-oruro",
+   "municipality_name": "Oruro",
+   "address": "",
+   "phone": "+59176154801",
+   "mobile": true,
+   "offers": "Consultorias en elaboracion y ejecucion de proyectos sociales y privados, consultorias en servicios profesionales de ingenieria agropecuaria, consultorias en servicios de asesoramiento juridico legal, compra y venta de i…",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "forraje",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/consultores-lucana-wok"
+  },
+  {
+   "id": "fertialtiplano-tkg",
+   "name": "FERTIALTIPLANO",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-challapata",
+   "municipality_name": "Challapata",
+   "address": "Calle Ladislao Cabrera s/n, Challapata",
+   "phone": "+59168313350",
+   "mobile": true,
+   "offers": "Venta de agroquímicos y abonos orgánicos; servicios veterinarios y consultorías en agronomía.",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/fertialtiplano-tkg"
+  },
+  {
+   "id": "faunavet-vv2",
+   "name": "Faunavet",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-oruro",
+   "municipality_name": "Oruro",
+   "address": "Manuel Molina Nro. S/N",
+   "phone": "+59170182082",
+   "mobile": true,
+   "offers": "Atencion veterinaria, asistencia tecnica y consultoria en ganaderia, produccion y sanidad animal; venta de alimento balanceado para mascotas y farmacos veterinarios",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/faunavet-vv2"
+  },
+  {
+   "id": "amantani-vrs",
+   "name": "Amantaní",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-oruro",
+   "municipality_name": "Oruro",
+   "address": "",
+   "phone": "+59172335506",
+   "mobile": true,
+   "offers": "Realizamos construcciones de obras de ingeniería civil, tanto para servicio público como privado. Nuestras especialidades incluyen: Estructuras hidráulicas, represas y sistemas de riego. Impermeabilización de canales, pl…",
+   "services": [
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/amantani-vrs"
+  },
+  {
+   "id": "consultora-zadmex-qwf",
+   "name": "Consultora Zadmex",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-oruro",
+   "municipality_name": "Oruro",
+   "address": "",
+   "phone": "+59171848854",
+   "mobile": true,
+   "offers": "Servicio de consultoria en elaboracion, estudios, planificacion y evaluacion de proyectos agropecuarios, diseños e infraestructura; venta de productos agropecuarios, materiales de infraestructura, animales vivos, cueros,…",
+   "services": [
+    "forraje",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/consultora-zadmex-qwf"
+  },
+  {
+   "id": "daisy-condori-aguilar-v66",
+   "name": "Daisy Condori Aguilar",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-challapata",
+   "municipality_name": "Challapata",
+   "address": "Challapata",
+   "phone": "+59174116115",
+   "mobile": true,
+   "offers": "Agricultura, abastecimiento de forraje, crianza de bovinos y venta de leche.",
+   "services": [
+    "forraje"
+   ],
+   "url": "https://boliviahub.com/empresa/daisy-condori-aguilar-v66"
+  },
+  {
+   "id": "empresa-agroindustrial-limoneira-sa-5ai",
+   "name": "Empresa Agroindustrial Limoneira S.A.",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-oruro",
+   "municipality_name": "Oruro",
+   "address": "BRASIL Nro. 310",
+   "phone": "+5913647115",
+   "mobile": false,
+   "offers": "Produccion de toda variedad de citricos; produccion industrial de losderivados de citricos, como ser aceite esencial, j ugo concentrado yotros; produccion agri cola de granos y semillas en predios pro pios oajenos y su p…",
+   "services": [
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/empresa-agroindustrial-limoneira-sa-5ai"
+  },
+  {
+   "id": "agroindustria-y-logistica-jhimke-jun",
+   "name": "Agroindustria y Logistica Jhimke",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-salinas",
+   "municipality_name": "Salinas de Garci Mendoza",
+   "address": "",
+   "phone": "+59172352757",
+   "mobile": true,
+   "offers": "Venta y proveedor de abono orgánico, cultivo de semilla, productos agropecuarios, cria de camélido, servicio de transporte logístico, servicio de remolque, importaciones y exportaciones.",
+   "services": [
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agroindustria-y-logistica-jhimke-jun"
+  },
+  {
+   "id": "agroindustrias-rffc-maa",
+   "name": "Agroindustrias Rffc",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-salinas",
+   "municipality_name": "Salinas de Garci Mendoza",
+   "address": "",
+   "phone": "+59172321096",
+   "mobile": true,
+   "offers": "Venta de insumos orgánicos, abono, semilla y productos agropecuarios, venta de semovientes. Capacitación y asistencia técnica en forestación, manejo ganadero y producción orgánica, así como alquiler de maquinarias. Consu…",
+   "services": [
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agroindustrias-rffc-maa"
+  },
+  {
+   "id": "kinualive-srl-yz7",
+   "name": "\" Kinualive S.r.l.\"",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": null,
+   "municipality_name": "Machacamarca",
+   "address": "",
+   "phone": "+59172345379",
+   "mobile": true,
+   "offers": "Comercio, transformación y procesamiento de productos andinos en general. Esto incluye: Compra, procesamiento, venta y transformación de productos agrícolas puros, derivados, procesados y otros rubros. Obtención y venta …",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/kinualive-srl-yz7"
+  },
+  {
+   "id": "empresa-multidisciplinaria-sumatakimaya-constructores-pdk",
+   "name": "Empresa Multidisciplinaria Sumatakimaya Constructores",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-oruro",
+   "municipality_name": "Oruro",
+   "address": "ROMAN KOSLOWKI Nro. S/N",
+   "phone": "+59168336090",
+   "mobile": true,
+   "offers": "Construcciones civiles en general actividades de arquitectura y otras actividades tecnicas elaboracion de proyectos estructurales, viales, hidraulicos y sanitarios, supervision en ingenieria y otras areas tecnicas, alqui…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/empresa-multidisciplinaria-sumatakimaya-constructores-pdk"
+  },
+  {
+   "id": "adrian-cruz-choque-l41",
+   "name": "Adrian Cruz Choque",
+   "kind": "Negocio registrado",
+   "department_id": "oruro",
+   "municipality_id": "or-challapata",
+   "municipality_name": "Challapata",
+   "address": "Challapata",
+   "phone": "+59174757582",
+   "mobile": true,
+   "offers": "Agricultura, construcción de obras civiles y consultoría en obras de ingeniería.",
+   "services": [
+    "construccion"
+   ],
+   "url": "https://boliviahub.com/empresa/adrian-cruz-choque-l41"
+  },
+  {
+   "id": "agroveterinaria-san-sebastian-ariany-yobanca-tzo",
+   "name": "Agroveterinaria San Sebastian - Ariany Yobanca",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-cobija",
+   "municipality_name": "Cobija",
+   "address": "",
+   "phone": "+59176104981",
+   "mobile": true,
+   "offers": "Venta de insumos agropecuarios y veterinarios",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroveterinaria-san-sebastian-ariany-yobanca-tzo"
+  },
+  {
+   "id": "carmelo-penaranda-coria-pmo",
+   "name": "Carmelo Peñaranda Coria",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-cobija",
+   "municipality_name": "Cobija",
+   "address": "",
+   "phone": "+59173913943",
+   "mobile": true,
+   "offers": "Servicios en ganadería en preproducción, inseminación artificial, transferencia de embriones y alimentación para engorde de ganado, asistencia técnica en sanidad animal, desparasitaciones, vitaminizacion, capacitación en…",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/carmelo-penaranda-coria-pmo"
+  },
+  {
+   "id": "genesio-stanger-manurini-eco-import-export-jhb",
+   "name": "Genesio Stanger - Manurini Eco Import Export",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-porvenir",
+   "municipality_name": "Porvenir",
+   "address": "CARRETERA A FILADELFIA Nro. S/N",
+   "phone": "+59176103579",
+   "mobile": true,
+   "offers": "Aserrado, secado, tableado, descortezado y cepillado de madera para exportación y agropecuaria aserradero de madera, tableado, cepillado y comercializacion de madera y comercio en general de madera y agropecuaria agropec…",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/genesio-stanger-manurini-eco-import-export-jhb"
+  },
+  {
+   "id": "agrocarlo-uid",
+   "name": "Agrocarlo",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-cobija",
+   "municipality_name": "Cobija",
+   "address": "",
+   "phone": "+59167443024",
+   "mobile": true,
+   "offers": "Empresa Agropecuaria , venta de insumos, productos y servicios agrícolas. Ofrecemos servicios de fumigación domiciliaria, industrial y agroforestal.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrocarlo-uid"
+  },
+  {
+   "id": "agrofiltro-pando-ulx",
+   "name": "Agrofiltro Pando",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-cobija",
+   "municipality_name": "Cobija",
+   "address": "",
+   "phone": "+59167664914",
+   "mobile": true,
+   "offers": "Venta de partes, piezas y accesorios para vehículos automotores. Venta por mayor de maquinaria, equipo y materiales agropecuarios. Consultores, servicios profesionales y técnicos. Venta por menor de plantas, semillas, ab…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrofiltro-pando-ulx"
+  },
+  {
+   "id": "agropandina-jum",
+   "name": "Agropandina",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-porvenir",
+   "municipality_name": "Porvenir",
+   "address": "",
+   "phone": "+59167835934",
+   "mobile": true,
+   "offers": "Venta al por mayor de materias primas agropecuarias y de animales vivos. Importación y comercialización de insumos, productos, implementos y equipos agrícolas.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropandina-jum"
+  },
+  {
+   "id": "amazoniccacaoconsulting-iow",
+   "name": "Amazoniccacaoconsulting",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-cobija",
+   "municipality_name": "Cobija",
+   "address": "",
+   "phone": "+59172221740",
+   "mobile": true,
+   "offers": "Ofrecemos viveros de plantas y flores, así como servicios profesionales y consultorías. Además, nos especializamos en la importación de equipos agrícolas y la venta de abonos y productos químicos.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/amazoniccacaoconsulting-iow"
+  },
+  {
+   "id": "carol-estefany-rosales-callao-gyf",
+   "name": "Carol Estefany Rosales Callao",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-cobija",
+   "municipality_name": "Cobija",
+   "address": "",
+   "phone": "+59169562208",
+   "mobile": true,
+   "offers": "Venta al por mayor de materiales de construccion, articulos de ferreteria, equipos y materiales de fontaneria y calefaccion, piezas y accesorios de vehiculos automotores, productos textiles y materiales de escritorio y o…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/carol-estefany-rosales-callao-gyf"
+  },
+  {
+   "id": "centro-agricola-de-pando-cap-2ae",
+   "name": "Centro Agricola de Pando C.a.p.",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-cobija",
+   "municipality_name": "Cobija",
+   "address": "",
+   "phone": "+59175103757",
+   "mobile": true,
+   "offers": "Propagacion y venta de plantines agrofo restales_y hornamentales",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/centro-agricola-de-pando-cap-2ae"
+  },
+  {
+   "id": "fertijai-g60",
+   "name": "Fertijai",
+   "kind": "Negocio registrado",
+   "department_id": "pando",
+   "municipality_id": "pd-cobija",
+   "municipality_name": "Cobija",
+   "address": "CALLE FINAL TARIJA Y LA PAZ Nro. SN Ed. SN",
+   "phone": "+59172360220",
+   "mobile": true,
+   "offers": "Venta de abonos y fertilizantes venta de equipos agricolas venta de herramientas agricolas venta de plasticos en general venta de semillas",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/fertijai-g60"
+  },
+  {
+   "id": "agropecuaria-lachula-spl",
+   "name": "Agropecuaria \"lachula\"",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": "pt-potosi",
+   "municipality_name": "Potosi",
+   "address": "",
+   "phone": "+59170455076",
+   "mobile": true,
+   "offers": "Venta de insumos agropecuarios, material de riego, artículos de ferretería, pinturas y productos de vidrio. Venta de productos veterinarios, animales domésticos y alimentos para animales. Venta al por menor de materiales…",
+   "services": [
+    "veterinaria",
+    "forraje",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropecuaria-lachula-spl"
+  },
+  {
+   "id": "clinica-veterinaria-uyuni-lbl",
+   "name": "Clinica Veterinaria Uyuni",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": "pt-uyuni",
+   "municipality_name": "Uyuni",
+   "address": "",
+   "phone": "+59172402085",
+   "mobile": true,
+   "offers": "Servicios de veterinaria para animales d omesticos venta de productosbasicos, abonos y pla guicidas",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/clinica-veterinaria-uyuni-lbl"
+  },
+  {
+   "id": "eben-ezzer-s6f",
+   "name": "Eben Ezzer",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": null,
+   "municipality_name": "Puna",
+   "address": "SIN NOMBRE Nro. S/N",
+   "phone": "+59175720104",
+   "mobile": true,
+   "offers": "Venta y produccion de material vegetal, plantas frutales, forestales y ornamentales. venta de material de apicultura. compra y venta de insumos agrícolas. prestacion de servicios profesionales en el area agronomica. vent…",
+   "services": [
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/eben-ezzer-s6f"
+  },
+  {
+   "id": "agrocicon-el-progreso-7ez",
+   "name": "Agrocicon El Progreso",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": null,
+   "municipality_name": "Villazon",
+   "address": "",
+   "phone": "+59173334779",
+   "mobile": true,
+   "offers": "Nuestra empresa ofrece una amplia gama de servicios y productos, incluyendo: Venta de alimentos y abarrotes. Venta de verduras y productos frescos. Materiales y servicios para construcción civil. Venta de productos agrop…",
+   "services": [
+    "forraje",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agrocicon-el-progreso-7ez"
+  },
+  {
+   "id": "maluvictorina-uaj",
+   "name": "Maluvictorina",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": "pt-potosi",
+   "municipality_name": "Potosi",
+   "address": "TOCOPILLA Nro. 184",
+   "phone": "+59163716683",
+   "mobile": true,
+   "offers": "El objeto social tendrá como actividad principal La Prospección, Exploración, Explotación y Comercialización de minerales en general como ser plata, Plomo, Estaño, Zinc, oro, y otros recursos minerales (metálicos y no me…",
+   "services": [
+    "forraje"
+   ],
+   "url": "https://boliviahub.com/empresa/maluvictorina-uaj"
+  },
+  {
+   "id": "agro-vet-el-mollar-tx4",
+   "name": "Agro Vet \"el Mollar\"",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": null,
+   "municipality_name": "Cotagaita",
+   "address": "",
+   "phone": "+59174209329",
+   "mobile": true,
+   "offers": "Venta de insumos y productos agropecuarios, ropa de trabajo, ferretería, equipo y maquinaria.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-vet-el-mollar-tx4"
+  },
+  {
+   "id": "agroinsumos-betiveria-aibe-whq",
+   "name": "Agroinsumos Betiveria \"aibe\"",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": null,
+   "municipality_name": "Tomave",
+   "address": "",
+   "phone": "+59173335161",
+   "mobile": true,
+   "offers": "Proveer insumos y herramientas agropecuarias",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroinsumos-betiveria-aibe-whq"
+  },
+  {
+   "id": "amanecerjem-ede",
+   "name": "Amanecerjem",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": "pt-potosi",
+   "municipality_name": "Potosi",
+   "address": "",
+   "phone": "+59172798498",
+   "mobile": true,
+   "offers": "Construcción de obras de ingeniería civil en general, y la compra y venta de material de escritorio, productos agropecuarios, ropa deportiva e insumos médicos.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/amanecerjem-ede"
+  },
+  {
+   "id": "constructora-y-consultora-copa-de-piedra-gym",
+   "name": "Constructora y Consultora Copa de Piedra",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": null,
+   "municipality_name": "Llallagua",
+   "address": "",
+   "phone": "+59172895730",
+   "mobile": true,
+   "offers": "Construcciones en general, comercializacion de material de construccion , riego y semillas",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/constructora-y-consultora-copa-de-piedra-gym"
+  },
+  {
+   "id": "dicsur-hd8",
+   "name": "Dicsur",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": null,
+   "municipality_name": "Tupiza",
+   "address": "",
+   "phone": "+59169795100",
+   "mobile": true,
+   "offers": "Cultivo, producción, procesamiento, comercialización y exportación de frutos oleaginosos, como sus derivados y subproductos. Compra, venta, importación, exportación y distribución al por mayor y al por menor de abonos, f…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/dicsur-hd8"
+  },
+  {
+   "id": "florencia-laime-mamani-z1l",
+   "name": "Florencia Laime Mamani",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": null,
+   "municipality_name": "Ocuri",
+   "address": "BOLIVAR Nro. 00",
+   "phone": "+59167638916",
+   "mobile": true,
+   "offers": "Venta al por mayor y menor de alimentos secos y frescos, venta al por menor de materiales de oficina y artículos de libreria, venta por mayor de materiales y productos de limpieza, venta al por mayor y menor de materias …",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/florencia-laime-mamani-z1l"
+  },
+  {
+   "id": "gutmirasain-srl-jwa",
+   "name": "Gutmirasain S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "potosi",
+   "municipality_id": "pt-potosi",
+   "municipality_name": "Potosi",
+   "address": "Lidio Ustares Nro. 801",
+   "phone": "+59171835372",
+   "mobile": true,
+   "offers": "Brindar servicios integrales de construcción y consultoría en arquitectura, ingeniería civil, ingeniería eléctrica y agropecuaria sin ninguna restricción, en el cumplimiento de este propósito podrá desarrollar todo tipo …",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/gutmirasain-srl-jwa"
+  },
+  {
+   "id": "adhemar-francisco-elias-portales-p3i",
+   "name": "Adhemar Francisco Elias Portales",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59176341808",
+   "mobile": true,
+   "offers": "Servicios veterinarios, agronomía y ganadero",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/adhemar-francisco-elias-portales-p3i"
+  },
+  {
+   "id": "agilizatech-srl-srl-93s",
+   "name": "Agilizatech SRL S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59175056340",
+   "mobile": true,
+   "offers": "Actuar por cuenta propia o de terceros o asociada con terceros en la gestión de negocios nacionales e internacionales en importación y exportación, así como en el registro y distribución de productos: agrícolas y veterin…",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/agilizatech-srl-srl-93s"
+  },
+  {
+   "id": "ibert-roca-terrazas-rdq",
+   "name": "Ibert Roca Terrazas",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "14 de junio Nro. 19",
+   "phone": "+59176333312",
+   "mobile": true,
+   "offers": "distribución de productos veterinarios y agropecuarios, asesoramiento técnico veterinario, nutrición en animales mayores y menores.",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/ibert-roca-terrazas-rdq"
+  },
+  {
+   "id": "ilender-bolivia-sa-2ki",
+   "name": "Ilender (bolivia) S.A.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+5913853352",
+   "mobile": false,
+   "offers": "La sociedad tiene por objeto principal la comercialización y la importación y exportación de productos agropecuarios y veterinarios, así como la ejecución y desarrollo de actividades de procesos de mezcla de productos ve…",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/ilender-bolivia-sa-2ki"
+  },
+  {
+   "id": "importaciones-solaram-srl-3pt",
+   "name": "Importaciones Solaram S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "ESCUADRON VELASCO Nro. 380",
+   "phone": "+59173626532",
+   "mobile": true,
+   "offers": "1 importación y comercialización de productos veterinarios y artículos para mascotas 2 construccion, dieseño arquitectonico de decoracion y venta de casas 3 servicios inmobiliarios 4 venta de ganado vacuno 5 venta de agr…",
+   "services": [
+    "veterinaria",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/importaciones-solaram-srl-3pt"
+  },
+  {
+   "id": "industria-de-nutricion-animal-yacyreta-srl-wry",
+   "name": "Industria de Nutricion Animal Yacyreta S.R.L",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "Mutualista Nro. s/n Ed. Yacyreta",
+   "phone": "+5913428628",
+   "mobile": false,
+   "offers": "Fabricacion de alimentos para peces,aves animales engeneral,elaboracion de nucleo vitaminico para alimentacionanimal,comercializacion de animales en general,vacunas,productosveterinarios, desinfectantes,vitaminas,insumos…",
+   "services": [
+    "veterinaria",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/industria-de-nutricion-animal-yacyreta-srl-wry"
+  },
+  {
+   "id": "jaime-alfredo-guzman-carvajal-tyz",
+   "name": "Jaime Alfredo Guzman Carvajal",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "CHILON Nro. 46",
+   "phone": "+59160006622",
+   "mobile": true,
+   "offers": "Ventas de de medicamentos veterinarios, antibioticos, vitaminas para todo tipo de animales, ademas venta de equipos veterianos como ser kit de analisis y tambien servicios de agronomia como ser analisis de suelo de semil…",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/jaime-alfredo-guzman-carvajal-tyz"
+  },
+  {
+   "id": "jesus-paz-suarez-ei2",
+   "name": "Jesus Paz Suarez",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "LAGUNILLAS Nro. S/N",
+   "phone": "+59171385296",
+   "mobile": true,
+   "offers": "Servicio veterinarios y comercialización de productos agroquímicos, pecuarios, productos veterinarios",
+   "services": [
+    "veterinaria",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/jesus-paz-suarez-ei2"
+  },
+  {
+   "id": "joel-jose-castro-lino-qbi",
+   "name": "Joel Jose Castro Lino",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "PIRAI ESQUINA CALLE DR. SAUL SERRATE Nro. S/N",
+   "phone": "+59177819601",
+   "mobile": true,
+   "offers": "Venta y servicio de productos veterinarios e insumos agrícolas",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/joel-jose-castro-lino-qbi"
+  },
+  {
+   "id": "john-ritter-hoyos-acebo-ecc",
+   "name": "John Ritter Hoyos Acebo",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": null,
+   "municipality_name": "El Torno",
+   "address": "S/N Nro. S/N",
+   "phone": "+59176611557",
+   "mobile": true,
+   "offers": "distribución de insumos veterinarios, asesoramiento técnico veterinario a granjas avícolas y porcinas, mejoramiento genético de animales mayores.",
+   "services": [
+    "veterinaria",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/john-ritter-hoyos-acebo-ecc"
+  },
+  {
+   "id": "jose-ernesto-perez-terrazas-jeg",
+   "name": "Jose Ernesto Perez Terrazas",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "Doble vía la guardia Nro. 13 Ed. Condominio Natio",
+   "phone": "+59175388597",
+   "mobile": true,
+   "offers": "Servicios Veterinarios y agropecuaria",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/jose-ernesto-perez-terrazas-jeg"
+  },
+  {
+   "id": "jose-lucas-beal-73c",
+   "name": "Jose Lucas Beal",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "Santiago Vaca Guzman, Esquina Calle General M. Franco. Nro. S/N Ed. Condominio San Fransisco Norte, Torre 1 Piso 5",
+   "phone": "+59176384022",
+   "mobile": true,
+   "offers": "Servicio de Veterinaria en ganado vacuno y reproducción del mismo.",
+   "services": [
+    "veterinaria",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/jose-lucas-beal-73c"
+  },
+  {
+   "id": "jose-manuel-justiniano-roca-z6m",
+   "name": "Jose Manuel Justiniano Roca",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "Portervalle Nro. 108",
+   "phone": "+59176333314",
+   "mobile": true,
+   "offers": "Actividades veterinarias y actividades agropecuarias.",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/jose-manuel-justiniano-roca-z6m"
+  },
+  {
+   "id": "juan-jhonatan-numbela-tapia-lbd",
+   "name": "Juan Jhonatan Numbela Tapia",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "6 DE AGOSTO Nro. 695",
+   "phone": "+59171346717",
+   "mobile": true,
+   "offers": "venta al por mayor y menor de productos veterinarios y agroquímicos como abonos y plaguicidas",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/juan-jhonatan-numbela-tapia-lbd"
+  },
+  {
+   "id": "juan-jose-centenaro-cuellar-rll",
+   "name": "Juan Jose Centenaro Cuellar",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "BLOQUE C Nro. 14",
+   "phone": "+59171662266",
+   "mobile": true,
+   "offers": "Servicios de actividades veterinarios, agronomia y alquiler de vehiculo automotor, consultoria en servicios veterinarios y agronomia",
+   "services": [
+    "veterinaria",
+    "agronomia"
+   ],
+   "url": "https://boliviahub.com/empresa/juan-jose-centenaro-cuellar-rll"
+  },
+  {
+   "id": "juan-montano-pena-ce6",
+   "name": "Juan Montaño Peña",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": null,
+   "municipality_name": "El Torno",
+   "address": "AV. REPUBLICA EL TORNO KM. 32 Nro. 585",
+   "phone": "+5913822111",
+   "mobile": false,
+   "offers": "Venta de venenos, abonos, semillas, servicio veterinario",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/juan-montano-pena-ce6"
+  },
+  {
+   "id": "juan-pablo-ortiz-ardaya-mql",
+   "name": "Juan Pablo Ortiz Ardaya",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "Bibosi Nro. S/N",
+   "phone": "+59167811985",
+   "mobile": true,
+   "offers": "Distribución y asesoramiento de productos veterinarios, nutrición, mejoramiento genético, sanidad y cirugía en animales mayores y menores y venta de equipos agropecuarios.",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/juan-pablo-ortiz-ardaya-mql"
+  },
+  {
+   "id": "juan-pedro-suarez-arana-castillo-mca",
+   "name": "Juan Pedro Suarez Arana Castillo",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "CATALUÑA Nro. 6",
+   "phone": "+59173939969",
+   "mobile": true,
+   "offers": "La empresa tiene por objeto la intermediación comercial y promoción de ventas de productos veterinarios, actuando como comisionista en la distribución y comercialización de insumos, medicamentos, alimentos y demás produc…",
+   "services": [
+    "veterinaria",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/juan-pedro-suarez-arana-castillo-mca"
+  },
+  {
+   "id": "la-casa-del-agro-lpc",
+   "name": "La Casa del Agro",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "URUGUAY Nro. 492",
+   "phone": "+5913353040",
+   "mobile": false,
+   "offers": "Comercialización, Fraccionamiento, Fabricación, Importación y exportación de toda clase de productos veterinarios, comida para animales, peluquería canina y sus accesorios, agroquímicos, semillas de todas clases, abonos,…",
+   "services": [
+    "veterinaria",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/la-casa-del-agro-lpc"
+  },
+  {
+   "id": "la-fuerza-del-agro-srl-9ah",
+   "name": "La Fuerza del Agro S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "AV. FINAL BENI, B/ NUEVA JERUSALEN Nro. 7800 Ed. AGROFORTE",
+   "phone": "+59175649108",
+   "mobile": true,
+   "offers": "Actividades agricolas y ganaderas importacion y comercializacion deagroquimicos y maquinaria comprar, vender, transformar, producir,almacenar transportar, ceder, permutar, importar, exportar semillas,granos, maquinarias,…",
+   "services": [
+    "veterinaria",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/la-fuerza-del-agro-srl-9ah"
+  },
+  {
+   "id": "la-tranquera-aqd",
+   "name": "La Tranquera",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "PIRAI Nro. 3142",
+   "phone": "+59178580959",
+   "mobile": true,
+   "offers": "Venta de productos agroquimicos e insumos veterinarios",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/la-tranquera-aqd"
+  },
+  {
+   "id": "leonardo-vaca-morales-leg",
+   "name": "Leonardo Vaca Morales",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "Calle velasco Nro. 479 Ed. Edificio Ignacio Piso 01",
+   "phone": "+59162141818",
+   "mobile": true,
+   "offers": "Servicio veterinarios, agronomia, ganadero y actividades administrativas de oficina.",
+   "services": [
+    "veterinaria",
+    "agronomia",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/leonardo-vaca-morales-leg"
+  },
+  {
+   "id": "loba-import-export-srl-m34",
+   "name": "Loba Import Export S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "CALLE COCHABAMBA  NRO 579 BARRIO CASCO VIEJO UV 00A MZA 118, DENTRO DELDEL 1ER ANILLO Nro. 579 Ed. CASA Piso UNO",
+   "phone": "+5913363811",
+   "mobile": false,
+   "offers": "La Sociedad tendrá el objeto y facultad: 1. Dedicarse a la importación, exportación, fabricación, representación, comercialización y distribución preferentemente de productos para uso médico humano y/o veterinario, para …",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/loba-import-export-srl-m34"
+  },
+  {
+   "id": "lourdes-angelica-miranda-arabijo-z9m",
+   "name": "Lourdes Angelica Miranda Arabijo",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "6 DE AGOSTO Nro. 560",
+   "phone": "+59170930476",
+   "mobile": true,
+   "offers": "Adquisicion, comercializacion y distribucion al por mayor y menor de productos veterinarios y agroquimicos",
+   "services": [
+    "veterinaria",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/lourdes-angelica-miranda-arabijo-z9m"
+  },
+  {
+   "id": "luis-david-cuellar-gil-maz",
+   "name": "Luis David Cuellar Gil",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "S/N Nro. 29",
+   "phone": "+59175533098",
+   "mobile": true,
+   "offers": "Servicio de asesoramiento y capacitaciones en rubro veterinario y agricola",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/luis-david-cuellar-gil-maz"
+  },
+  {
+   "id": "agrdrohnenspritzen-importaciones-4kd",
+   "name": "Agrdrohnenspritzen Importaciones",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59179017070",
+   "mobile": true,
+   "offers": "Servicio de reparación y mantenimiento de maquinaria de uso agropecuario y forestal. Consultoría en agronomía. Venta por mayor de abonos y productos químicos de uso agrícola. Suministro de maquinaria agrícola con operado…",
+   "services": [
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrdrohnenspritzen-importaciones-4kd"
+  },
+  {
+   "id": "agricultura-avanzada-de-america-internacional-limitada-cwt",
+   "name": "Agricultura Avanzada de America Internacional Limitada.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+5913449565",
+   "mobile": false,
+   "offers": "Producción, comercialización e importación de materia prima para la producción de insumos agrícolas en general. Importación y exportación de maquinaria agrícola. Importación y comercialización de semillas certificadas. I…",
+   "services": [
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agricultura-avanzada-de-america-internacional-limitada-cwt"
+  },
+  {
+   "id": "agrifor-srl-a0c",
+   "name": "Agrifor S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+5913430642",
+   "mobile": false,
+   "offers": "Importación, exportación, producción, distribución, comercialización y representación de toda clase de semillas y granos, sean estas híbridas o variedades forrajeras, leguminosas, hortalizas, oleaginosas, frutales y fore…",
+   "services": [
+    "forraje",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrifor-srl-a0c"
+  },
+  {
+   "id": "agrimaster-srl-lgn",
+   "name": "Agrimaster S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+5913449090",
+   "mobile": false,
+   "offers": "Producción, distribución, comercialización, importación y exportación de: semillas forrajeras semillas leguminosas semillas oleaginosas semillas de pasto ganado vacuno y equino agroquímicos fungicidas insecticidas fertil…",
+   "services": [
+    "forraje",
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agrimaster-srl-lgn"
+  },
+  {
+   "id": "serrate-paz-asociados-srl-czv",
+   "name": "\" Serrate Paz & Asociados \" S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+5913339093",
+   "mobile": false,
+   "offers": "Prestación de servicios legales, crianza y comercialización de ganado, y comercialización de bienes raíces.",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/serrate-paz-asociados-srl-czv"
+  },
+  {
+   "id": "agricola-ganadera-bj-ranch-sa-ece",
+   "name": "Agricola Ganadera Bj Ranch S.A.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+5913432281",
+   "mobile": false,
+   "offers": "Producción y comercialización de productos agropecuarios y agrícolas. Asesoramiento técnico, diseño e implementación de sistemas de producción de ganado vacuno o cualquier especie.",
+   "services": [
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agricola-ganadera-bj-ranch-sa-ece"
+  },
+  {
+   "id": "agricola-rio-victoria-srl-9ae",
+   "name": "Agricola Rio Victoria S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59177333866",
+   "mobile": true,
+   "offers": "La sociedad podrá dedicarse por cuenta propia, ajena o asociada con terceros, a la actividad agrícola, lo que significa la siembra, producción, cosecha y comercialización de productos agrícolas, como por ejemplo soja, gi…",
+   "services": [
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agricola-rio-victoria-srl-9ae"
+  },
+  {
+   "id": "agricultura-rentable-rentagro-srl-xav",
+   "name": "Agricultura Rentable Rentagro S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": null,
+   "municipality_name": "San Julian",
+   "address": "",
+   "phone": "+5913451809",
+   "mobile": false,
+   "offers": "La empresa se dedica a la comercialización de insumos agropecuarios, así como a la comercialización y producción de granos y semillas. La empresa importará y comercializará productos agropecuarios tales como granos, semi…",
+   "services": [
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agricultura-rentable-rentagro-srl-xav"
+  },
+  {
+   "id": "a-r-srl-bad",
+   "name": "A & R S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59172541021",
+   "mobile": true,
+   "offers": "Importación, exportación, acopio, comercialización y distribución intermedia de productos e insumos agropecuarios, alimentos, semillas, maquinaria y equipos agroindustriales y fertilizantes. Representación de marcas, pat…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/a-r-srl-bad"
+  },
+  {
+   "id": "aban-group-ukf",
+   "name": "Aban Group",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59177612367",
+   "mobile": true,
+   "offers": "Comercialización de semillas, agroquímicos, abonos y fertilizantes",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/aban-group-ukf"
+  },
+  {
+   "id": "aereoaplicacion-del-este-srl-g21",
+   "name": "Aereoaplicacion del Este S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59177310008",
+   "mobile": true,
+   "offers": "Servicios de aerofumigación de sembradíos , mantenimiento de aeronaves, escuela de aviación, servicio de monitoreo de control de plagas, importación y comercialización de repuestos de aeronaves, tractores y otros vehícul…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/aereoaplicacion-del-este-srl-g21"
+  },
+  {
+   "id": "agprotect-srl-7qq",
+   "name": "Agprotect S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": null,
+   "municipality_name": "San Julian",
+   "address": "",
+   "phone": "+59178045870",
+   "mobile": true,
+   "offers": "La producción de granos como ser: soya (soja), girasol, maíz, frejol, chía, arroz, sorgo, y otros granos que se producen en el departamento de Santa Cruz; La venta y compra al por menor y mayor de granos establecidos en …",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agprotect-srl-7qq"
+  },
+  {
+   "id": "agribusiness-gareal-srl-xxe",
+   "name": "Agribusiness Gareal S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": null,
+   "municipality_name": "San Julian",
+   "address": "",
+   "phone": "+5913428946",
+   "mobile": false,
+   "offers": "Importación y comercialización de agroquímicos e insumos agrícolas , como herbicidas, insecticidas, fungicidas, fertilizantes, coadyuvantes, semillas y demás insumos agrícolas. Importación y exportación de granos, maíz, …",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agribusiness-gareal-srl-xxe"
+  },
+  {
+   "id": "agricola-granagro-sa-0v9",
+   "name": "Agricola Granagro S.A.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59171380655",
+   "mobile": true,
+   "offers": "Cultivo de granos y semillas oleaginosas. Comercialización de granos y semillas. Exportación de granos y semillas. Acopio y autorización de producción de granos. Importación de insumos para el desarrollo de actividades a…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agricola-granagro-sa-0v9"
+  },
+  {
+   "id": "agricola-mateo-srl-o3l",
+   "name": "Agricola Mateo S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59175603333",
+   "mobile": true,
+   "offers": "Realización por cuenta propia o de terceros, o asociada a terceros, tanto en el Estado Plurinacional de Bolivia como en el extranjero, de actividades principales de importación y exportación, así como gestiones comercial…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agricola-mateo-srl-o3l"
+  },
+  {
+   "id": "agricomseeds-srl-0km",
+   "name": "Agricomseeds S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+5913414471",
+   "mobile": false,
+   "offers": "Producción y venta de genética vegetal, semillas y agricultura.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agricomseeds-srl-0km"
+  },
+  {
+   "id": "agripower-srl-iq7",
+   "name": "Agripower S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59168923503",
+   "mobile": true,
+   "offers": "La Sociedad tendrá como objeto la actividad agroindustrial en general , como ser, entre otros, sembrar, cosechar, comercializar y exportar todo tipo de granos; importar, formular, distribuir y comercializar productos quí…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agripower-srl-iq7"
+  },
+  {
+   "id": "ard-srl-qh8",
+   "name": "Ard S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "santa-cruz",
+   "municipality_id": "sc-santa-cruz",
+   "municipality_name": "Santa Cruz de la Sierra",
+   "address": "",
+   "phone": "+59176629174",
+   "mobile": true,
+   "offers": "Siembra de granos como ser: soya, girasol, trigo, sorgo, maíz y arroz, comercialización, compra, venta, importacion, exportacion, distribucion, representacion de grano de maíz, soya, girasol, sorgo, manies, arroz, chia, …",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/ard-srl-qh8"
+  },
+  {
+   "id": "agro-campo-vet-1tb",
+   "name": "Agro - Campo - Vet",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59172942413",
+   "mobile": true,
+   "offers": "Venta de productos veterinarios y venta de materias primas agrícolas y de animales vivos",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-campo-vet-1tb"
+  },
+  {
+   "id": "agropuesto-wvn",
+   "name": "Agropuesto",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": null,
+   "municipality_name": "Villamontes",
+   "address": "",
+   "phone": "+59173489754",
+   "mobile": true,
+   "offers": "Venta de productos veterinarios, agrícolas y asistencia técnica veterinaria.",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/agropuesto-wvn"
+  },
+  {
+   "id": "jhozabel-gloriana-tolaba-pantoja-ia1",
+   "name": "Jhozabel Gloriana Tolaba Pantoja",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-yacuiba",
+   "municipality_name": "Yacuiba",
+   "address": "AVAROA 1 Nro. S/N Ed. NO CORRESPONDE Piso NO CORRESPONDE",
+   "phone": "+59173669231",
+   "mobile": true,
+   "offers": "Servicio de veterinaria para animales do mesticos",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/jhozabel-gloriana-tolaba-pantoja-ia1"
+  },
+  {
+   "id": "los-pinos-business-8ur",
+   "name": "Los Pinos Business",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-yacuiba",
+   "municipality_name": "Yacuiba",
+   "address": "Libertadores esq. Timboy Nro. S/N",
+   "phone": "+59167675394",
+   "mobile": true,
+   "offers": "Venta de productos veterinarios. Venta de equipos y accesorios de computación. Venta de materias primas agrícolas y de la silvicultura. Venta de aceites, grasas y lubricantes. Ventas de alimentos. Venta de aparatos, artí…",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/los-pinos-business-8ur"
+  },
+  {
+   "id": "lynet-srl-jvr",
+   "name": "Lynet SRL",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "FROILAN TEJERINA Nro. S/N",
+   "phone": "+59171834023",
+   "mobile": true,
+   "offers": "Servicios integrales de consultoria en p royecto agropecuarios,ingenieria civil venta de semovientes, fabricacion, impor tacion ycomercializacion de productos a gropecuarios clinica veterinariadiseño de obras civiles arq…",
+   "services": [
+    "veterinaria"
+   ],
+   "url": "https://boliviahub.com/empresa/lynet-srl-jvr"
+  },
+  {
+   "id": "agro-churqui-b6i",
+   "name": "Agro Churqui",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59172995631",
+   "mobile": true,
+   "offers": "Compra y venta de productos químicos, abonos, plaguicidas y fertilizantes de agronomía. Venta de material de ferretería, material de fontanería y calificación. Sistema de riego tecnificado. Maquinaria agrícola y venta de…",
+   "services": [
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-churqui-b6i"
+  },
+  {
+   "id": "agromasiel-yct",
+   "name": "Agromasiel",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": null,
+   "municipality_name": "Entre Rios",
+   "address": "",
+   "phone": "+59171863874",
+   "mobile": true,
+   "offers": "Venta por menor de plantas, semillas, abonos y fertilizantes; venta al por mayor de materias primas agropecuarias y de animales vivos Venta de productos agroquímicos y fertilizantes. Servicio de consultoría en ingeniería…",
+   "services": [
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agromasiel-yct"
+  },
+  {
+   "id": "agroponia-pro-mzp",
+   "name": "Agroponia Pro",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59179261435",
+   "mobile": true,
+   "offers": "Consultora, servicios profesionales y técnicos en agronomía, con especialidad en cultivos hidropónicos, riego y jardines. Venta por mayor y menor de maquinaria, equipo y materiales agropecuarios. Venta por mayor y menor …",
+   "services": [
+    "agronomia",
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroponia-pro-mzp"
+  },
+  {
+   "id": "agrovil-srl-wgd",
+   "name": "Agrovil S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-yacuiba",
+   "municipality_name": "Yacuiba",
+   "address": "",
+   "phone": "+59176827040",
+   "mobile": true,
+   "offers": "La sociedad tiene como objeto principal dedicarse a actividades de cultivo de productos agrícolas en combinación con la cría de animales (explotación mixta), actividades de servicios agrícolas, ganaderos y servicios de c…",
+   "services": [
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/agrovil-srl-wgd"
+  },
+  {
+   "id": "aurora-nuevo-amanecer-srl-n44",
+   "name": "Aurora (nuevo Amanecer) S.R.L.",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-yacuiba",
+   "municipality_name": "Yacuiba",
+   "address": "",
+   "phone": "+59169347235",
+   "mobile": true,
+   "offers": "Cultivo de productos agrícolas en combinación con la cría de animales (explotación mixta). Actividades de servicios agrícolas, ganaderos y servicios pos cosecha. Elaboración de alimentos preparados para animales. Elabora…",
+   "services": [
+    "insumos",
+    "ganaderia"
+   ],
+   "url": "https://boliviahub.com/empresa/aurora-nuevo-amanecer-srl-n44"
+  },
+  {
+   "id": "adan-figueroa-vera-bxs",
+   "name": "Adan Figueroa Vera",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-bermejo",
+   "municipality_name": "Bermejo",
+   "address": "",
+   "phone": "+59170213845",
+   "mobile": true,
+   "offers": "Venta de agroquímicos en general.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/adan-figueroa-vera-bxs"
+  },
+  {
+   "id": "agro-carballo-6gb",
+   "name": "Agro Carballo",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": null,
+   "municipality_name": "Entre Rios",
+   "address": "",
+   "phone": "+59168689226",
+   "mobile": true,
+   "offers": "Venta al por mayor de materias primas agropecuarias y de animales vivos. Venta por menor de plantas, semillas, abonos y fertilizantes. Venta al por mayor de productos químicos industriales básicos, abonos y plaguicidas (…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-carballo-6gb"
+  },
+  {
+   "id": "agro-san-juan-del-oro-ejf",
+   "name": "Agro San Juan del Oro",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59171860543",
+   "mobile": true,
+   "offers": "Compra y venta de productos agroquímicos, fertilizantes, semillas y otros dentro del mismo rubro.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-san-juan-del-oro-ejf"
+  },
+  {
+   "id": "agro-tarifa-arenas-ele",
+   "name": "Agro Tarifa Arenas",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59161869275",
+   "mobile": true,
+   "offers": "Venta por mayor de productos químicos industriales básicos, abonos y plaguicidas. Materiales plásticos en forma primaria, fibra textil, materiales para reciclar. Venta por menor de plantas, semillas, abonos y fertilizant…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-tarifa-arenas-ele"
+  },
+  {
+   "id": "agro-el-rosal-rkr",
+   "name": "Agro-el Rosal",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59173496523",
+   "mobile": true,
+   "offers": "Comerciante de productos agroquímicos",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agro-el-rosal-rkr"
+  },
+  {
+   "id": "agrocamila-z5d",
+   "name": "Agrocamila",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59172232867",
+   "mobile": true,
+   "offers": "Servicios agrícolas , venta de maquinaria agrícola, abonos, semillas, plantines, insumos y equipamiento, y todo tipo de herramientas para la agricultura, material para riego y agroquímicos. Servicios agrícolas , venta de…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrocamila-z5d"
+  },
+  {
+   "id": "agrocampofertil-9zf",
+   "name": "Agrocampofertil",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59167395037",
+   "mobile": true,
+   "offers": "Venta de fertilizantes agrícolas al por mayor y menor, semillas, material de construcción y riego.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrocampofertil-9zf"
+  },
+  {
+   "id": "agrofavi-rza",
+   "name": "Agrofavi",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": null,
+   "municipality_name": "Entre Rios",
+   "address": "",
+   "phone": "+59171323564",
+   "mobile": true,
+   "offers": "Venta por mayor de abonos, semillas, plantas, fertilizantes y productos químicos de uso agrícola.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrofavi-rza"
+  },
+  {
+   "id": "agrojosueflores-nm2",
+   "name": "Agrojosueflores",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59160263655",
+   "mobile": true,
+   "offers": "Venta de material agrícola, insumos agroquímicos, semillas, herramientas y abonos, urea, maquinaria agrícola.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrojosueflores-nm2"
+  },
+  {
+   "id": "agropecuaria-los-vinedos-kdt",
+   "name": "Agropecuaria \"los Viñedos\"",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59160251175",
+   "mobile": true,
+   "offers": "Asesoramiento y venta de productos agroquímicos, semillas, plantas, abonos y fertilizantes. Venta por mayor de maquinaria, equipo y materiales agropecuarios, como ser material de riego tegnificado o microriego. Asesorami…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropecuaria-los-vinedos-kdt"
+  },
+  {
+   "id": "agropecuaria-valdez-9le",
+   "name": "Agropecuaria Valdez",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59172979191",
+   "mobile": true,
+   "offers": "Venta por mayor de productos químicos industriales básicos, abonos y plaguicidas (materiales plásticos en forma primaria, fibras textiles, materiales para reciclar). Venta por menor de plantas, semillas, abonos y fertili…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropecuaria-valdez-9le"
+  },
+  {
+   "id": "agropecuaria-los-parrales-ri4",
+   "name": "Agropecuaria los Parrales",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59172993488",
+   "mobile": true,
+   "offers": "Venta de insumos agrícolas",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropecuaria-los-parrales-ri4"
+  },
+  {
+   "id": "agropecuariadifiori-uec",
+   "name": "Agropecuariadifiori",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59179256324",
+   "mobile": true,
+   "offers": "Venta de material agrícola, insumos agroquímicos, semillas, herramientas, abonos, urea y maquinaria agrícola.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agropecuariadifiori-uec"
+  },
+  {
+   "id": "agroquimicos-inteagro-n7m",
+   "name": "Agroquimicos Inteagro",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59172958686",
+   "mobile": true,
+   "offers": "Compra y venta por mayor de abonos y productos químicos de uso agrícola: urea, fertilizantes, plaguicidas. Venta al por mayor de maquinaria, equipo y materiales de uso agrícola. Compra y venta por mayor de abonos y produ…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agroquimicos-inteagro-n7m"
+  },
+  {
+   "id": "agrosem-el-zarcillo-ofa",
+   "name": "Agrosem El Zarcillo",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": null,
+   "municipality_name": "Uriondo",
+   "address": "",
+   "phone": "+59172993724",
+   "mobile": true,
+   "offers": "Venta de agroquímicos y semillas.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrosem-el-zarcillo-ofa"
+  },
+  {
+   "id": "agrototal-4c4",
+   "name": "Agrototal",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59171192628",
+   "mobile": true,
+   "offers": "Venta por menor de plantas, semillas, abonos y fertilizantes.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrototal-4c4"
+  },
+  {
+   "id": "agrovelasquez-9vx",
+   "name": "Agrovelasquez",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-tarija",
+   "municipality_name": "Tarija",
+   "address": "",
+   "phone": "+59171874168",
+   "mobile": true,
+   "offers": "Venta de agroquímicos y productos químicos de uso agrícola.",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/agrovelasquez-9vx"
+  },
+  {
+   "id": "sagrofer-akb",
+   "name": "Sagrofer",
+   "kind": "Negocio registrado",
+   "department_id": "tarija",
+   "municipality_id": "tj-yacuiba",
+   "municipality_name": "Yacuiba",
+   "address": "LA SALADA Nro. S/N",
+   "phone": "+59167691243",
+   "mobile": true,
+   "offers": "Elaboración de productos vinculados a la agricultura. Venta al por mayor y menor de productos químicos industriales básicos, abonos y plaguicidas. Cultivo de productos agrícolas en combinación con la cría de animales (ex…",
+   "services": [
+    "insumos"
+   ],
+   "url": "https://boliviahub.com/empresa/sagrofer-akb"
+  }
+ ]
 }
