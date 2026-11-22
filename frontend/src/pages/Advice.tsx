@@ -73,7 +73,7 @@ function AdviceResult({ r, question }: { r: AdviceT; question: string }) {
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <p className="eyebrow !mb-0">Respuesta</p>
           <span className="rounded-sm border border-[var(--color-outline-variant)] px-2 py-0.5 text-[.7rem] font-semibold uppercase tracking-[.08em] text-[var(--color-on-variant)]" data-testid="advice-mode">
-            {r.mode === 'ia' ? 'Redactada con IA (Claude)' : 'Respuesta automática básica'}
+            {r.mode === 'ia' ? 'Redactada con IA (Groq)' : 'Respuesta automática básica'}
           </span>
         </div>
         <p className="whitespace-pre-line text-lg leading-relaxed">{r.answer}</p>

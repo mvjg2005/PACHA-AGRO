@@ -15,7 +15,7 @@
 9. **Recuperación de clave sin SMS**: un administrador verifica a la persona y le proporciona una clave temporal.
 10. **Quechua y aimara**: la estructura existe, pero las traducciones y la revisión por hablantes están pendientes.
 11. **Modo sin conexión**: la app puede abrir y mostrar último clima, avisos y biblioteca guardados. No permite enviar reportes sin señal ni sincronizarlos posteriormente; la cola de envío diferido sigue pendiente.
-12. **Revisión de plantas por foto**: es una orientación preliminar, no un diagnóstico de laboratorio. Puede equivocarse con imágenes borrosas. No recomienda productos ni dosis. Sin `ANTHROPIC_API_KEY` ofrece guía por síntomas.
+12. **Revisión de plantas por foto**: es una orientación preliminar, no un diagnóstico de laboratorio. Puede equivocarse con imágenes borrosas. No recomienda productos ni dosis. Sin `GROQ_API_KEY` ofrece guía por síntomas.
 13. **Fichas de cultivo**: contienen rangos generales y no reemplazan recomendaciones por variedad validadas por INIAF u otra entidad técnica.
 14. **Condiciones para fumigar**: usa criterios generales sobre viento, lluvia, temperatura y humedad a partir del pronóstico. Siempre prevalece la etiqueta del producto y la orientación técnica autorizada.
 15. **Medición GPS de parcelas**: el GPS del teléfono tiene un margen de error de varios metros; en parcelas pequeñas el error relativo puede ser alto.

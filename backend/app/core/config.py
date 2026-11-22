@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
-    @field_validator("anthropic_api_key", "xai_api_key", "groq_api_key", "gemini_api_key", mode="before")
+    @field_validator("xai_api_key", "groq_api_key", mode="before")
     @classmethod
     def clean_key(cls, v):
         """Quita espacios, comillas y un «Bearer » pegado por error al copiar la clave."""
@@ -41,20 +41,14 @@ class Settings(BaseSettings):
     whatsapp_template_meeting: str = ""
     whatsapp_template_notice: str = ""
 
-    # Asistente con IA (Claude). Sin ANTHROPIC_API_KEY funciona en modo básico (sin IA), igual de útil para contactos.
-    anthropic_api_key: str = ""
-    assistant_model: str = "claude-opus-5-5"
-    # Grok (xAI) para Pacha IA (opcional). Se usa si no hay clave de Anthropic.
+    # IA gratuita con Groq. Sin GROQ_API_KEY todo funciona en modo básico (sin IA).
+    # Compatibilidad: una clave de Groq («gsk_») puesta antes en XAI_API_KEY también se acepta.
     xai_api_key: str = ""
-    xai_model: str = "grok-4"
     # Groq (groq.com, claves «gsk_»), con plan gratuito (opcional).
     groq_api_key: str = ""
     groq_model: str = "llama-3.3-70b-versatile"
-    # Alternativa para Pacha IA si no hay clave de Anthropic (opcional).
-    gemini_api_key: str = ""
-    gemini_model: str = "gemini-3.8-flash"
-    # Modelos de respaldo si el principal está saturado (separados por coma). Vacío = solo reintentos.
-    gemini_fallback_models: str = ""
+    # Modelo de Groq que entiende imágenes (revisión de plantas por foto).
+    groq_vision_model: str = "meta-llama/llama-4-scout-17b-16e-instruct"
 
     # Fuente meteorológica oficial con contrato normalizado (p. ej. un servicio de SENAMHI habilitado).
     # No existe una API pública documentada: solo se usa si se configura. Ver docs/FUENTES_DATOS.md.

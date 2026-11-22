@@ -80,3 +80,45 @@ def login(c, phone, password):
 
 def admin_headers(c):
     return login(c, "+59170000099", "admin-test-123")
+
+
+class FakeGroq:
+    """Cliente HTTP simulado para Groq: guarda las solicitudes y devuelve las respuestas en cola."""
+
+    def __init__(self):
+        self.calls: list[dict] = []
+        self.responses: list = []
+
+    def reply(self, text: str):
+        self.responses.append(httpx.Response(200, json={"choices": [{"message": {"content": text}}]}))
+
+    def error(self, status: int, message: str = "error"):
+        self.responses.append(httpx.Response(status, json={"error": {"message": message}}))
+
+    def client(self, **kw):
+        fake = self
+
+        class _C:
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+
+            def post(self, url, json, headers):
+                fake.calls.append({"url": url, "json": json, "headers": headers})
+                if not fake.responses:
+                    raise httpx.ConnectError("sin respuestas simuladas")
+                r = fake.responses.pop(0)
+                if isinstance(r, Exception):
+                    raise r
+                return r
+        return _C()
+
+
+@pytest.fixture
+def fake_groq(monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    monkeypatch.setattr(get_settings(), "groq_api_key", "gsk_prueba")
+    monkeypatch.setattr(agent.time, "sleep", lambda s: None)
+    fake = FakeGroq()
+    monkeypatch.setattr(agent.httpx, "Client", fake.client)
+    return fake

@@ -1,5 +1,4 @@
 """Pacha IA: agente por voz y texto (integrado desde el prototipo de Antigravity)."""
-from types import SimpleNamespace
 
 import httpx
 import pytest
@@ -53,51 +52,16 @@ def test_history_is_alternated_and_trimmed():
     assert out[0] == {"role": "user", "content": "a\nb"} and out[-1]["role"] == "assistant" and len(out) == 2
 
 
-class FakeAnthropic:
-    calls: list = []
-
-    def __init__(self, **kw):
-        self.beta = SimpleNamespace(messages=SimpleNamespace(create=self._create))
-
-    def _create(self, **kw):
-        FakeAnthropic.calls.append(kw)
-        return SimpleNamespace(stop_reason="end_turn", content=[SimpleNamespace(type="text", text="Respuesta con **dato clave**.\n- uno")])
-
-
-def test_claude_receives_real_context_without_phone_numbers(app_client, monkeypatch):
-    import anthropic
-
-    from app.core.config import get_settings
-    monkeypatch.setattr(get_settings(), "anthropic_api_key", "clave")
-    monkeypatch.setattr(anthropic, "Anthropic", FakeAnthropic)
-    FakeAnthropic.calls = []
+def test_groq_receives_real_context_without_phone_numbers(app_client, fake_groq):
+    fake_groq.reply("Respuesta con **dato clave**.\n- uno")
     d = chat(app_client, "Mi papa tiene manchas", municipality_id="or-challapata",
              history=[{"role": "user", "content": "hola"}, {"role": "assistant", "content": "¡Hola!"}])
-    assert d["provider"] == "claude" and d["speech_text"] == "Respuesta con dato clave. uno"
-    call = FakeAnthropic.calls[0]
-    assert call["fallbacks"] == "default" and call["messages"][0] == {"role": "user", "content": "hola"}
-    last = call["messages"][-1]["content"]
-    assert "Challapata" in last and "Clima (estimaciones)" in last and "+591" not in last
-
-
-def test_gemini_used_when_only_gemini_key(app_client, monkeypatch):
-    from app.core.config import get_settings
-    from app.services import agent
-    monkeypatch.setattr(get_settings(), "gemini_api_key", "g-clave")
-    seen = {}
-
-    class Client:
-        def __init__(self, **kw): pass
-        def __enter__(self): return self
-        def __exit__(self, *a): return False
-
-        def post(self, url, json, headers):
-            seen.update(url=url, headers=headers, body=json)
-            return httpx.Response(200, json={"candidates": [{"content": {"parts": [{"text": "Hola desde Gemini"}]}}]})
-    monkeypatch.setattr(agent.httpx, "Client", Client)
-    d = chat(app_client, "hola")
-    assert d["provider"] == "gemini" and d["reply"] == "Hola desde Gemini"
-    assert "key=" not in seen["url"] and seen["headers"]["x-goog-api-key"] == "g-clave"
+    assert d["provider"] == "groq" and d["sources"][0] == "Pacha IA (Groq)" and d["speech_text"] == "Respuesta con dato clave. uno"
+    call = fake_groq.calls[0]
+    assert call["url"] == "https://api.groq.com/openai/v1/chat/completions" and call["headers"]["Authorization"] == "Bearer gsk_prueba"
+    msgs = call["json"]["messages"]
+    assert msgs[0]["role"] == "system" and msgs[1] == {"role": "user", "content": "hola"}
+    assert "Challapata" in msgs[-1]["content"] and "Clima (estimaciones)" in msgs[-1]["content"] and "+591" not in msgs[-1]["content"]
 
 
 def test_microphone_allowed_for_voice(app_client):
@@ -140,159 +104,38 @@ def test_questions_to_pacha_and_no_repetition(app_client):
     assert "Me alegra" in d["reply"]
 
 
-def test_ai_error_is_explained_without_leaking_key(app_client, monkeypatch):
-    from app.core.config import get_settings
-    from app.services import agent
-    monkeypatch.setattr(get_settings(), "gemini_api_key", "SECRETO123")
-
-    class Client:
-        def __init__(self, **kw): pass
-        def __enter__(self): return self
-        def __exit__(self, *a): return False
-
-        def post(self, url, json, headers):
-            return httpx.Response(404, json={"error": {"message": "models/gemini-x is not found. key SECRETO123"}})
-    monkeypatch.setattr(agent.httpx, "Client", Client)
+def test_groq_error_explained_without_leaking_key(app_client, fake_groq):
+    fake_groq.error(400, "model llama-x decommissioned. key gsk_prueba")
     d = chat(app_client, "hola")
-    assert d["provider"] == "local" and "404" in d["ai_error"] and "GEMINI_MODEL" in d["ai_error"]
-    assert "SECRETO123" not in d["ai_error"]
+    assert d["provider"] == "local" and "400" in d["ai_error"] and "GROQ_MODEL" in d["ai_error"] and "gsk_prueba" not in d["ai_error"]
     st = app_client.get("/api/ai/agent/status").json()
-    assert st["provider"] == "gemini" and "404" in st["last_error"] and "SECRETO123" not in str(st)
+    assert st["provider"] == "groq" and "400" in st["last_error"] and "gsk_prueba" not in str(st)
 
 
-def _gemini_client(responses, calls):
-    class Client:
-        def __init__(self, **kw): pass
-        def __enter__(self): return self
-        def __exit__(self, *a): return False
-
-        def post(self, url, json, headers):
-            calls.append(url.split("/models/")[1].split(":")[0])
-            return responses.pop(0)
-    return Client
-
-
-def test_gemini_retries_when_overloaded(app_client, monkeypatch):
-    from app.core.config import get_settings
-    from app.services import agent
-    monkeypatch.setattr(get_settings(), "gemini_api_key", "k")
-    monkeypatch.setattr(agent.time, "sleep", lambda s: None)
-    busy = httpx.Response(503, json={"error": {"message": "This model is currently experiencing high demand."}})
-    ok = httpx.Response(200, json={"candidates": [{"content": {"parts": [{"text": "¡Hola! Aquí estoy."}]}}]})
-    calls = []
-    monkeypatch.setattr(agent.httpx, "Client", _gemini_client([busy, busy, ok], calls))
+def test_groq_retries_when_overloaded(app_client, fake_groq):
+    fake_groq.error(503, "overloaded"); fake_groq.error(503, "overloaded"); fake_groq.reply("¡Hola! Aquí estoy.")
     d = chat(app_client, "hola")
-    assert d["provider"] == "gemini" and len(calls) == 3 and d["ai_error"] is None
+    assert d["provider"] == "groq" and len(fake_groq.calls) == 3 and d["ai_error"] is None
 
 
-def test_gemini_uses_fallback_model_then_local(app_client, monkeypatch):
+def test_groq_invalid_key_does_not_retry(app_client, fake_groq):
+    fake_groq.error(401, "Invalid API Key")
+    assert chat(app_client, "hola")["provider"] == "local" and len(fake_groq.calls) == 1
+
+
+def test_groq_key_accepted_in_old_xai_variable(app_client, monkeypatch):
     from app.core.config import get_settings
     from app.services import agent
-    s = get_settings()
-    monkeypatch.setattr(s, "gemini_api_key", "k")
-    monkeypatch.setattr(s, "gemini_fallback_models", "modelo-respaldo")
-    monkeypatch.setattr(agent.time, "sleep", lambda s: None)
-    busy = lambda: httpx.Response(503, json={"error": {"message": "high demand"}})  # noqa: E731
-    calls = []
-    monkeypatch.setattr(agent.httpx, "Client", _gemini_client([busy() for _ in range(5)], calls))
-    d = chat(app_client, "hola")
-    assert calls == [s.gemini_model] * 3 + ["modelo-respaldo"] * 2
-    assert d["provider"] == "local" and "503" in d["ai_error"] and "modelo-respaldo" in d["ai_error"]
-
-
-def test_gemini_invalid_key_does_not_retry(app_client, monkeypatch):
-    from app.core.config import get_settings
-    from app.services import agent
-    monkeypatch.setattr(get_settings(), "gemini_api_key", "k")
-    calls = []
-    monkeypatch.setattr(agent.httpx, "Client", _gemini_client([httpx.Response(400, json={"error": {"message": "API key not valid"}})], calls))
-    assert chat(app_client, "hola")["provider"] == "local" and len(calls) == 1
-
-
-class _GrokClient:
-    calls: list = []
-    responses: list = []
-
-    def __init__(self, **kw): pass
-    def __enter__(self): return self
-    def __exit__(self, *a): return False
-
-    def post(self, url, json, headers):
-        _GrokClient.calls.append({"url": url, "json": json, "headers": headers})
-        return _GrokClient.responses.pop(0)
-
-
-def test_grok_used_and_gemini_as_backup(app_client, monkeypatch):
-    from app.core.config import get_settings
-    from app.services import agent
-    s = get_settings()
-    monkeypatch.setattr(s, "xai_api_key", "xai-secreto")
-    monkeypatch.setattr(s, "gemini_api_key", "g")
-    monkeypatch.setattr(agent.time, "sleep", lambda x: None)
-    _GrokClient.calls = []
-    _GrokClient.responses = [httpx.Response(200, json={"choices": [{"message": {"content": "¡Hola! Soy **Pacha**."}}]})]
-    monkeypatch.setattr(agent.httpx, "Client", _GrokClient)
-    d = chat(app_client, "hola", history=[{"role": "user", "content": "buenas"}, {"role": "assistant", "content": "¡Hola!"}])
-    assert d["provider"] == "grok" and d["sources"][0] == "Pacha IA (Grok)" and d["speech_text"] == "¡Hola! Soy Pacha."
-    call = _GrokClient.calls[0]
-    assert call["url"] == "https://api.x.ai/v1/chat/completions" and call["headers"]["Authorization"] == "Bearer xai-secreto"
-    assert call["json"]["model"] == s.xai_model and call["json"]["messages"][0]["role"] == "system"
-    assert call["json"]["messages"][1] == {"role": "user", "content": "buenas"}
+    monkeypatch.setattr(get_settings(), "xai_api_key", "gsk_clavedegroq123")
     st = app_client.get("/api/ai/agent/status").json()
-    assert st["provider"] == "grok" and st["backup"] == ["gemini"]
+    assert st["provider"] == "groq" and st["backup"] == [] and st["key_hint"]["groq"].startswith("gsk_")
+    assert "clavedegroq" not in str(st) and agent.provider_keys()["groq"] == "gsk_clavedegroq123"
 
 
-def test_grok_error_explained_then_gemini(app_client, monkeypatch):
+def test_no_paid_providers_remain():
     from app.core.config import get_settings
-    from app.services import agent
     s = get_settings()
-    monkeypatch.setattr(s, "xai_api_key", "xai-secreto")
-    monkeypatch.setattr(s, "gemini_api_key", "g")
-    monkeypatch.setattr(agent.time, "sleep", lambda x: None)
-    _GrokClient.calls = []
-    _GrokClient.responses = [
-        httpx.Response(400, json={"error": "Incorrect API key provided: xai-secreto"}),
-        httpx.Response(200, json={"candidates": [{"content": {"parts": [{"text": "Respuesta de Gemini"}]}}]}),
-    ]
-    monkeypatch.setattr(agent.httpx, "Client", _GrokClient)
-    d = chat(app_client, "hola")
-    assert d["provider"] == "gemini" and d["reply"] == "Respuesta de Gemini"
-    assert "400" in agent.LAST_ERROR["grok"] and "xai-secreto" not in agent.LAST_ERROR["grok"]
-
-
-def test_groq_key_in_xai_variable_is_used_as_groq(app_client, monkeypatch):
-    from app.core.config import get_settings
-    from app.services import agent
-    s = get_settings()
-    monkeypatch.setattr(s, "xai_api_key", "gsk_clavedegroq123")
-    monkeypatch.setattr(s, "gemini_api_key", "AIzaX")
-    _GrokClient.calls = []
-    _GrokClient.responses = [httpx.Response(200, json={"choices": [{"message": {"content": "¡Hola desde Groq!"}}]})]
-    monkeypatch.setattr(agent.httpx, "Client", _GrokClient)
-    d = chat(app_client, "hola")
-    assert d["provider"] == "groq" and d["sources"][0] == "Pacha IA (Groq)"
-    call = _GrokClient.calls[0]
-    assert call["url"] == "https://api.groq.com/openai/v1/chat/completions" and call["json"]["model"] == s.groq_model
-    st = app_client.get("/api/ai/agent/status").json()
-    assert st["provider"] == "groq" and st["backup"] == ["gemini"] and st["key_hint"]["groq"].startswith("gsk_")
-    assert "clavedegroq" not in str(st)
-
-
-def test_groq_error_then_gemini_error_both_reported(app_client, monkeypatch):
-    from app.core.config import get_settings
-    from app.services import agent
-    s = get_settings()
-    monkeypatch.setattr(s, "groq_api_key", "gsk_x")
-    monkeypatch.setattr(s, "gemini_api_key", "AIzaX")
-    monkeypatch.setattr(agent.time, "sleep", lambda x: None)
-    _GrokClient.calls = []
-    busy = lambda: httpx.Response(503, json={"error": {"message": "high demand"}})  # noqa: E731
-    _GrokClient.responses = [httpx.Response(401, json={"error": {"message": "Invalid API Key"}}), busy(), busy(), busy()]
-    monkeypatch.setattr(agent.httpx, "Client", _GrokClient)
-    d = chat(app_client, "hola")
-    assert d["provider"] == "local" and "Groq respondió 401" in d["ai_error"] and "503" in d["ai_error"]
-    st = app_client.get("/api/ai/agent/status").json()
-    assert "503" in st["backup_errors"]["gemini"]
+    assert not any(hasattr(s, k) for k in ("anthropic_api_key", "gemini_api_key", "xai_model"))
 
 
 def test_time_budget_falls_back_to_local_quickly(app_client, monkeypatch):

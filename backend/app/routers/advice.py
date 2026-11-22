@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.config import get_settings
 from app.core.ratelimit import chat_limiter, client_key
 from app.data.catalog import crops_config, department_ids
 from app.db import get_db
@@ -10,6 +9,7 @@ from app.deps import admin_user
 from app.models import Expert, User
 from app.schemas import AssistantIn, ExpertIn
 from app.services import advisor
+from app.services.agent import provider_keys
 from app.services.activity import log
 
 router = APIRouter(prefix="/api", tags=["asesoría"])
@@ -29,7 +29,7 @@ def list_experts(department_id: str | None = Query(None, max_length=40), crop: s
 def ask(body: AssistantIn, request: Request, db: Session = Depends(get_db)):
     chat_limiter.check(client_key(request))
     out = advisor.advise(db, body.question, body.municipality_id, body.crop)
-    out["ai_available"] = bool(get_settings().anthropic_api_key)
+    out["ai_available"] = bool(provider_keys()["groq"])
     return out
 
 
