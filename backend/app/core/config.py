@@ -36,7 +36,7 @@ class Settings(BaseSettings):
     assistant_model: str = "claude-opus-5-5"
     # Alternativa para Pacha IA si no hay clave de Anthropic (opcional).
     gemini_api_key: str = ""
-    gemini_model: str = "gemini-2.5-flash"
+    gemini_model: str = "gemini-3.8-flash"
 
     # Fuente meteorológica oficial con contrato normalizado (p. ej. un servicio de SENAMHI habilitado).
     # No existe una API pública documentada: solo se usa si se configura. Ver docs/FUENTES_DATOS.md.
