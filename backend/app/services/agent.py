@@ -9,6 +9,7 @@ Formato: Markdown simple (**negritas** y listas con «- »), que la interfaz mue
 """
 import logging
 import re
+import time
 
 import httpx
 from sqlalchemy import select
@@ -201,7 +202,27 @@ def ask_claude(message: str, context: str, history: list[dict]) -> str | None:
     return "".join(b.text for b in r.content if b.type == "text").strip() or None
 
 
+RETRY_STATUS = {429, 500, 502, 503, 504}  # saturación o fallas pasajeras del servicio
+
+
+def _gemini_once(c: httpx.Client, model: str, payload: dict, key: str) -> tuple[str | None, int | None, str]:
+    """Una llamada a Gemini. Devuelve (texto, código de error, detalle)."""
+    res = c.post(f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent",
+                 json=payload, headers={"x-goog-api-key": key})
+    if res.status_code != 200:
+        try:
+            detail = str(res.json().get("error", {}).get("message", ""))
+        except ValueError:
+            detail = ""
+        return None, res.status_code, detail.replace(key, "***")
+    parts = res.json()["candidates"][0]["content"]["parts"]
+    text = "".join(p.get("text", "") for p in parts if not p.get("thought")).strip()
+    return (text or None), (None if text else 0), ""
+
+
 def ask_gemini(message: str, context: str, history: list[dict]) -> str | None:
+    """Gemini con reintentos: si el modelo está saturado (503/429), espera y reintenta, y luego prueba
+    los modelos de respaldo de GEMINI_FALLBACK_MODELS (separados por coma)."""
     s = get_settings()
     if not s.gemini_api_key:
         return None
@@ -209,29 +230,32 @@ def ask_gemini(message: str, context: str, history: list[dict]) -> str | None:
     payload = {"contents": [*turns, {"role": "user", "parts": [{"text": f"{context}\n\nConsulta: {message}"}]}],
                "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
                "generationConfig": {"temperature": 0.4, "maxOutputTokens": 2048}}
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{s.gemini_model}:generateContent"
+    models = [s.gemini_model] + [m.strip() for m in s.gemini_fallback_models.split(",") if m.strip() and m.strip() != s.gemini_model]
+    errors = []
     try:
         with httpx.Client(timeout=20.0) as c:
-            res = c.post(url, json=payload, headers={"x-goog-api-key": s.gemini_api_key})
-        if res.status_code != 200:
-            try:
-                detail = str(res.json().get("error", {}).get("message", ""))
-            except ValueError:
-                detail = ""
-            LAST_ERROR["gemini"] = _explain("gemini", res.status_code, detail.replace(s.gemini_api_key, "***"))
-            logger.warning("Pacha IA: %s", LAST_ERROR["gemini"])
-            return None
-        parts = res.json()["candidates"][0]["content"]["parts"]
-        text = "".join(p.get("text", "") for p in parts if not p.get("thought")).strip()
-        LAST_ERROR["gemini"] = None if text else "Gemini respondió sin texto (revise GEMINI_MODEL)."
-        return text or None
+            for model in models:
+                for attempt in range(3 if model == models[0] else 2):
+                    try:
+                        text, code, detail = _gemini_once(c, model, payload, s.gemini_api_key)
+                    except (KeyError, IndexError, ValueError):
+                        logger.warning("Pacha IA (Gemini) respuesta inesperada", exc_info=True)
+                        text, code, detail = None, 0, "formato inesperado (posible bloqueo de seguridad)"
+                    if text:
+                        LAST_ERROR["gemini"] = None
+                        return text
+                    if code in RETRY_STATUS and attempt < 2:
+                        time.sleep(1.5 * (attempt + 1))  # 1,5 s y 3 s
+                        continue
+                    break
+                errors.append(f"{model}: " + (_explain("gemini", code, detail) if code else "respuesta sin texto"))
+                if code not in RETRY_STATUS and code != 404:
+                    break  # clave inválida, sin permiso…: otro modelo no lo arregla
     except httpx.HTTPError:
-        LAST_ERROR["gemini"] = "No se pudo conectar con Gemini (red del servidor)."
-        return None
-    except (KeyError, IndexError, ValueError):
-        LAST_ERROR["gemini"] = "Gemini respondió en un formato inesperado (posible bloqueo de seguridad o modelo no compatible)."
-        logger.warning("Pacha IA (Gemini) respuesta inesperada", exc_info=True)
-        return None
+        errors.append("No se pudo conectar con Gemini (red del servidor).")
+    LAST_ERROR["gemini"] = " | ".join(errors) or "Gemini no respondió."
+    logger.warning("Pacha IA: %s", LAST_ERROR["gemini"])
+    return None
 
 
 GREETINGS = ("hola", "holi", "ola", "buenos dias", "buen dia", "buenas tardes", "buenas noches", "buenas", "saludos", "hey",

@@ -37,6 +37,8 @@ class Settings(BaseSettings):
     # Alternativa para Pacha IA si no hay clave de Anthropic (opcional).
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.8-flash"
+    # Modelos de respaldo si el principal está saturado (separados por coma). Vacío = solo reintentos.
+    gemini_fallback_models: str = ""
 
     # Fuente meteorológica oficial con contrato normalizado (p. ej. un servicio de SENAMHI habilitado).
     # No existe una API pública documentada: solo se usa si se configura. Ver docs/FUENTES_DATOS.md.

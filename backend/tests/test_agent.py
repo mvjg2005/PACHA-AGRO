@@ -158,3 +158,52 @@ def test_ai_error_is_explained_without_leaking_key(app_client, monkeypatch):
     assert "SECRETO123" not in d["ai_error"]
     st = app_client.get("/api/ai/agent/status").json()
     assert st["provider"] == "gemini" and "404" in st["last_error"] and "SECRETO123" not in str(st)
+
+
+def _gemini_client(responses, calls):
+    class Client:
+        def __init__(self, **kw): pass
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+
+        def post(self, url, json, headers):
+            calls.append(url.split("/models/")[1].split(":")[0])
+            return responses.pop(0)
+    return Client
+
+
+def test_gemini_retries_when_overloaded(app_client, monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    monkeypatch.setattr(get_settings(), "gemini_api_key", "k")
+    monkeypatch.setattr(agent.time, "sleep", lambda s: None)
+    busy = httpx.Response(503, json={"error": {"message": "This model is currently experiencing high demand."}})
+    ok = httpx.Response(200, json={"candidates": [{"content": {"parts": [{"text": "¡Hola! Aquí estoy."}]}}]})
+    calls = []
+    monkeypatch.setattr(agent.httpx, "Client", _gemini_client([busy, busy, ok], calls))
+    d = chat(app_client, "hola")
+    assert d["provider"] == "gemini" and len(calls) == 3 and d["ai_error"] is None
+
+
+def test_gemini_uses_fallback_model_then_local(app_client, monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    s = get_settings()
+    monkeypatch.setattr(s, "gemini_api_key", "k")
+    monkeypatch.setattr(s, "gemini_fallback_models", "modelo-respaldo")
+    monkeypatch.setattr(agent.time, "sleep", lambda s: None)
+    busy = lambda: httpx.Response(503, json={"error": {"message": "high demand"}})  # noqa: E731
+    calls = []
+    monkeypatch.setattr(agent.httpx, "Client", _gemini_client([busy() for _ in range(5)], calls))
+    d = chat(app_client, "hola")
+    assert calls == [s.gemini_model] * 3 + ["modelo-respaldo"] * 2
+    assert d["provider"] == "local" and "503" in d["ai_error"] and "modelo-respaldo" in d["ai_error"]
+
+
+def test_gemini_invalid_key_does_not_retry(app_client, monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    monkeypatch.setattr(get_settings(), "gemini_api_key", "k")
+    calls = []
+    monkeypatch.setattr(agent.httpx, "Client", _gemini_client([httpx.Response(400, json={"error": {"message": "API key not valid"}})], calls))
+    assert chat(app_client, "hola")["provider"] == "local" and len(calls) == 1
