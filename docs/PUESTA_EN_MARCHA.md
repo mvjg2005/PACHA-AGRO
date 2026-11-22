@@ -35,6 +35,7 @@ Esta guía separa lo que **ya está resuelto en el código** de lo que **solo el
 | `ADMIN_PHONE`, `ADMIN_PASSWORD` | Sí | Primera cuenta de administrador (clave de 10+ caracteres) |
 | `OPEN_METEO_API_KEY` | Recomendada | Más consultas y uso comercial |
 | `ANTHROPIC_API_KEY` | Recomendada | Activa la IA de Asesoría, Pacha IA y la revisión de plantas por foto (sin ella: modo básico) |
+| `XAI_API_KEY` | Opcional | Grok (xAI) para Pacha IA si no hay clave de Anthropic (`XAI_MODEL`, por defecto `grok-4`) |
 | `GEMINI_API_KEY` | Opcional | Alternativa para Pacha IA si no hay clave de Anthropic (`GEMINI_MODEL`, por defecto `gemini-3.8-flash`) |
 | `WHATSAPP_*` | Para WhatsApp real | Ver `docs/WHATSAPP.md` |
 | `OFFICIAL_WEATHER_URL`, `OFFICIAL_WEATHER_KEY` | Si hay convenio | Fuente oficial de clima |

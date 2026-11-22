@@ -3,7 +3,7 @@
 Cómo decide la respuesta:
   1. Reúne contexto REAL: municipio, clima (pronóstico, helada, fumigación), técnicos del directorio y
      recursos útiles. Los contactos y enlaces los elige el servidor, nunca el modelo.
-  2. Redacta con Claude (ANTHROPIC_API_KEY) o, si no hay, con Gemini (GEMINI_API_KEY).
+  2. Redacta con Claude (ANTHROPIC_API_KEY), Grok (XAI_API_KEY) o Gemini (GEMINI_API_KEY), en ese orden.
   3. Sin claves o si el proveedor falla, responde el motor local con los mismos datos reales.
 Formato: Markdown simple (**negritas** y listas con «- »), que la interfaz muestra con estilo.
 """
@@ -24,7 +24,8 @@ from app.services.textnorm import normalize
 logger = logging.getLogger("agrobolivia.agent")
 DEFAULT_MUNICIPALITY_ID = "or-challapata"
 # Último error de cada proveedor de IA (sin datos secretos), para diagnosticar desde la app.
-LAST_ERROR: dict[str, str | None] = {"claude": None, "gemini": None}
+LAST_ERROR: dict[str, str | None] = {"claude": None, "grok": None, "gemini": None}
+NAMES = {"claude": ("Claude", "ASSISTANT_MODEL"), "grok": ("Grok", "XAI_MODEL"), "gemini": ("Gemini", "GEMINI_MODEL")}
 
 ERROR_HELP = {
     400: "la clave no es válida o la solicitud fue rechazada",
@@ -37,9 +38,9 @@ ERROR_HELP = {
 
 def _explain(provider: str, status: int, detail: str = "") -> str:
     help_ = ERROR_HELP.get(status, "error del servicio, intente más tarde" if status >= 500 else "error desconocido")
-    model_var = "ASSISTANT_MODEL" if provider == "claude" else "GEMINI_MODEL"
-    msg = f"{'Claude' if provider == 'claude' else 'Gemini'} respondió {status}: {help_}"
-    if status == 404:
+    name, model_var = NAMES[provider]
+    msg = f"{name} respondió {status}: {help_}"
+    if status == 404 or "model" in detail.lower():
         msg += f" ({model_var})"
     return msg + (f". Detalle: {detail[:160]}" if detail else "")
 
@@ -258,6 +259,41 @@ def ask_gemini(message: str, context: str, history: list[dict]) -> str | None:
     return None
 
 
+def ask_grok(message: str, context: str, history: list[dict]) -> str | None:
+    """Grok (xAI), API compatible con el formato de chat de OpenAI. Reintenta si está saturado."""
+    s = get_settings()
+    if not s.xai_api_key:
+        return None
+    payload = {"model": s.xai_model, "temperature": 0.4, "max_tokens": 1500,
+               "messages": [{"role": "system", "content": SYSTEM_PROMPT}, *_history(history),
+                            {"role": "user", "content": f"{context}\n\nConsulta: {message}"}]}
+    try:
+        with httpx.Client(timeout=30.0) as c:
+            for attempt in range(3):
+                res = c.post("https://api.x.ai/v1/chat/completions", json=payload,
+                             headers={"Authorization": f"Bearer {s.xai_api_key}"})
+                if res.status_code == 200:
+                    text = (res.json()["choices"][0]["message"].get("content") or "").strip()
+                    LAST_ERROR["grok"] = None if text else "Grok respondió sin texto."
+                    return text or None
+                if res.status_code in RETRY_STATUS and attempt < 2:
+                    time.sleep(1.5 * (attempt + 1))
+                    continue
+                try:
+                    err = res.json().get("error", "")
+                    detail = str(err.get("message", "") if isinstance(err, dict) else err or res.json().get("message", ""))
+                except ValueError:
+                    detail = ""
+                LAST_ERROR["grok"] = _explain("grok", res.status_code, detail.replace(s.xai_api_key, "***"))
+                break
+    except httpx.HTTPError:
+        LAST_ERROR["grok"] = "No se pudo conectar con Grok (red del servidor)."
+    except (KeyError, IndexError, ValueError):
+        LAST_ERROR["grok"] = "Grok respondió en un formato inesperado."
+    logger.warning("Pacha IA: %s", LAST_ERROR["grok"])
+    return None
+
+
 GREETINGS = ("hola", "holi", "ola", "buenos dias", "buen dia", "buenas tardes", "buenas noches", "buenas", "saludos", "hey",
              "kamisaraki", "allillanchu", "allianllachu", "napaykullayki", "jallalla")
 
@@ -401,18 +437,21 @@ def chat(db: Session, message: str, municipality_id: str | None, lat: float | No
     meetings = meetings_for(db, user)
     context = _context(location, w, crop, experts, resources, meetings)
 
-    reply, provider = ask_claude(message, context, history), "claude"
+    reply, provider = None, "local"
+    for name, ask in (("claude", ask_claude), ("grok", ask_grok), ("gemini", ask_gemini)):
+        if reply := ask(message, context, history):
+            provider = name
+            break
     if not reply:
-        reply, provider = ask_gemini(message, context, history), "gemini"
-    if not reply:
-        reply, provider = local_reply(message, location, w, crop, experts, meetings, user, history), "local"
-    sources = ["Motor local de PACHA-AGRO"] if provider == "local" else [f"Pacha IA ({'Claude' if provider == 'claude' else 'Gemini'})"]
+        reply = local_reply(message, location, w, crop, experts, meetings, user, history)
+    sources = ["Motor local de PACHA-AGRO"] if provider == "local" else [f"Pacha IA ({NAMES[provider][0]})"]
     if w.get("available") or w.get("frost_level") not in (None, "desconocido"):
         sources.append(w.get("source") or "NASA POWER (promedio histórico)")
     s = get_settings()
     ai_error = None
-    if provider == "local" and (s.anthropic_api_key or s.gemini_api_key):
-        ai_error = " · ".join(e for k, key in (("claude", s.anthropic_api_key), ("gemini", s.gemini_api_key)) if key and (e := LAST_ERROR[k])) or None
+    keys = {"claude": s.anthropic_api_key, "grok": s.xai_api_key, "gemini": s.gemini_api_key}
+    if provider == "local" and any(keys.values()):
+        ai_error = " · ".join(e for k, key in keys.items() if key and (e := LAST_ERROR[k])) or None
     return {"reply": reply, "speech_text": clean_for_speech(reply), "provider": provider, "ai_error": ai_error, "sources": sources,
             "suggested_questions": suggestions(topics, location), "experts": experts,
             "location": {"id": location["id"], "name": location["name"], "department_name": location["department_name"]}}

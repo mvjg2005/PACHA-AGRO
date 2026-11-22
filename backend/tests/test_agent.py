@@ -207,3 +207,54 @@ def test_gemini_invalid_key_does_not_retry(app_client, monkeypatch):
     calls = []
     monkeypatch.setattr(agent.httpx, "Client", _gemini_client([httpx.Response(400, json={"error": {"message": "API key not valid"}})], calls))
     assert chat(app_client, "hola")["provider"] == "local" and len(calls) == 1
+
+
+class _GrokClient:
+    calls: list = []
+    responses: list = []
+
+    def __init__(self, **kw): pass
+    def __enter__(self): return self
+    def __exit__(self, *a): return False
+
+    def post(self, url, json, headers):
+        _GrokClient.calls.append({"url": url, "json": json, "headers": headers})
+        return _GrokClient.responses.pop(0)
+
+
+def test_grok_used_and_gemini_as_backup(app_client, monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    s = get_settings()
+    monkeypatch.setattr(s, "xai_api_key", "xai-secreto")
+    monkeypatch.setattr(s, "gemini_api_key", "g")
+    monkeypatch.setattr(agent.time, "sleep", lambda x: None)
+    _GrokClient.calls = []
+    _GrokClient.responses = [httpx.Response(200, json={"choices": [{"message": {"content": "¡Hola! Soy **Pacha**."}}]})]
+    monkeypatch.setattr(agent.httpx, "Client", _GrokClient)
+    d = chat(app_client, "hola", history=[{"role": "user", "content": "buenas"}, {"role": "assistant", "content": "¡Hola!"}])
+    assert d["provider"] == "grok" and d["sources"][0] == "Pacha IA (Grok)" and d["speech_text"] == "¡Hola! Soy Pacha."
+    call = _GrokClient.calls[0]
+    assert call["url"] == "https://api.x.ai/v1/chat/completions" and call["headers"]["Authorization"] == "Bearer xai-secreto"
+    assert call["json"]["model"] == s.xai_model and call["json"]["messages"][0]["role"] == "system"
+    assert call["json"]["messages"][1] == {"role": "user", "content": "buenas"}
+    st = app_client.get("/api/ai/agent/status").json()
+    assert st["provider"] == "grok" and st["backup"] == ["gemini"]
+
+
+def test_grok_error_explained_then_gemini(app_client, monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    s = get_settings()
+    monkeypatch.setattr(s, "xai_api_key", "xai-secreto")
+    monkeypatch.setattr(s, "gemini_api_key", "g")
+    monkeypatch.setattr(agent.time, "sleep", lambda x: None)
+    _GrokClient.calls = []
+    _GrokClient.responses = [
+        httpx.Response(400, json={"error": "Incorrect API key provided: xai-secreto"}),
+        httpx.Response(200, json={"candidates": [{"content": {"parts": [{"text": "Respuesta de Gemini"}]}}]}),
+    ]
+    monkeypatch.setattr(agent.httpx, "Client", _GrokClient)
+    d = chat(app_client, "hola")
+    assert d["provider"] == "gemini" and d["reply"] == "Respuesta de Gemini"
+    assert "400" in agent.LAST_ERROR["grok"] and "xai-secreto" not in agent.LAST_ERROR["grok"]

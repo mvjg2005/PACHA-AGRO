@@ -16,10 +16,12 @@ router = APIRouter(prefix="/api/ai/agent", tags=["pacha ia"])
 @router.get("/status")
 def status():
     s = get_settings()
+    prov = "claude" if s.anthropic_api_key else "grok" if s.xai_api_key else "gemini" if s.gemini_api_key else "local"
     return {"status": "ready", "agent_name": "Pacha IA",
-            "provider": "claude" if s.anthropic_api_key else "gemini" if s.gemini_api_key else "local",
-            "model": s.assistant_model if s.anthropic_api_key else s.gemini_model if s.gemini_api_key else None,
-            "last_error": (agent.LAST_ERROR["claude"] if s.anthropic_api_key else agent.LAST_ERROR["gemini"]),
+            "provider": prov,
+            "model": {"claude": s.assistant_model, "grok": s.xai_model, "gemini": s.gemini_model}.get(prov),
+            "last_error": agent.LAST_ERROR.get(prov),
+            "backup": [p for p, k in (("grok", s.xai_api_key), ("gemini", s.gemini_api_key)) if k and p != prov],
             "voice": "navegador (Web Speech API)"}
 
 

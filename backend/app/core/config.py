@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     # Asistente con IA (Claude). Sin ANTHROPIC_API_KEY funciona en modo básico (sin IA), igual de útil para contactos.
     anthropic_api_key: str = ""
     assistant_model: str = "claude-opus-5-5"
+    # Grok (xAI) para Pacha IA (opcional). Se usa si no hay clave de Anthropic.
+    xai_api_key: str = ""
+    xai_model: str = "grok-4"
     # Alternativa para Pacha IA si no hay clave de Anthropic (opcional).
     gemini_api_key: str = ""
     gemini_model: str = "gemini-3.8-flash"
