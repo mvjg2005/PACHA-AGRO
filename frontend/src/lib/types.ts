@@ -23,6 +23,7 @@ export interface Recommendation {
   scenario_status: 'implemented' | 'demo' | 'no_rules'; scenario_label: string; mode: string; disclaimer: string
   criteria: Criterion[]; actions: string[]; sources: string[]; notes: string[]; variety_note?: string
   key_factor: Criterion | null; main_action: string; missing_data: string[]; confidence_explanation: string
+  alternatives?: { id: string; name: string }[]
   weather_summary?: { forecast_available: boolean; forecast_error: string | null; forecast_source: string; recent_source: string | null; fetched_at: string | null; stale?: boolean; stale_fetched_at?: string | null }
 }
 export interface Crop { id: string; name: string; varieties: string[]; regions: Record<string, string> }

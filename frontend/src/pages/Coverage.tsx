@@ -5,7 +5,7 @@ import { useApp } from '../lib/store'
 import type { Crop } from '../lib/types'
 
 const CoverageMap = lazy(() => import('../components/CoverageMap'))
-type CropsResp = { crops: Crop[]; calendars: { crop: string; department_id: string }[] }
+type CropsResp = { crops: Crop[]; calendars: { crop: string; department_id: string | null; region: string | null }[] }
 
 /** Cobertura nacional (idea de PACHAAGRO): qué hay disponible en cada departamento, sin exagerar. */
 export default function Coverage() {
@@ -20,7 +20,7 @@ export default function Coverage() {
 
   const status = (deptId: string, regions: Set<string>, c: Crop) => {
     const st = [...regions].map(r => c.regions[r]).find(Boolean)
-    const cal = crops.calendars.some(x => x.crop === c.id && x.department_id === deptId)
+    const cal = crops.calendars.some(x => x.crop === c.id && (x.department_id === deptId || (!x.department_id && !!x.region && regions.has(x.region))))
     if (st && cal) return st === 'implemented' ? 'disponible' : 'demostración'
     return null
   }

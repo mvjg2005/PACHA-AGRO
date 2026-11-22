@@ -6,7 +6,7 @@
 
 1. **WhatsApp es un simulador** mientras no se configure la Cloud API oficial, sus plantillas aprobadas y credenciales (ver [WHATSAPP.md](WHATSAPP.md)).
 2. **SENAMHI no está integrado como fuente automática**: no se reciben alertas oficiales dentro de la plataforma; se enlaza al sitio institucional.
-3. **Reglas agronómicas experimentales**: el escenario completo de recomendación está concentrado en quinua del Altiplano; papa y maíz son demostración; haba y cebada no tienen reglas completas.
+3. **Reglas agronómicas experimentales**: el escenario completo de recomendación está concentrado en quinua del Altiplano; papa, maíz, haba y cebada tienen reglas preliminares de demostración.
 4. **Cobertura municipal limitada**: hay 32 municipios cargados. Con GPS el clima se consulta para el punto; el calendario usa el municipio registrado más cercano y avisa si está lejos.
 5. **Resolución meteorológica regional**: NASA POWER (decenas de kilómetros) y los modelos globales no capturan necesariamente el microclima de quebradas, laderas o parcelas pequeñas.
 6. **Proveedor meteorológico**: el plan gratuito de Open-Meteo tiene límites y condiciones de uso. Un despliegue real debe revisar el volumen, la licencia y si hace falta un plan pagado.

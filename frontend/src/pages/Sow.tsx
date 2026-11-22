@@ -27,8 +27,8 @@ export default function Sow({ presetCrop }: { presetCrop?: string }) {
   const set = (k: keyof Answers, v: string) => { setA(p => ({ ...p, [k]: v })); setStep(s => s + 1) }
   const useSaved = () => { if (saved) { setA({ dept: saved.department_id, muni: saved.id }); setStep(2) } }
 
-  const submit = async (irrigation: string) => {
-    const ans = { ...a, irrigation }
+  const submit = async (irrigation: string, extra: Partial<Answers> = {}) => {
+    const ans = { ...a, ...extra, irrigation }
     setA(ans); setLoading(true); setErr(null)
     try {
       // Con GPS para ese municipio se envía el punto exacto (el clima es de su parcela, no del centro urbano).
@@ -51,7 +51,8 @@ export default function Sow({ presetCrop }: { presetCrop?: string }) {
   }, [step, crops])
 
   if (loading) return <><PageTitle title="¿Cuándo puedo sembrar?" /><Loading text="Revisando clima y calendario…" /></>
-  if (result) return <Result r={result} onRestart={restart} />
+  const tryCrop = (id: string) => { setResult(null); submit(a.irrigation ?? 'secano', { crop: id, variety: undefined }) }
+  if (result) return <Result r={result} onRestart={restart} onTry={tryCrop} />
 
   const crop = crops?.find(c => c.id === a.crop)
   const muni = findMunicipality(a.muni ?? null)
@@ -113,7 +114,7 @@ function Q({ n, text }: { n: number; text: string }) {
   return <h2 className="mb-3 text-[1.4rem] font-bold leading-snug"><span className="sr-only">Pregunta {n}: </span>{text}</h2>
 }
 
-function Result({ r, onRestart }: { r: Recommendation; onRestart: () => void }) {
+function Result({ r, onRestart, onTry }: { r: Recommendation; onRestart: () => void; onTry: (crop: string) => void }) {
   const ui = STATUS_UI[r.status]
   const sim = r.mode === 'simulado'
   const noForecast = r.weather_summary && !r.weather_summary.forecast_available && r.mode === 'real'
@@ -148,6 +149,9 @@ function Result({ r, onRestart }: { r: Recommendation; onRestart: () => void }) 
         <div className="mt-2.5 rounded-md bg-white p-3" data-testid="main-action">
           <p className="text-sm font-bold uppercase tracking-wide text-bosque">Qué hacer ahora</p>
           <p className="text-lg font-semibold">{r.main_action}</p>
+          {!!r.alternatives?.length && <div className="mt-2.5 flex flex-wrap gap-2" data-testid="crop-alternatives">
+            {r.alternatives.map(c => <button key={c.id} type="button" className="btn-soft !w-auto !min-h-11" onClick={() => onTry(c.id)}>Ver {c.name.toLowerCase()}</button>)}
+          </div>}
         </div>
         {sim && <p className="mt-2 text-sm font-semibold text-tierra">Caso simulado: el clima usado es ficticio. No lo use para decidir.</p>}
       </section>

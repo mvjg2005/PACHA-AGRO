@@ -79,13 +79,24 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     return `${taps} toques, ${(Date.now() - t0) / 1000}s automatizado; resultado: ${status.split('\n').find(x => x.trim().length > 3)}`
   })
 
-  await test('Siembra: cultivo sin reglas muestra "Información insuficiente" sin recomendar', async () => {
+  await test('Siembra: cultivo poco común en la zona sugiere cultivos de la región', async () => {
+    const p = await newPage()
+    await p.goto(`${BASE}/#/sembrar`)
+    for (const t of [/^Santa Cruz$/, /Montero/, /Quinua/, /Real Blanca/, /Sí, está húmedo/, /Tengo riego/]) await btn(p, t).click()
+    await p.waitForSelector('text=Cultivo poco común en su zona')
+    assert(await p.locator('text=Todos los factores').count() === 0, 'no debería mostrar criterios')
+    assert(await p.locator('text=Faltan datos').count() === 0, 'no debe mostrar el aviso de faltan datos')
+    await btn(p, /Ver maíz/).click()
+    await p.getByRole('heading', { name: /Maíz en Montero/ }).waitFor()
+  })
+
+  await test('Siembra: haba en el Altiplano da época de siembra', async () => {
     const p = await newPage()
     await p.goto(`${BASE}/#/sembrar`)
     for (const t of [/^Oruro$/, /Challapata/, /Haba/, /Usnayo/, /Sí, está húmedo/, /Tengo riego/]) await btn(p, t).click()
-    await p.waitForSelector('text=Información insuficiente')
-    assert(await p.locator('text=Todos los factores').count() === 0, 'no debería mostrar criterios')
-    assert(await p.locator('text=Faltan datos').count() === 1, 'debe decir que faltan datos')
+    await p.getByRole('heading', { name: /Haba en Challapata/ }).waitFor()
+    assert(await p.locator('text=Información insuficiente').count() === 0, 'haba no debería quedar sin información')
+    assert(await p.locator('text=Reglas preliminares').count() === 1, 'debe marcar reglas preliminares')
   })
 
   await test('Clima: sin pronóstico se explica el problema y se puede reintentar', async () => {
@@ -298,9 +309,9 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     await p.goto(`${BASE}/#/cobertura`)
     await p.getByText('Quinua: disponible').first().waitFor()
     const oruro = await p.locator('li', { has: p.getByRole('heading', { name: 'Oruro' }) }).innerText()
-    assert(oruro.includes('Quinua: disponible') && !oruro.includes('Papa'), 'Oruro: estado de cultivos incorrecto: ' + oruro)
+    assert(oruro.includes('Quinua: disponible') && oruro.includes('Cebada') && !oruro.includes('Maíz'), 'Oruro: estado de cultivos incorrecto: ' + oruro)
     const beni = await p.locator('li', { has: p.getByRole('heading', { name: 'Beni' }) }).innerText()
-    assert(beni.includes('Aún sin reglas'), 'Beni no debería tener reglas')
+    assert(beni.includes('Maíz') && !beni.includes('Quinua'), 'Beni: estado de cultivos incorrecto: ' + beni)
     await btn(p, /Ver mapa de municipios/).click(); await p.locator('.leaflet-container').waitFor()
     await p.goto(`${BASE}/#/privacidad`); await p.getByRole('heading', { name: 'Qué datos pedimos' }).waitFor()
     await p.goto(`${BASE}/#/terminos`); await p.getByRole('heading', { name: 'Avisos no oficiales' }).waitFor()

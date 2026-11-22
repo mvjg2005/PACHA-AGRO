@@ -99,13 +99,20 @@ def evaluate(cfg: dict, municipality: dict, answers: Answers, wx: WeatherView, t
     }
 
     if scenario == "no_rules" or not crop.get("thresholds"):
-        return {**base, "status": GRAY, "headline": HEADLINES[GRAY], "criteria": [], "score": None, "confidence": "ninguna",
-                "summary": f"Todavía no tenemos reglas revisadas para {crop['name'].lower()} en la región de {region}. "
-                           "No damos una recomendación para no confundirle. En Asesoría encontrará técnicos e instituciones que pueden orientarle.",
-                "actions": ["Pida orientación en la sección Asesoría.", "Revise el pronóstico de heladas en la sección Clima."],
-                "key_factor": None, "main_action": "Pida orientación en Asesoría: ahí encontrará técnicos de su zona.",
-                "missing_data": ["reglas para este cultivo en esta región"],
-                "confidence_explanation": "Sin orientación: no hay reglas cargadas para este cultivo en esta región."}
+        alts = [{"id": k, "name": c["name"]} for k, c in cfg["crops"].items()
+                if k != answers.crop and c.get("thresholds") and region in c.get("regions", {})]
+        names = _join([a["name"].lower() for a in alts])
+        where = REGION_NAMES.get(region, region)
+        tip = f" En {where} sí podemos orientarle sobre {names}." if alts else ""
+        return {**base, "status": GRAY, "headline": "Cultivo poco común en su zona", "criteria": [], "score": None, "confidence": "ninguna",
+                "summary": f"{crop['name']} casi no se siembra en {where}: el clima de la zona no le favorece.{tip}",
+                "actions": ([f"Consulte la época de siembra de {names}."] if alts else [])
+                           + ["Si igual quiere probar, hable con un técnico de su zona en Asesoría.", "Revise el pronóstico de heladas y lluvia en la sección Clima."],
+                "key_factor": None,
+                "main_action": (f"Pruebe con {names}: son cultivos de su zona y le damos la época de siembra." if alts
+                                else "Hable con un técnico de su zona en Asesoría antes de sembrar."),
+                "alternatives": alts, "missing_data": [],
+                "confidence_explanation": "Sin cálculo: este cultivo no es habitual en esta región."}
 
     th = crop["thresholds"]
     sim = wx.mode == "simulado"
@@ -192,6 +199,13 @@ _ACTION = {
 }
 
 
+REGION_NAMES = {"altiplano": "el Altiplano", "valles": "los valles", "llanos": "los llanos"}
+
+
+def _join(items: list[str]) -> str:
+    return items[0] if len(items) == 1 else ", ".join(items[:-1]) + " o " + items[-1] if items else ""
+
+
 def main_action(status: str, key: Criterion | None) -> str:
     """Una sola acción, en lenguaje sencillo, ligada al factor decisivo."""
     if status == GREEN or key is None:
@@ -220,7 +234,8 @@ def _confidence_text(confidence: str, sim: bool, forecast: bool, scenario: str) 
 
 
 def _calendar(cfg, crop_id, m, today) -> Criterion:
-    cal = next((c for c in cfg["calendars"] if c["crop"] == crop_id and c["department_id"] == m["department_id"]), None)
+    cal = (next((c for c in cfg["calendars"] if c["crop"] == crop_id and c.get("department_id") == m["department_id"]), None)
+           or next((c for c in cfg["calendars"] if c["crop"] == crop_id and c.get("region") == m["region"] and not c.get("department_id")), None))
     if cal is None:
         return Criterion("calendario", "Época de siembra", GRAY,
                          f"No hay un calendario de siembra cargado para {m['department_name']}.", "sin_datos")

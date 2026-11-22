@@ -21,11 +21,12 @@ crops.json (pesos, umbrales, calendarios) ────────────�
 | Cultivo | Región | Estado |
 |---|---|---|
 | Quinua | Altiplano (Oruro, Potosí, La Paz) | `implemented`: datos meteorológicos reales + reglas documentadas (pendientes de validación) |
-| Papa | Altiplano (La Paz), valles (Cochabamba) | `demo`: reglas preliminares, se muestra aviso |
-| Maíz | Llanos (Santa Cruz), valles (Cochabamba) | `demo` |
-| Haba, Cebada | — | `no_rules`: devuelve ⚪ **sin** criterios ni recomendación |
+| Papa | Altiplano (La Paz, Oruro, Potosí), valles | `demo`: reglas preliminares, se muestra aviso |
+| Maíz | Llanos y valles | `demo` |
+| Haba, Cebada | Altiplano y valles | `demo` |
+| Cultivo fuera de su región (p. ej. quinua en llanos, maíz en el Altiplano) | — | `no_rules`: no calcula; explica que el cultivo es poco común en la zona y ofrece con un toque los cultivos que sí tienen reglas allí |
 
-Si no existe calendario para el departamento elegido (p. ej. quinua en Beni), el criterio de época queda ⚪ y el resultado es "Información insuficiente".
+El calendario se busca primero por departamento y, si no hay, por región (Altiplano, valles o llanos). Si tampoco existe, el criterio de época queda ⚪ y el resultado es "Información insuficiente".
 
 ## Criterios
 

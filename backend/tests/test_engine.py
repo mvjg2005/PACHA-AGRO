@@ -80,13 +80,19 @@ def test_outside_calendar_is_red():
     assert run(wx([3] * 7), today=date(2026, 3, 1))["status"] == "rojo"
 
 
-def test_crop_without_rules_returns_insufficient_without_criteria():
-    r = run(wx([3] * 7), crop="haba")
+def test_haba_and_cebada_have_demo_rules_in_altiplano():
+    for crop in ("haba", "cebada"):
+        r = run(wx([3] * 7), crop=crop)
+        assert r["scenario_status"] == "demo" and r["criteria"] and r["status"] != "gris"
+        cal = next(c for c in r["criteria"] if c["id"] == "calendario")
+        assert cal["status"] != "gris"
+
+
+def test_quinoa_in_lowlands_suggests_local_crops():
+    r = run(wx([20] * 7), muni=SC)
     assert r["status"] == "gris" and r["criteria"] == []
-
-
-def test_quinoa_in_lowlands_has_no_rules():
-    assert run(wx([20] * 7), muni=SC)["status"] == "gris"
+    assert [a["id"] for a in r["alternatives"]] == ["maiz"]
+    assert "maíz" in r["main_action"] and "Asesoría" not in r["main_action"]
 
 
 def test_maize_santa_cruz_is_demo_and_window_crosses_year():
@@ -186,5 +192,5 @@ def test_confidence_explanation_says_it_is_not_a_probability():
 
 
 def test_no_rules_crop_has_action_and_no_key_factor():
-    r = run(wx([3] * 7), crop="haba")
-    assert r["key_factor"] is None and "técnico" in r["main_action"]
+    r = run(wx([20] * 7), muni=SC)
+    assert r["key_factor"] is None and r["main_action"] and "no damos" not in r["summary"].lower()

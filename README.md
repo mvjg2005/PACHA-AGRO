@@ -59,7 +59,7 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 | Página principal con navegación que se adapta a móvil, tableta y escritorio | Sí |
 | Selección de departamento → municipio → cultivo (9 departamentos, 32 municipios) | Sí |
 | Clima: pronóstico **Open-Meteo**, respaldo **MET Norway**, historial y climatología **NASA POWER**, riesgo de helada, tormentas | Sí: datos reales (con caché y respaldo) |
-| Recomendación de siembra con factor decisivo, acción principal y fuentes | Sí: **Quinua en el Altiplano** (Oruro, Potosí, La Paz) · Papa y Maíz en modo *demostración* · Haba y Cebada sin reglas |
+| Recomendación de siembra con factor decisivo, acción principal y fuentes | Sí: **Quinua en el Altiplano** (Oruro, Potosí, La Paz) · Papa, Maíz, Haba y Cebada con reglas preliminares (*demostración*) · si el cultivo no es de la zona, sugiere los que sí |
 | Registro e inicio de sesión de agricultores (celular + clave) | Sí |
 | Comunidades con aprobación del administrador; solicitudes de unión aprobadas por el representante | Sí |
 | Reuniones, confirmación de asistencia, avisos, reportes de helada/granizo, historial | Sí |
@@ -211,7 +211,7 @@ npx playwright install chromium
 npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **164/164** backend y **18/18** unitarias frontend. La suite E2E tiene **36 casos** (36/36 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **164/164** backend y **18/18** unitarias frontend. La suite E2E tiene **37 casos** (37/37 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 

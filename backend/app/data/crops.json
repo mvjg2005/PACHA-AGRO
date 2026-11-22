@@ -4,7 +4,7 @@
   "status_labels": {
     "implemented": "Escenario implementado con datos meteorológicos reales y reglas documentadas (pendientes de validación agronómica).",
     "demo": "Escenario de DEMOSTRACIÓN: reglas preliminares, no validadas.",
-    "no_rules": "Aún no existen reglas suficientes para este cultivo en esta región."
+    "no_rules": "Este cultivo casi no se siembra en esta región."
   },
   "weights": {
     "calendario": 0.25,
@@ -139,9 +139,26 @@
         "Gigante de Copacabana",
         "Otra / no sé"
       ],
-      "regions": {},
-      "thresholds": null,
-      "sources": []
+      "regions": {
+        "altiplano": "demo",
+        "valles": "demo"
+      },
+      "thresholds": {
+        "frost_red_c": -4.0,
+        "frost_yellow_c": -1.0,
+        "germination_mean_min_c": 5.0,
+        "heavy_rain_day_mm": 25.0,
+        "rain_ok_7d_mm": 10.0,
+        "rain_low_7d_mm": 3.0
+      },
+      "sources": [
+        "Umbrales preliminares de demostración a partir de literatura general sobre haba en zonas altas. Requieren revisión con INIAF / PROINPA u otros técnicos."
+      ],
+      "variety_note": "La variedad todavía no modifica el cálculo.",
+      "notes": [
+        "El haba tolera heladas leves mejor que la papa, pero la floración es sensible al frío fuerte.",
+        "Siémbrela con humedad en el suelo; no tolera charcos que pudran la semilla."
+      ]
     },
     "cebada": {
       "name": "Cebada",
@@ -150,9 +167,26 @@
         "Variedad local",
         "Otra / no sé"
       ],
-      "regions": {},
-      "thresholds": null,
-      "sources": []
+      "regions": {
+        "altiplano": "demo",
+        "valles": "demo"
+      },
+      "thresholds": {
+        "frost_red_c": -3.0,
+        "frost_yellow_c": 0.0,
+        "germination_mean_min_c": 4.0,
+        "heavy_rain_day_mm": 25.0,
+        "rain_ok_7d_mm": 10.0,
+        "rain_low_7d_mm": 3.0
+      },
+      "sources": [
+        "Umbrales preliminares de demostración a partir de literatura general sobre cebada en zonas altas. Requieren revisión con INIAF u otros técnicos."
+      ],
+      "variety_note": "La variedad todavía no modifica el cálculo.",
+      "notes": [
+        "La cebada germina con poco calor y aguanta heladas leves; en el Altiplano se siembra con las lluvias para grano o forraje.",
+        "Para forraje del ganado conviene sembrar temprano en la época de lluvias."
+      ]
     }
   },
   "calendars": [
@@ -246,6 +280,123 @@
         "11-30"
       ],
       "source": "DEMOSTRACIÓN: ventana preliminar para valles. Validar."
+    },
+    {
+      "crop": "papa",
+      "department_id": "oruro",
+      "window": [
+        "10-01",
+        "12-15"
+      ],
+      "optimal": [
+        "10-15",
+        "11-30"
+      ],
+      "source": "DEMOSTRACIÓN: ventana preliminar de 'siembra grande' en el Altiplano. Validar."
+    },
+    {
+      "crop": "papa",
+      "department_id": "potosi",
+      "window": [
+        "10-01",
+        "12-15"
+      ],
+      "optimal": [
+        "10-15",
+        "11-30"
+      ],
+      "source": "DEMOSTRACIÓN: ventana preliminar de 'siembra grande' en el Altiplano. Validar."
+    },
+    {
+      "crop": "papa",
+      "region": "valles",
+      "window": [
+        "08-01",
+        "12-15"
+      ],
+      "optimal": [
+        "09-01",
+        "11-15"
+      ],
+      "source": "DEMOSTRACIÓN: ventana preliminar para valles. Validar."
+    },
+    {
+      "crop": "maiz",
+      "region": "llanos",
+      "window": [
+        "11-01",
+        "01-31"
+      ],
+      "optimal": [
+        "11-15",
+        "12-31"
+      ],
+      "source": "DEMOSTRACIÓN: ventana preliminar de campaña de verano en llanos. Validar."
+    },
+    {
+      "crop": "maiz",
+      "region": "valles",
+      "window": [
+        "09-15",
+        "12-15"
+      ],
+      "optimal": [
+        "10-01",
+        "11-30"
+      ],
+      "source": "DEMOSTRACIÓN: ventana preliminar para valles. Validar."
+    },
+    {
+      "crop": "haba",
+      "region": "altiplano",
+      "window": [
+        "08-01",
+        "10-31"
+      ],
+      "optimal": [
+        "08-15",
+        "09-30"
+      ],
+      "source": "DEMOSTRACIÓN: ventana preliminar para el Altiplano. Validar con técnicos locales."
+    },
+    {
+      "crop": "haba",
+      "region": "valles",
+      "window": [
+        "09-01",
+        "12-15"
+      ],
+      "optimal": [
+        "10-01",
+        "11-30"
+      ],
+      "source": "DEMOSTRACIÓN: ventana preliminar para valles. Validar con técnicos locales."
+    },
+    {
+      "crop": "cebada",
+      "region": "altiplano",
+      "window": [
+        "11-01",
+        "01-31"
+      ],
+      "optimal": [
+        "12-01",
+        "01-15"
+      ],
+      "source": "DEMOSTRACIÓN: ventana preliminar para el Altiplano (grano o forraje). Validar con técnicos locales."
+    },
+    {
+      "crop": "cebada",
+      "region": "valles",
+      "window": [
+        "12-01",
+        "02-15"
+      ],
+      "optimal": [
+        "12-15",
+        "01-31"
+      ],
+      "source": "DEMOSTRACIÓN: ventana preliminar para valles. Validar con técnicos locales."
     }
   ]
 }

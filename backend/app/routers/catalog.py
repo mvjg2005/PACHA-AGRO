@@ -19,7 +19,7 @@ def list_crops():
         "crops": [{"id": k, "name": v["name"], "varieties": v["varieties"], "regions": v.get("regions", {})}
                   for k, v in cfg["crops"].items()],
         "config": {"weights": cfg["weights"], "critical_criteria": cfg["critical_criteria"], "aggregation": cfg["aggregation"]},
-        "calendars": [{"crop": c["crop"], "department_id": c["department_id"]} for c in cfg["calendars"]],
+        "calendars": [{"crop": c["crop"], "department_id": c.get("department_id"), "region": c.get("region")} for c in cfg["calendars"]],
     }
 
 

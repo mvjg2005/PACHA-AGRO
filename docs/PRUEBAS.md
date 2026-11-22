@@ -6,7 +6,7 @@ Resultados del 22-11-2026. El backend usa fixtures. La suite de navegador usa el
 |---|---|---|
 | Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **164/164** aprobadas |
 | Frontend unitarias (vitest) | `cd frontend && npm test` | **18/18** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `npm run test:e2e -- http://localhost:8000` | **36 casos** (36/36 aprobados en local el 22-11-2026) (ejecutar en local o CI dedicado) |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `npm run test:e2e -- http://localhost:8000` | **37 casos** (37/37 aprobados en local el 22-11-2026) (ejecutar en local o CI dedicado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
 
 ## Preparación de la suite E2E
@@ -61,7 +61,7 @@ El servidor debe estar iniciado con el frontend compilado y `SEED_DEMO=true`, co
 | Recomendación | Suelo seco y secano / seco con riego | 🔴 / 🟡 | `test_engine` |
 | Recomendación | "No sé" la humedad → usa modelo; sin modelo → ⚪ | Etiqueta "estimación" / insuficiente | `test_engine` |
 | Recomendación | Fuera de calendario; ventana que cruza el año (maíz nov–ene) | 🔴; 🟡 en enero | `test_engine` |
-| Recomendación | Haba (sin reglas); quinua en llanos | ⚪ sin criterios | `test_engine`, e2e #3 |
+| Recomendación | Haba y cebada en el Altiplano; quinua en llanos | Haba/cebada con reglas preliminares; quinua en llanos sugiere maíz con un toque | `test_engine`, e2e |
 | Recomendación | Reporte comunitario de granizo influye | Criterio "tormenta" con `data_kind=comunidad` y texto "no es aviso oficial" | `test_api` |
 | Datos faltantes | Open-Meteo con límite diario | Se usa el respaldo MET Norway y se indica en Clima | `test_weather` |
 | Datos faltantes | Open-Meteo y MET Norway caídos | Error en español, riesgo por climatología, confianza baja | `test_weather`, `test_engine` |
