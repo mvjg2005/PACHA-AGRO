@@ -203,37 +203,51 @@ GREETINGS = ("hola", "holi", "ola", "buenos dias", "buen dia", "buenas tardes", 
              "kamisaraki", "allillanchu", "allianllachu", "napaykullayki", "jallalla")
 
 
-def small_talk(t: str, user: User | None, greeted: bool) -> str | None:
-    """Conversación cotidiana para el motor local: responde como una persona amable, sin repetir el menú."""
+def small_talk(t: str, user: User | None, greeted: bool, asked: bool) -> list[str] | None:
+    """Conversación cotidiana para el motor local. Devuelve variantes para no repetir la misma frase.
+    `asked` es True si el mensaje es una pregunta (lleva «?»)."""
     has = lambda *ws: any(f" {x} " in t or (" " in x and x in t) for x in ws)  # noqa: E731
     name = f", {user.full_name.split()[0]}" if user else ""
+    hello = "¡Hola! " if has(*GREETINGS) else ""
+    to_bot = has("tu", "usted", "y tu", "y usted", "te encuentras", "estas", "pacha")
     if has("te amo", "te quiero", "te adoro", "eres lindo", "eres linda", "me gustas", "mi amor"):
-        return (f"¡Qué lindo mensaje{name}! Gracias por el cariño. Yo soy un asistente, pero me alegra mucho acompañarle "
-                "y cuidar su campo junto a usted. ¿Cómo están sus cultivos estos días?")
-    if has("como estas", "como esta", "como te va", "que tal", "como andas", "como has estado", "como amaneciste"):
-        hello = "¡Hola! " if has(*GREETINGS) else ""
-        return (f"{hello}Muy bien, gracias por preguntar{name}. Siempre atento al clima de su zona. "
-                "¿Y usted cómo está? ¿Cómo va su campo?")
+        return [f"¡Qué lindo mensaje{name}! Gracias por el cariño. Soy un asistente, pero me alegra mucho acompañarle y cuidar su campo junto a usted. ¿Cómo están sus cultivos?",
+                "¡Gracias, de verdad! Yo también aprecio mucho conversar con usted. ¿Cómo va todo en su chacra?"]
+    # Preguntas dirigidas a Pacha: «¿cómo estás?», «¿todo bien?», «¿tú estás bien?», «¿y usted?»
+    if has("como estas", "como esta usted", "como te va", "que tal", "como andas", "como has estado", "como amaneciste", "y tu", "y usted") \
+            or (asked and has("todo bien", "estas bien", "esta bien", "bien")) or (to_bot and has("bien") and asked):
+        return [f"{hello}Sí, muy bien, gracias por preguntar{name}. Siempre atento al clima de su zona. ¿Y usted cómo está? ¿Cómo va su campo?",
+                f"{hello}¡Todo bien por aquí{name}, gracias! Con ganas de ayudarle. ¿Y usted, cómo se encuentra hoy?",
+                "Estoy muy bien, gracias. Me alegra que me lo pregunte. Cuénteme, ¿cómo están sus cultivos estos días?"]
     if has("quien eres", "que eres", "como te llamas", "tu nombre", "eres humano", "eres una persona", "eres real", "eres un robot"):
-        return ("Me llamo **Pacha IA**. Soy un asistente de la plataforma PACHA-AGRO, no una persona. "
-                "Le ayudo con el clima, las heladas, la siembra, las plagas y su comunidad. Si necesita a una persona, "
-                "le paso contactos de técnicos.")
+        return ["Me llamo **Pacha IA**. Soy un asistente de la plataforma PACHA-AGRO, no una persona. Le ayudo con el clima, las heladas, la siembra, las plagas y su comunidad. Si necesita a una persona, le paso contactos de técnicos.",
+                "Soy **Pacha IA**, un asistente virtual (no una persona) hecho para acompañar a productoras y productores de Bolivia."]
     if has("gracias", "muchas gracias", "pagarato", "yusulpayki", "dios le pague"):
-        return f"¡Con mucho gusto{name}! Aquí estoy cuando me necesite. Que le vaya bien en el campo."
+        return [f"¡Con mucho gusto{name}! Aquí estoy cuando me necesite. Que le vaya bien en el campo.",
+                "¡De nada! Para eso estoy. Si surge otra duda, pregúnteme con confianza."]
     if has("chau", "chao", "adios", "hasta luego", "hasta manana", "nos vemos", "me voy"):
-        return f"¡Hasta pronto{name}! Cuide sus cultivos y revise el pronóstico antes de las noches frías. Jallalla."
-    if has("bien", "muy bien", "todo bien", "estoy bien", "excelente", "tranquilo", "tranquila") and len(t.split()) <= 6:
-        return "¡Qué bueno! Me alegra. Si quiere, le cuento cómo viene el clima o si hay riesgo de helada en su zona."
+        return [f"¡Hasta pronto{name}! Cuide sus cultivos y revise el pronóstico antes de las noches frías. Jallalla.",
+                "¡Que le vaya muy bien! Aquí estaré cuando me necesite."]
     if has("mal", "triste", "preocupado", "preocupada", "cansado", "cansada", "perdi", "se murio", "se helo", "no llueve"):
-        return ("Lo siento mucho, el trabajo en el campo es duro y el clima no siempre ayuda. Cuénteme qué pasó: "
-                "si fue helada, granizo o falta de lluvia, le doy ideas y contactos de técnicos que pueden ayudarle.")
+        return ["Lo siento mucho, el trabajo en el campo es duro y el clima no siempre ayuda. Cuénteme qué pasó: si fue helada, granizo o falta de lluvia, le doy ideas y contactos de técnicos que pueden ayudarle.",
+                "Lamento escuchar eso. No está solo: cuénteme un poco más y vemos juntos qué se puede hacer."]
+    if has("bien", "muy bien", "todo bien", "estoy bien", "excelente", "tranquilo", "tranquila") and len(t.split()) <= 6:
+        return ["¡Qué bueno! Me alegra. Si quiere, le cuento cómo viene el clima o si hay riesgo de helada en su zona.",
+                "¡Me alegra mucho! ¿Hay algo en lo que le pueda ayudar hoy?"]
     if has("jaja", "jeje", "jajaja", "jsjs"):
-        return "¡Jaja! Me alegra el ánimo. ¿En qué le puedo ayudar hoy?"
-    if has("ok", "okey", "vale", "si", "sí", "bueno", "listo", "entiendo", "ya") and len(t.split()) <= 3:
-        return "Perfecto. ¿Hay algo más en lo que le pueda ayudar? Puede preguntarme por el clima, la siembra o una planta enferma."
+        return ["¡Jaja! Me alegra el ánimo. ¿En qué le puedo ayudar hoy?", "¡Jaja, qué bueno reír un poco! ¿Le ayudo con algo?"]
+    if has("ok", "okey", "vale", "si", "bueno", "listo", "entiendo", "ya", "aja") and len(t.split()) <= 3:
+        return ["Perfecto. ¿Hay algo más en lo que le pueda ayudar? Puede preguntarme por el clima, la siembra o una planta enferma.",
+                "Muy bien. Aquí sigo si necesita algo más."]
     if has(*GREETINGS) and greeted:
-        return f"¡Hola de nuevo{name}! ¿En qué le ayudo?"
+        return [f"¡Hola de nuevo{name}! ¿En qué le ayudo?", "¡Hola otra vez! Dígame, ¿qué necesita?"]
     return None
+
+
+def _pick(options: list[str], history: list[dict] | None) -> str:
+    """Elige la primera variante que no se haya dicho en las últimas respuestas."""
+    said = {normalize(h["content"]) for h in (history or [])[-6:] if h["role"] == "assistant"}
+    return next((o for o in options if normalize(o) not in said), options[-1])
 
 
 def topic_reply(t: str, place: str, w: dict, crop: str | None, experts: list[dict], meetings: list[str], user: User | None) -> str | None:
@@ -294,12 +308,15 @@ def local_reply(message: str, location: dict, w: dict, crop: str | None, experts
     topic = topic_reply(t, place, w, crop, experts, meetings, user)
     if topic:
         return (f"¡Hola{', ' + user.full_name.split()[0] if user else ''}! " if has(*GREETINGS) else "") + topic
-    if talk := small_talk(t, user, greeted):
-        return talk
+    if talk := small_talk(t, user, greeted, "?" in message):
+        return _pick(talk, history)
     if has(*GREETINGS):
         name = f", {user.full_name.split()[0]}" if user else ""
         return (f"¡Hola{name}! Jallalla. Soy **Pacha IA**, su asistente para {place}. ¿Cómo está usted? "
                 "Cuénteme en qué le ayudo: el clima, las heladas, cuándo sembrar o una planta enferma.")
+    if any(h["role"] == "assistant" and h["content"].startswith("Le escucho") for h in (history or [])[-2:]):
+        return ("Disculpe, todavía no entiendo bien esa pregunta. Por ahora respondo sobre el clima, las heladas, la siembra, "
+                "las plagas y su comunidad. Para conversar de cualquier tema, el administrador puede activar la IA completa.")
     return (f"Le escucho. Todavía no sé responder bien a eso, pero para {place} puedo ayudarle con:\n- «¿Cómo está el clima hoy?»\n- «¿Hay riesgo de helada?»\n"
             "- «¿Cuándo siembro quinua?»\n- «Mi papa tiene manchas en las hojas»")
 
