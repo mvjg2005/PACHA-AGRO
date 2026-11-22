@@ -279,7 +279,8 @@ def groq_chat(system: str, messages: list[dict], max_tokens: int = 1500, json_mo
                         attempt -= 1  # el reintento con el modelo nuevo no cuenta
                         continue
                 if res.status_code == 200:
-                    text = (res.json()["choices"][0]["message"].get("content") or "").strip()
+                    text = (res.json()["choices"][0]["message"].get("content") or "")
+                    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL).strip()  # razonamiento interno (Qwen)
                     LAST_ERROR["groq"] = None if text else "Groq respondió sin texto."
                     return text or None
                 if res.status_code in RETRY_STATUS and attempt < 3 and _time_left() > 8:

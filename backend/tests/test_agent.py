@@ -171,3 +171,8 @@ def test_choose_model_preferences():
     assert choose_model(["qwen/qwen3-32b", "llama-3.1-8b-instant", "llama-3.3-70b-versatile"], "text") == "llama-3.3-70b-versatile"
     assert choose_model(["whisper-large-v3", "playai-tts"], "text") is None
     assert choose_model(["llama-3.1-8b-instant"], "vision") is None
+
+
+def test_reasoning_tags_are_removed(app_client, fake_groq):
+    fake_groq.reply("<think>pienso en el clima…</think>¡Hola! ¿En qué le ayudo?")
+    assert chat(app_client, "hola")["reply"] == "¡Hola! ¿En qué le ayudo?"
