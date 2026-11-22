@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     xai_api_key: str = ""
     # Groq (groq.com, claves «gsk_»), con plan gratuito (opcional).
     groq_api_key: str = ""
-    groq_model: str = "llama-3.3-70b-versatile"
+    groq_model: str = "openai/gpt-oss-120b"
     # Modelo de Groq que entiende imágenes (revisión de plantas por foto).
     groq_vision_model: str = "meta-llama/llama-4-scout-17b-16e-instruct"
 

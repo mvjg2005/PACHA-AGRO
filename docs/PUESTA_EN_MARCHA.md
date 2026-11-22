@@ -34,7 +34,7 @@ Esta guía separa lo que **ya está resuelto en el código** de lo que **solo el
 |---|---|---|
 | `ADMIN_PHONE`, `ADMIN_PASSWORD` | Sí | Primera cuenta de administrador (clave de 10+ caracteres) |
 | `OPEN_METEO_API_KEY` | Recomendada | Más consultas y uso comercial |
-| `GROQ_API_KEY` | Recomendada | IA gratuita (groq.com, claves `gsk_…`) para Pacha IA, Asesoría y revisión de plantas por foto. Modelos: `GROQ_MODEL` (por defecto `llama-3.3-70b-versatile`) y `GROQ_VISION_MODEL` (por defecto `meta-llama/llama-4-scout-17b-16e-instruct`). Sin ella: modo básico |
+| `GROQ_API_KEY` | Recomendada | IA gratuita (groq.com, claves `gsk_…`) para Pacha IA, Asesoría y revisión de plantas por foto. Modelos: `GROQ_MODEL` (por defecto `openai/gpt-oss-120b`; si el modelo deja de existir, la app elige otro disponible) y `GROQ_VISION_MODEL` (por defecto `meta-llama/llama-4-scout-17b-16e-instruct`). Sin ella: modo básico |
 | `WHATSAPP_*` | Para WhatsApp real | Ver `docs/WHATSAPP.md` |
 | `OFFICIAL_WEATHER_URL`, `OFFICIAL_WEATHER_KEY` | Si hay convenio | Fuente oficial de clima |
 

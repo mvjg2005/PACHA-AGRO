@@ -12,13 +12,13 @@
 | Extensible a 9 departamentos y nuevos cultivos | Ubicaciones, cultivos, calendarios, pesos y umbrales en JSON; ninguno está en el código |
 | Futuro machine learning | Motor de recomendación puro (sin red ni BD) que recibe una vista normalizada del clima |
 
-## 2. Justificación tecnológica (equipo de 5 estudiantes)
+## 2. Justificación tecnológica
 
 | Capa | Elección | Por qué |
 |---|---|---|
-| Frontend | **React 18 + TypeScript + Tailwind CSS 4** (Vite) | Ecosistema más conocido por estudiantes; TypeScript evita errores de contrato con la API; Tailwind permite un sistema visual propio sin hojas de estilo enormes; división de código por pantalla |
+| Frontend | **React 18 + TypeScript + Tailwind CSS 4** (Vite) | Ecosistema muy difundido; TypeScript evita errores de contrato con la API; Tailwind permite un sistema visual propio sin hojas de estilo enormes; división de código por pantalla |
 | Backend | **FastAPI (Python)** | Validación automática con Pydantic, documentación OpenAPI gratis (`/docs`), y el mismo lenguaje que el análisis agroclimático |
-| Base de datos | **SQLAlchemy 2** → SQLite en desarrollo, **PostgreSQL** en producción | Cero instalación para el jurado; cambiar `DATABASE_URL` basta para PostgreSQL |
+| Base de datos | **SQLAlchemy 2** → SQLite en desarrollo, **PostgreSQL** en producción | Cero instalación para probarlo; cambiar `DATABASE_URL` basta para PostgreSQL |
 | Análisis agroclimático | Python puro (reglas + multicriterio) | Explicable y auditable; base para ML con scikit-learn cuando haya datos |
 | Mapas | **Leaflet + OpenStreetMap** | Libre, liviano, carga diferida |
 | Mensajería | **WhatsApp Business Platform (Cloud API)** — hoy en simulador | Única vía oficial y autorizada |

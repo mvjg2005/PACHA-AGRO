@@ -33,7 +33,7 @@ El archivo `render.yaml` (Blueprint) crea:
 ## Plan gratuito: tenga en cuenta
 
 - El servicio **se duerme tras unos 15 minutos sin visitas**; la siguiente visita tarda ~1 minuto en despertar. **Ábralo antes de presentar.**
-- La base PostgreSQL gratuita de Render **vence después de un tiempo** (según la política actual, unos 30 días). Para la hackatón alcanza; luego pase a un plan pagado o a Neon. Verifique las condiciones vigentes en render.com/pricing.
+- La base PostgreSQL gratuita de Render **vence después de un tiempo** (según la política actual, unos 30 días). Para producción pase a un plan pagado o a Neon. Verifique las condiciones vigentes en render.com/pricing.
 - Open-Meteo gratuito cuenta consultas por IP; si se agota, la app usa NASA POWER si hay datos históricos disponibles.
 
 ## Verificado antes de publicar

@@ -14,7 +14,7 @@
 8. **Sin migraciones versionadas de esquema**: se usa `create_all` y una rutina mínima de columnas compatibles. Antes de evolucionar una base de producción debe incorporarse Alembic y probar migraciones sobre una copia.
 9. **Recuperación de clave sin SMS**: un administrador verifica a la persona y le proporciona una clave temporal.
 10. **Quechua y aimara**: la estructura existe, pero las traducciones y la revisión por hablantes están pendientes.
-11. **Modo sin conexión**: la app puede abrir y mostrar último clima, avisos y biblioteca guardados. No permite enviar reportes sin señal ni sincronizarlos posteriormente; la cola de envío diferido sigue pendiente.
+11. **Modo sin conexión**: con señal se guarda la semana (pronóstico, noches peligrosas, alerta de año seco y boletín) y luego se ve sin internet. No permite enviar reportes sin señal ni sincronizarlos posteriormente; la cola de envío diferido sigue pendiente.
 12. **Revisión de plantas por foto**: es una orientación preliminar, no un diagnóstico de laboratorio. Puede equivocarse con imágenes borrosas. No recomienda productos ni dosis. Sin `GROQ_API_KEY` ofrece guía por síntomas.
 13. **Fichas de cultivo**: contienen rangos generales y no reemplazan recomendaciones por variedad validadas por INIAF u otra entidad técnica.
 14. **Condiciones para fumigar**: usa criterios generales sobre viento, lluvia, temperatura y humedad a partir del pronóstico. Siempre prevalece la etiqueta del producto y la orientación técnica autorizada.
@@ -22,7 +22,7 @@
 16. **Señas que se miden**: el contraste usa estimaciones satelitales regionales, no una estación en cada comunidad. Con pocas observaciones no se puede concluir sobre la capacidad predictiva; la interfaz debe advertirlo. El catálogo inicial requiere revisión con las comunidades y organizaciones locales.
 17. **Servicios externos e IA**: según la configuración, el texto de consultas y las fotos analizadas pueden enviarse al proveedor de IA. Véase la [política de privacidad](../frontend/src/pages/Legal.tsx) y no se deben incluir datos personales innecesarios.
 18. **E2E**: las pruebas Playwright requieren instalar la dependencia Node y el navegador Chromium. Se ejecutan localmente; el workflow CI actual verifica backend, pruebas unitarias frontend y build, no ejecuta la suite E2E.
-17. **Ganado en riesgo**: los umbrales de noches peligrosas y el consumo de forraje son referencias generales, no recomendaciones veterinarias. El satélite (~50 km) no distingue lluvia de nieve: los «días compatibles con nevada» son precipitación con helada. Las pérdidas las reportan las familias y no se verifican.
+19. **Ganado en riesgo**: los umbrales de noches peligrosas y el consumo de forraje son referencias generales, no recomendaciones veterinarias. El satélite (~50 km) no distingue lluvia de nieve: los «días compatibles con nevada» son precipitación con helada. Las pérdidas las reportan las familias y no se verifican.
 
 ## Próximos pasos sugeridos
 

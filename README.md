@@ -4,7 +4,7 @@
 
 > *Tu campo, tu comunidad, mejores decisiones.*
 
-Prototipo funcional para hackatón universitaria. Integra los tracks **Comunicación** (comunidades, reuniones, avisos, reportes y WhatsApp) y **Educación** (lecciones breves para interpretar el clima y reducir riesgos).
+Une el pronóstico real, los datos satelitales y el saber andino para decidir cuándo sembrar y cuándo proteger al ganado. Incluye comunicación comunitaria (comunidades, reuniones, avisos, reportes) y lecciones breves para interpretar el clima y reducir riesgos.
 
 > **PACHA-AGRO** es el nombre de marca que aparece en la interfaz; **AgroBolivia** es el nombre técnico del prototipo.
 
@@ -27,7 +27,7 @@ Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea 
 
 ## Un problema real: «Uywa · Ganado en riesgo»
 
-Nace de la familia de una integrante del equipo, criadora de ovejas en la **comunidad Huayñacagua**: no tienen corral techado, en invierno el pasto se seca, el suelo se agrieta, las ovejas adelgazan y hay que comprar alimento; algunas crías mueren. En comunidades vecinas, las **nevadas mataron llamas**. La sección **Ganado** (`#/ganado`) muestra esas fotos (con permiso, sin datos de ubicación) y ofrece:
+Nace de una familia criadora de ovejas en la **comunidad Huayñacagua**: no tienen corral techado, en invierno el pasto se seca, el suelo se agrieta, las ovejas adelgazan y hay que comprar alimento; algunas crías mueren. En comunidades vecinas, las **nevadas mataron llamas**. La sección **Ganado** (`#/ganado`) muestra esas fotos (con permiso, sin datos de ubicación) y ofrece:
 
 - **Noches peligrosas para el rebaño**: con el pronóstico real (mínima, nevada probable, viento de la noche) avisa qué noches encerrar y abrigar a las crías, con acciones de bajo costo. También responde Pacha IA («¿mis ovejas corren peligro esta noche?»).
 - **Alerta temprana de año seco**: une lo que anuncian las **señas** de la zona con la lluvia de la temporada medida por satélite (terciles desde 2001) y la temporada pasada, para empezar a guardar forraje meses antes.
@@ -35,7 +35,6 @@ Nace de la familia de una integrante del equipo, criadora de ovejas en la **comu
 - **Calculadora «¿hasta cuándo me alcanza el forraje?»**: ovejas, llamas, alpacas y vacas; fardos, kg o quintales; días que alcanza, lo que falta hasta que vuelva el pasto y su costo.
 - **Cómo proteger al rebaño sin techo**: muros contra el viento, dormidero, cama seca, depredadores, planificación de pariciones.
 - **Pérdidas de la comunidad e informe para autoridades**: cada familia registra sus pérdidas (especie, causa, comunidad); se publican solo totales. El informe imprimible junta pérdidas + datos del invierno para pedir forraje, materiales para cobertizos y asistencia técnica.
-
 - **Negocios de la zona en los 9 departamentos**: 204 negocios de veterinaria, asistencia técnica, forraje, ganadería e insumos (La Paz, Oruro, Potosí, Cochabamba, Chuquisaca, Tarija, Santa Cruz, Beni y Pando), tomados del directorio público BoliviaHub y filtrados para quedarse con lo útil para el campo. Se muestran primero los del municipio elegido, con filtros por servicio, la fuente, la fecha y el aviso de que PACHA-AGRO no los verificó; sin NIT. Están separados de los técnicos de la Asesoría, que solo aparecen con su consentimiento.
 - **Sin internet** (`#/sin-internet`): en el campo no siempre hay datos ni luz. Con señal se **guarda la semana** (pronóstico, noches peligrosas, alerta de año seco, boletín) y luego se ve sin conexión, con la fecha en que se guardó; la app se **instala** en el celular (ícono propio) y se abre sin internet; y un **boletín por SMS** sin tildes (160 caracteres por mensaje en vez de 70: cuesta menos) o para leer en la **radio comunitaria** se envía con un toque.
 
@@ -43,7 +42,7 @@ Nace de la familia de una integrante del equipo, criadora de ovejas en la **comu
 
 ## Lo nuevo: «Señas que se miden»
 
-Las comunidades andinas anticipan el año con **señas** (bioindicadores): las Pléyades (*Qutu*) en la madrugada de San Juan, el nido del *leque leque*, el aullido del zorro, la floración de la t'ola. Las apps agrícolas las ignoran y los programas tradicionales las anotan en papel. **PACHA-AGRO las registra y, al terminar cada temporada, mide si acertaron** con la lluvia y las heladas medidas por satélite en ese mismo municipio. Hasta donde sabemos, no encontramos otra herramienta abierta y comunitaria que lo haga.
+Las comunidades andinas anticipan el año con **señas** (bioindicadores): las Pléyades (*Qutu*) en la madrugada de San Juan, el nido del *leque leque*, el aullido del zorro, la floración de la t'ola. Las apps agrícolas las ignoran y los programas tradicionales las anotan en papel. **PACHA-AGRO las registra y, al terminar cada temporada, mide si acertaron** con la lluvia y las heladas medidas por satélite en ese mismo municipio. No conocemos otra herramienta abierta y comunitaria que lo haga.
 
 - **Dos saberes lado a lado.** Lo que anuncian las señas de la comunidad (votos por año seco, normal o lluvioso) junto a lo que realmente pasó, medido con NASA POWER.
 - **Medición rigurosa.** La temporada se ubica por **terciles** frente a todas las temporadas desde 2001, el método usual de los pronósticos estacionales. Por construcción, adivinar al azar acierta 1 de cada 3 veces, y cada seña se compara contra esa vara. Con datos reales, Challapata da: 2015–16 (El Niño) **seca**, 2023–24 **normal**, 2024–25 **lluviosa** y 2025–26 **seca**.
@@ -125,7 +124,7 @@ La IA es opcional. Con una clave gratuita de Groq se activan Pacha IA, la asesor
 ```bash
 # Opcional, en backend/.env
 GROQ_API_KEY=
-GROQ_MODEL=llama-3.3-70b-versatile
+GROQ_MODEL=openai/gpt-oss-120b
 GROQ_VISION_MODEL=meta-llama/llama-4-scout-17b-16e-instruct
 ```
 
@@ -188,7 +187,7 @@ render.yaml    Blueprint de Render
 
 ## Desplegar
 
-Use `SEED_DEMO=false` en producción. En **Sembrar → Comparar condiciones** puede evaluar dos niveles de humedad para quinua en el municipio seleccionado.
+Use `SEED_DEMO=false` en producción.
 
 - **Render (recomendado):** *New + → Blueprint* → elegir este repositorio. `render.yaml` crea el servicio (Docker) y la base PostgreSQL; solo pide `ADMIN_PHONE` y `ADMIN_PASSWORD`.
 - **Vercel (alternativa):** ya configurado con `vercel.json` y `api/index.py`; requiere conectar PostgreSQL (Neon).
@@ -213,10 +212,6 @@ npm run test:e2e -- http://localhost:8000
 ```
 
 Resultados actuales: **164/164** backend y **18/18** unitarias frontend. La suite E2E tiene **36 casos** (36/36 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
-
-## Auditoría y presentación
-
-- [docs/AUDITORIA_ABSTRACTHON.md](docs/AUDITORIA_ABSTRACTHON.md) — auditoría frente a los criterios de innovación, viabilidad técnica e impacto, con evidencia, riesgos y prioridades.
 
 ## Documentación
 
@@ -260,4 +255,4 @@ MIT © 2026 JEHOSEBA GABRIELA MUÑOZ VALDEZ. Ver [LICENSE](LICENSE).
 
 ## Aviso
 
-Prototipo académico. Las orientaciones de siembra usan reglas y umbrales **experimentales, no validados agronómicamente**. No reemplazan a un técnico agrícola ni los avisos oficiales del SENAMHI. No se realizaron pruebas con usuarios reales ni existen métricas de impacto.
+Prototipo. Las orientaciones de siembra usan reglas y umbrales **experimentales, no validados agronómicamente**. No reemplazan a un técnico agrícola ni los avisos oficiales del SENAMHI. No se realizaron pruebas con usuarios reales ni existen métricas de impacto.

@@ -148,8 +148,10 @@ def test_time_budget_falls_back_to_local_quickly(app_client, monkeypatch):
     assert d["provider"] == "local" and "tiempo" in d["ai_error"]
 
 
-def test_retired_model_is_replaced_automatically(app_client, fake_groq):
+def test_retired_model_is_replaced_automatically(app_client, fake_groq, monkeypatch):
     from app.services import agent
+    from app.core.config import get_settings
+    monkeypatch.setattr(get_settings(), "groq_model", "llama-3.3-70b-versatile")
     fake_groq.models = ["whisper-large-v3", "llama-guard-4-12b", "openai/gpt-oss-120b", "meta-llama/llama-4-scout-17b-16e-instruct"]
     fake_groq.error(404, "The model `llama-3.3-70b-versatile` does not exist or you do not have access to it.")
     fake_groq.reply("¡Hola! Ya funciono con otro modelo.")
