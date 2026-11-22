@@ -17,7 +17,7 @@ Prototipo funcional para hackatón universitaria. Integra los tracks **Comunicac
 | **Despliegue** | Render |
 | **Licencia** | MIT |
 
-Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea propios, sin emoticones; cada bloque muestra datos reales con su fuente):
+Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea propios; cada bloque muestra datos reales con su fuente):
 
 ![Portada en escritorio](docs/img/inicio-escritorio.png)
 
@@ -27,7 +27,7 @@ Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea 
 
 ## Lo nuevo: «Señas que se miden»
 
-Las comunidades andinas anticipan el año con **señas** (bioindicadores): las Pléyades (*Qutu*) en la madrugada de San Juan, el nido del *leque leque*, el aullido del zorro, la floración de la t'ola. Las apps agrícolas las ignoran y los programas tradicionales las anotan en papel. **PACHA-AGRO las registra y, al terminar cada temporada, mide si acertaron** con la lluvia y las heladas medidas por satélite en ese mismo municipio. No conocemos otra herramienta que lo haga de forma abierta y comunitaria.
+Las comunidades andinas anticipan el año con **señas** (bioindicadores): las Pléyades (*Qutu*) en la madrugada de San Juan, el nido del *leque leque*, el aullido del zorro, la floración de la t'ola. Las apps agrícolas las ignoran y los programas tradicionales las anotan en papel. **PACHA-AGRO las registra y, al terminar cada temporada, mide si acertaron** con la lluvia y las heladas medidas por satélite en ese mismo municipio. Hasta donde sabemos, no encontramos otra herramienta abierta y comunitaria que lo haga.
 
 - **Dos saberes lado a lado.** Lo que anuncian las señas de la comunidad (votos por año seco, normal o lluvioso) junto a lo que realmente pasó, medido con NASA POWER.
 - **Medición rigurosa.** La temporada se ubica por **terciles** frente a todas las temporadas desde 2001, el método usual de los pronósticos estacionales. Por construcción, adivinar al azar acierta 1 de cada 3 veces, y cada seña se compara contra esa vara. Con datos reales, Challapata da: 2015–16 (El Niño) **seca**, 2023–24 **normal**, 2024–25 **lluviosa** y 2025–26 **seca**.
@@ -62,15 +62,31 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 | Cultivos de interés en el perfil (filtran los avisos que recibe cada persona) | Sí |
 | Biblioteca filtrable por cultivo, tipo y departamento (8 guías con nota de fuente) | Sí |
 | Cobertura nacional (mapa de municipios y qué hay en cada departamento), privacidad y términos | Sí |
-| **Mi campo** (inspirado en apps como Plantix y FieldMargin): revisar una planta con una **foto** (posibles causas, qué verificar, primeras medidas sin químicos y técnicos de la zona), **calculadoras** (ganancia, rendimiento requerido, precio sin pérdida, presupuesto de insumos, mezcla según la etiqueta; con quintales y arrobas), **condiciones para fumigar** hora por hora, **fichas de cultivo con lectura en voz alta** y **parcelas con cuaderno de campo** (superficie medida caminando con GPS, gastos, cosecha, ventas, balance y rendimiento) | Sí. La revisión por foto usa un modelo de visión de Groq (gratuito) con `GROQ_API_KEY`; sin ella ofrece una guía por síntomas. La foto no se guarda. Nunca se indican productos ni dosis |
+| **Mi campo**: revisión por foto, calculadoras, fumigación, fichas y parcelas | Sí; ver detalle abajo |
 | Bienvenida en la primera visita (cultivos, perfil y ubicación) | Sí; se puede saltar |
-| **Señas que se miden** y **Pachagrama digital**: registro de bioindicadores andinos, comparación con lluvia y heladas medidas por satélite (terciles desde 2001), tabla de aciertos frente al azar por departamento | Sí, con datos reales de NASA POWER. Los registros de ejemplo solo aparecen con `SEED_DEMO=true` y están marcados |
-| **Pacha IA**: asistente flotante por **voz y texto** en todas las pantallas (micrófono y lectura en voz alta del navegador), con el clima real del municipio, técnicos del directorio con WhatsApp y respuestas con formato | Sí. Redacta con Groq (`GROQ_API_KEY`, plan gratuito); sin clave responde el motor local con los mismos datos reales. Integrado desde el prototipo hecho con Antigravity |
-| **Asesoría con IA**: responde preguntas del campo y recomienda técnicos/ingenieros agrónomos (WhatsApp, llamada, correo) y sitios especializados (SENAMHI, INIAF, FAO Ecocrop, PlantwisePlus, EOSDA, OneSoil, Windy, Meteoblue…) | Sí: con `GROQ_API_KEY` (gratuita) usa IA; sin ella, respuesta automática básica. Los contactos los elige el servidor del directorio (solo técnicos con consentimiento, cargados por el administrador); la IA nunca inventa teléfonos ni enlaces |
+| **Señas que se miden** y **Pachagrama digital**: registro, comparación con satélite y tabla de aciertos por departamento | Sí, con datos reales de NASA POWER |
+| **Pacha IA**: asistente flotante por voz y texto en todas las pantallas | Sí; usa Groq o el motor local |
+| **Asesoría**: respuestas del campo y directorio de técnicos/agrónomos | Sí; con contactos cargados con consentimiento |
 | Adaptador para fuente meteorológica oficial con contrato normalizado | Sí: listo; se activa con `OFFICIAL_WEATHER_URL` |
 | Avisos oficiales SENAMHI | No: no integrados (ver [docs/FUENTES_DATOS.md](docs/FUENTES_DATOS.md)); se enlaza al sitio oficial |
 
 Nada se presenta como algo que no es: los datos **simulados**, las **observaciones comunitarias**, los **datos ingresados por el agricultor** y los **pronósticos** llevan etiquetas distintas en la interfaz y en la API.
+
+### Mi campo
+
+- **Revisión por foto:** posibles causas, qué verificar y primeras medidas sin químicos; la foto no se guarda y nunca se indican productos ni dosis.
+- **Calculadoras:** ganancia, rendimiento requerido, precio sin pérdida, presupuesto de insumos y mezcla según la etiqueta; acepta quintales y arrobas.
+- **Fumigación:** condiciones hora por hora según viento, lluvia, temperatura y humedad.
+- **Fichas de cultivo** con lectura en voz alta.
+- **Parcelas:** superficie medida caminando con GPS, gastos, cosecha, ventas, balance y rendimiento.
+
+La revisión por foto usa un modelo de visión de Groq (gratuito) con `GROQ_API_KEY`. Sin clave ofrece una guía por síntomas.
+
+### Pacha IA y Asesoría
+
+- **Pacha IA** es el asistente flotante de toda la app: entiende voz y texto, usa el clima real del municipio y responde con Groq o con el motor local.
+- **Asesoría** es el espacio para preguntas del campo y el directorio de técnicos/ingenieros agrónomos con WhatsApp, llamada o correo.
+- Los contactos los elige el servidor del directorio: solo técnicos con consentimiento, cargados por el administrador. La IA nunca inventa teléfonos ni enlaces.
 
 ## Ejecutar (5 minutos)
 
