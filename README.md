@@ -135,6 +135,33 @@ cd frontend && npm run dev
 
 (Vite en <http://localhost:5173> redirige `/api` al backend.)
 
+### Variables de entorno principales
+
+| Variable | Uso | Obligatoria |
+|---|---|---|
+| `SECRET_KEY` | Firma los tokens de sesión. Debe tener 32+ caracteres en producción | Sí en producción |
+| `DATABASE_URL` | SQLite en desarrollo; PostgreSQL en producción | Recomendada |
+| `ADMIN_PHONE` / `ADMIN_PASSWORD` | Cuenta administradora inicial | Sí para administrar |
+| `SEED_DEMO` | Carga cuentas y datos ficticios. Use `false` en producción | No |
+| `OPEN_METEO_API_KEY` | Plan pagado de Open-Meteo si se agotan las consultas gratuitas | No |
+| `GROQ_API_KEY` | Pacha IA, asesoría y revisión de plantas por foto | No |
+| `WHATSAPP_ENABLED` y `WHATSAPP_*` | Conectar WhatsApp Cloud API; sin ellas se usa el simulador | No |
+| `OFFICIAL_WEATHER_URL` | Fuente meteorológica oficial con contrato normalizado | No |
+
+El archivo completo está en [`backend/.env.example`](backend/.env.example).
+
+### Estructura del repositorio
+
+```text
+backend/       API FastAPI, servicios de clima y recomendación, pruebas
+frontend/      React + TypeScript + Vite
+e2e/           Pruebas de navegador con Playwright
+docs/          Arquitectura, algoritmo, fuentes, despliegue y límites
+api/           Entrada para Vercel
+Dockerfile     Imagen única para Render
+render.yaml    Blueprint de Render
+```
+
 ### Cuentas ficticias para pruebas locales (`SEED_DEMO=true`)
 
 | Rol | Celular | Clave |
@@ -198,6 +225,31 @@ Resultados actuales: **150/150** backend y **16/16** unitarias frontend verifica
 ## Uso real
 
 Además de las funciones, AgroBolivia incluye lo necesario para operar fuera de una demo: clima con caché persistente y último dato disponible, ubicación por GPS, modo sin conexión, recuperación de clave sin SMS, eliminación de cuenta, modo producción que no arranca con configuración insegura y chequeo de salud. Lo que todavía depende del equipo (base de datos duradera, validación agronómica, WhatsApp de Meta, responsable de datos, piloto) está en **[docs/PUESTA_EN_MARCHA.md](docs/PUESTA_EN_MARCHA.md)**.
+
+## Contribuir
+
+1. Cree una rama desde `main`:
+   ```bash
+   git switch main && git pull
+   git switch -c mi-cambio
+   ```
+2. Ejecute las pruebas que correspondan:
+   ```bash
+   cd backend && .venv/bin/python -m pytest
+   cd ../frontend && npm test && npm run build
+   ```
+3. Para cambios de interfaz, ejecute también E2E:
+   ```bash
+   npm install && npx playwright install chromium
+   npm run test:e2e -- http://localhost:8000
+   ```
+4. Abra un Pull Request describiendo el cambio, las pruebas ejecutadas y cualquier dato que siga pendiente de validación.
+
+No suba `.env`, claves, bases de datos locales ni fotos de usuarios.
+
+## Licencia
+
+MIT © 2026 JEHOSEBA GABRIELA MUÑOZ VALDEZ. Ver [LICENSE](LICENSE).
 
 ## Créditos
 
