@@ -30,3 +30,20 @@ describe('calculadoras', () => {
     expect(a).toBeGreaterThan(0.99); expect(a).toBeLessThan(1.01)
   })
 })
+
+import { forage } from './calc'
+describe('forraje', () => {
+  it('20 ovejas consumen ~16,7 kg de heno al día; 500 kg alcanzan 29 días completos', () => {
+    const r = forage({ oveja: 20 }, 500, new Date('2026-07-01'), new Date('2026-12-15'), 2)!
+    expect(r.perDayKg).toBeCloseTo(16.67, 1)
+    expect(r.days).toBe(29)
+    expect(r.runsOut.toISOString().slice(0, 10)).toBe('2026-07-30')
+    expect(r.enough).toBe(false)
+    expect(Math.round(r.missingKg)).toBe(Math.round(167 * 16.6667 - 500))
+    expect(r.cost).toBeCloseTo(r.missingKg * 2)
+  })
+  it('sin animales o con datos imposibles no calcula', () => {
+    expect(forage({}, 100, new Date(), new Date())).toBeNull()
+    expect(forage({ llama: 2 }, -5, new Date(), new Date())).toBeNull()
+  })
+})

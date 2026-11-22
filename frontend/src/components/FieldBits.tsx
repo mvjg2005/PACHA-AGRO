@@ -72,3 +72,18 @@ export function SenasCta() {
     </section>
   )
 }
+
+/** Caso real de la comunidad Huayñacagua: lleva al módulo de ganado. */
+export function GanadoCta() {
+  return (
+    <section className="grid overflow-hidden rounded-2xl bg-white shadow-sm md:grid-cols-[1fr_1.2fr]" data-testid="ganado-cta">
+      <img src="/img/historia/pastoreo-seco.jpg" alt="Ovejas flacas pastando en un campo seco del Altiplano" loading="lazy" className="h-56 w-full object-cover md:h-full" />
+      <div className="p-6 sm:p-8">
+        <p className="eyebrow">Un problema real · Huayñacagua</p>
+        <h2 className="section-title">Uywa · Ganado en riesgo</h2>
+        <p className="mt-2 text-[var(--color-on-variant)]">Sin corral techado, sin pasto en invierno y con nevadas que matan crías y llamas. Anticipe las noches peligrosas y los años secos, calcule su forraje y registre pérdidas para pedir apoyo con datos.</p>
+        <a href="#/ganado" className="btn-primary mt-5">Proteger mi rebaño <Icon name="arrowRight" size={16} /></a>
+      </div>
+    </section>
+  )
+}

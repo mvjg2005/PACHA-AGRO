@@ -263,3 +263,21 @@ class SenaObservation(Base):
     notes: Mapped[str] = mapped_column(String(300), default="")
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class LivestockLoss(Base):
+    """Pérdida de ganado reportada por una familia. Solo se publican sumas por comunidad o municipio."""
+    __tablename__ = "livestock_losses"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    municipality_id: Mapped[str] = mapped_column(String(60), index=True)
+    department_id: Mapped[str] = mapped_column(String(40), index=True)
+    community_name: Mapped[str] = mapped_column(String(80), default="")
+    campaign: Mapped[int] = mapped_column(Integer, index=True)
+    date: Mapped[str] = mapped_column(String(10))
+    species: Mapped[str] = mapped_column(String(12))
+    count: Mapped[int] = mapped_column(Integer)
+    cause: Mapped[str] = mapped_column(String(14))
+    notes: Mapped[str] = mapped_column(String(300), default="")
+    is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)

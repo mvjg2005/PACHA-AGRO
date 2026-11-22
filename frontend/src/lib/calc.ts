@@ -66,3 +66,25 @@ export function polygonAreaHa(points: { lat: number; lon: number }[]) {
 
 export const bs = (n: number) => `Bs ${n.toLocaleString('es-BO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 export const num = (n: number, d = 1) => n.toLocaleString('es-BO', { maximumFractionDigits: d })
+
+/** Ganado: peso vivo típico (kg) y consumo diario de materia seca (% del peso). Valores generales de referencia. */
+export const HERD = {
+  oveja: { label: 'Ovejas', kg: 30, pct: 2.5 },
+  llama: { label: 'Llamas', kg: 100, pct: 2.0 },
+  alpaca: { label: 'Alpacas', kg: 60, pct: 2.0 },
+  vaca: { label: 'Vacas', kg: 300, pct: 2.5 },
+} as const
+export type HerdKind = keyof typeof HERD
+export const DRY_MATTER = 0.9  // heno o fardo seco: ~90 % de materia seca
+
+/** ¿Hasta cuándo alcanza el forraje guardado? Devuelve días, fecha y lo que falta hasta `until`. */
+export function forage(herd: Partial<Record<HerdKind, number>>, stockKg: number, today: Date, until: Date, pricePerKg = 0) {
+  const needDM = (Object.keys(herd) as HerdKind[]).reduce((a, k) => a + (herd[k] ?? 0) * HERD[k].kg * HERD[k].pct / 100, 0)
+  if (!ok(stockKg, pricePerKg) || needDM <= 0) return null
+  const perDayKg = needDM / DRY_MATTER
+  const days = Math.floor(stockKg / perDayKg)
+  const runsOut = new Date(today.getTime() + days * 86400000)
+  const daysNeeded = Math.max(0, Math.ceil((until.getTime() - today.getTime()) / 86400000))
+  const missingKg = Math.max(0, daysNeeded * perDayKg - stockKg)
+  return { perDayKg, days, runsOut, daysNeeded, missingKg, cost: missingKg * pricePerKg, enough: missingKg === 0 }
+}

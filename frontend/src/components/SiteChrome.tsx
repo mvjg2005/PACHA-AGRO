@@ -58,6 +58,7 @@ const NAV = [
   { path: '', label: 'Inicio' },
   { path: 'sembrar', label: '¿Cuándo sembrar?' },
   { path: 'campo', label: 'Mi campo' },
+  { path: 'ganado', label: 'Ganado' },
   { path: 'senas', label: 'Señas' },
   { path: 'clima', label: 'Clima' },
   { path: 'comunidad', label: 'Comunidad' },
@@ -125,7 +126,7 @@ export function SiteFooter() {
           </div>
           <FooterCol title="Zonas agrícolas" links={[['Altiplano', '#/cobertura'], ['Valles interandinos', '#/cobertura'], ['Llanos y Amazonía', '#/cobertura'], ['Cobertura nacional', '#/cobertura']]} />
           <FooterCol title="Módulos" links={[['¿Cuándo sembrar?', '#/sembrar'], ['Revisar una planta con foto', '#/campo/diagnostico'], ['Calculadoras y parcelas', '#/campo'], ['Pronóstico y heladas', '#/clima'], ['Biblioteca y guías', '#/aprender/biblioteca'], ['Avisos para el campo', '#/avisos']]} />
-          <FooterCol title="Comunidad" links={[['Señas andinas y Pachagrama', '#/senas'], ['Asesoría y técnicos', '#/asesoria'], ['Mi comunidad', '#/comunidad'], ['Asistente de WhatsApp (simulador)', '#/whatsapp'], ['Lecciones (quechua y aimara en preparación)', '#/aprender'], ['Comparar condiciones', '#/sembrar/comparar']]} />
+          <FooterCol title="Comunidad" links={[['Ganado en riesgo (Uywa)', '#/ganado'], ['Señas andinas y Pachagrama', '#/senas'], ['Asesoría y técnicos', '#/asesoria'], ['Mi comunidad', '#/comunidad'], ['Asistente de WhatsApp (simulador)', '#/whatsapp'], ['Lecciones (quechua y aimara en preparación)', '#/aprender'], ['Comparar condiciones', '#/sembrar/comparar']]} />
         </div>
         <div className="flex flex-col items-center justify-between gap-4 rounded-xl bg-[var(--color-surface-mid)] px-6 py-4 text-xs text-[var(--color-on-variant)] md:flex-row">
           <p className="text-center md:text-left">© 2026 PACHA-AGRO (AgroBolivia). Orientación agroclimática referencial. Avisos oficiales de clima: SENAMHI.</p>

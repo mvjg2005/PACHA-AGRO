@@ -25,6 +25,19 @@ Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea 
 |---|---|---|---|
 | ![](docs/img/inicio.png) | ![](docs/img/asistente-siembra.png) | ![](docs/img/resultado-siembra.png) | ![](docs/img/clima.png) |
 
+## Un problema real: «Uywa · Ganado en riesgo»
+
+Nace de la familia de una integrante del equipo, criadora de ovejas en la **comunidad Huayñacagua**: no tienen corral techado, en invierno el pasto se seca, el suelo se agrieta, las ovejas adelgazan y hay que comprar alimento; algunas crías mueren. En comunidades vecinas, las **nevadas mataron llamas**. La sección **Ganado** (`#/ganado`) muestra esas fotos (con permiso, sin datos de ubicación) y ofrece:
+
+- **Noches peligrosas para el rebaño**: con el pronóstico real (mínima, nevada probable, viento de la noche) avisa qué noches encerrar y abrigar a las crías, con acciones de bajo costo. También responde Pacha IA («¿mis ovejas corren peligro esta noche?»).
+- **Alerta temprana de año seco**: une lo que anuncian las **señas** de la zona con la lluvia de la temporada medida por satélite (terciles desde 2001) y la temporada pasada, para empezar a guardar forraje meses antes.
+- **Los inviernos según el satélite**: detecta días compatibles con nevada (precipitación con helada). Con datos reales de NASA POWER, el invierno de 2025 en Challapata tuvo **93 mm de junio a agosto, 2,4 veces lo normal**, con posibles nevadas el 3, 9, 10 y 18 de junio (44 mm el 3 de junio con −3 °C).
+- **Calculadora «¿hasta cuándo me alcanza el forraje?»**: ovejas, llamas, alpacas y vacas; fardos, kg o quintales; días que alcanza, lo que falta hasta que vuelva el pasto y su costo.
+- **Cómo proteger al rebaño sin techo**: muros contra el viento, dormidero, cama seca, depredadores, planificación de pariciones.
+- **Pérdidas de la comunidad e informe para autoridades**: cada familia registra sus pérdidas (especie, causa, comunidad); se publican solo totales. El informe imprimible junta pérdidas + datos del invierno para pedir forraje, materiales para cobertizos y asistencia técnica.
+
+![Los inviernos en Challapata según el satélite: invierno 2025 con 4 posibles nevadas](docs/img/ganado-invierno-2025.png)
+
 ## Lo nuevo: «Señas que se miden»
 
 Las comunidades andinas anticipan el año con **señas** (bioindicadores): las Pléyades (*Qutu*) en la madrugada de San Juan, el nido del *leque leque*, el aullido del zorro, la floración de la t'ola. Las apps agrícolas las ignoran y los programas tradicionales las anotan en papel. **PACHA-AGRO las registra y, al terminar cada temporada, mide si acertaron** con la lluvia y las heladas medidas por satélite en ese mismo municipio. Hasta donde sabemos, no encontramos otra herramienta abierta y comunitaria que lo haga.
@@ -40,9 +53,9 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 ### Cómo responde a los criterios del jurado
 | Criterio | Qué aporta PACHA-AGRO |
 |---|---|
-| **Innovación (40)** | Mide el acierto de los bioindicadores andinos con datos satelitales, con la vara del azar. Se suman la revisión de plantas por foto con IA y la asesoría con técnicos reales. |
-| **Viabilidad técnica (30)** | Funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 150 pruebas de backend y 16 de frontend verificadas por CI, más 34 casos E2E. Desplegable en Render con un archivo. |
-| **Impacto (30)** | Productoras y productores del Altiplano, valles y llanos: decidir cuándo sembrar, revisar plantas, hacer cuentas, organizarse en comunidad y valorar su propio saber. Funciona en celulares sencillos, con poca señal, lectura en voz alta y sin registrarse para lo esencial. |
+| **Innovación (40)** | Mide el acierto de los bioindicadores andinos con datos satelitales, con la vara del azar, y los usa como alerta temprana de año seco para el ganado. Se suman la revisión de plantas por foto con IA y la asesoría con técnicos reales. |
+| **Viabilidad técnica (30)** | Funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 161 pruebas de backend y 18 de frontend, más 35 casos E2E. Desplegable en Render con un archivo. |
+| **Impacto (30)** | Parte de un problema real y documentado (pérdida de ganado en Huayñacagua). Productoras, productores y familias criadoras del Altiplano, valles y llanos: decidir cuándo sembrar, revisar plantas, hacer cuentas, organizarse en comunidad y valorar su propio saber. Funciona en celulares sencillos, con poca señal, lectura en voz alta y sin registrarse para lo esencial. |
 
 ## Qué funciona hoy
 
@@ -203,7 +216,7 @@ npx playwright install chromium
 npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **150/150** backend y **16/16** unitarias frontend verificadas por CI. La suite E2E tiene **34 casos** y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **161/161** backend y **18/18** unitarias frontend. La suite E2E tiene **35 casos** (35/35 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Auditoría y presentación
 

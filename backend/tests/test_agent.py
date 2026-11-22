@@ -176,3 +176,23 @@ def test_choose_model_preferences():
 def test_reasoning_tags_are_removed(app_client, fake_groq):
     fake_groq.reply("<think>pienso en el clima…</think>¡Hola! ¿En qué le ayudo?")
     assert chat(app_client, "hola")["reply"] == "¡Hola! ¿En qué le ayudo?"
+
+
+def test_livestock_question_uses_night_forecast(app_client, monkeypatch):
+    from app.services import livestock
+    herd = {"available": True, "nights": [{"date": "2026-11-21", "tmin": -9, "snow": True, "level": "extremo", "label": "Extremo",
+                                           "actions": ["Encierre a todo el rebaño antes del atardecer."]}]}
+    herd["worst"] = herd["nights"][0]
+    monkeypatch.setattr(livestock, "nights", lambda m: herd)
+    d = chat(app_client, "¿Mis ovejas corren peligro esta noche?", municipality_id="or-challapata")
+    assert "riesgo es **extremo**" in d["reply"] and "nevada probable" in d["reply"] and "Encierre" in d["reply"]
+
+
+def test_livestock_context_sent_to_ai(app_client, fake_groq, monkeypatch):
+    from app.services import livestock
+    herd = {"available": True, "nights": [{"date": "2026-11-21", "tmin": -9, "snow": False, "level": "alto", "label": "Alto", "actions": []}]}
+    herd["worst"] = herd["nights"][0]
+    monkeypatch.setattr(livestock, "nights", lambda m: herd)
+    fake_groq.reply("ok")
+    chat(app_client, "¿Cómo protejo a mis llamas?")
+    assert "Ganado: riesgo para el ganado esta noche: alto" in fake_groq.calls[0]["json"]["messages"][-1]["content"]

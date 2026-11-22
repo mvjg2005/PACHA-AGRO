@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
 from app.core.security import hash_password
-from app.models import Community, Expert, Meeting, Membership, Notice, RegionalNotice, SenaObservation, User
+from app.models import Community, Expert, LivestockLoss, Meeting, Membership, Notice, RegionalNotice, SenaObservation, User
 
 DEMO_PASSWORD = "demo1234"
 DEMO_USERS = [
@@ -27,6 +27,9 @@ def seed(db: Session) -> None:
         # Base creada con una versión anterior: agrega solo lo nuevo (avisos regionales DEMO).
         if not db.scalar(select(RegionalNotice).where(RegionalNotice.is_demo.is_(True))):
             seed_regional_notices(db, existing.id)
+            db.commit()
+        if not db.scalar(select(LivestockLoss).where(LivestockLoss.is_demo.is_(True))):
+            seed_losses(db, [u.id for u in db.scalars(select(User).where(User.is_demo.is_(True)).order_by(User.id))])
             db.commit()
         if not db.scalar(select(SenaObservation).where(SenaObservation.is_demo.is_(True))):
             seed_senas(db, [u.id for u in db.scalars(select(User).where(User.is_demo.is_(True)).order_by(User.id))])
@@ -56,6 +59,7 @@ def seed(db: Session) -> None:
     db.add(Expert(full_name="Técnico de ejemplo (DEMO)", specialty="Manejo de quinua y heladas", institution="Cuenta de demostración",
                   phone="+59170000003", crops="quinua,papa", departments="oruro,potosi,la-paz", consent=True, verified=False, is_demo=True))
     seed_senas(db, [u.id for u in users])
+    seed_losses(db, [u.id for u in users])
     db.commit()
 
 
@@ -97,3 +101,15 @@ def seed_regional_notices(db: Session, author_id: int) -> None:
     for scope, fields, kind, title, summary in demo:
         db.add(RegionalNotice(scope=scope, kind=kind, title=title, summary=summary, is_demo=True,
                               author_id=author_id, expires_at=exp, **fields))
+
+
+# Pérdidas FICTICIAS de demostración (solo con SEED_DEMO=true).
+def seed_losses(db: Session, user_ids: list[int]) -> None:
+    from app.services.senas import campaign_of
+    from datetime import date
+    demo = [("2026-07-02", "oveja", 3, "helada", "Comunidad demo A"), ("2026-07-20", "oveja", 2, "hambre", "Comunidad demo A"),
+            ("2026-06-12", "llama", 4, "nevada", "Comunidad demo B"), ("2026-08-05", "oveja", 1, "depredador", "Comunidad demo B")]
+    for i, (d, sp, n, cause, comm) in enumerate(demo):
+        db.add(LivestockLoss(user_id=user_ids[i % len(user_ids)], municipality_id="or-challapata", department_id="oruro",
+                             community_name=comm, campaign=campaign_of(date.fromisoformat(d)), date=d, species=sp, count=n,
+                             cause=cause, notes="Registro de demostración", is_demo=True))

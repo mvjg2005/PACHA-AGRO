@@ -288,3 +288,26 @@ class AgentChatIn(BaseModel):
     lon: float | None = Field(default=None, ge=-180, le=180)
     crop: str | None = Field(default=None, max_length=30)
     history: list[AgentChatMessage] = Field(default_factory=list, max_length=12)
+
+
+class LivestockLossIn(BaseModel):
+    municipality_id: str = Field(min_length=2, max_length=60)
+    community_name: str = Field(default="", max_length=80)
+    date: str
+    species: Literal["oveja", "llama", "alpaca", "vaca", "otro"]
+    count: int = Field(ge=1, le=5000)
+    cause: Literal["helada", "nevada", "hambre", "depredador", "enfermedad", "otro"]
+    notes: str = Field(default="", max_length=300)
+
+    @field_validator("date")
+    @classmethod
+    def date_ok(cls, v):
+        d = _check_date(v)
+        if not d:
+            raise ValueError("Indique la fecha.")
+        return d
+
+    @field_validator("community_name", "notes")
+    @classmethod
+    def strip(cls, v: str) -> str:
+        return v.strip()

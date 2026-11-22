@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { ArticleGrid } from '../components/ArticleCard'
 import { SprayLine } from '../components/SprayCard'
-import { DiagnoseCta, MyCrops, SenasCta } from '../components/FieldBits'
+import { DiagnoseCta, GanadoCta, MyCrops, SenasCta } from '../components/FieldBits'
 import { onboarded, setOnboarded, useMyCrops } from '../lib/prefs'
 import { Icon, type IconName } from '../components/Icon'
 import { MunicipalitySelect } from '../components/SiteChrome'
@@ -69,6 +69,7 @@ export default function Home() {
 
       <Indicators weather={weather} />
 
+      <div className="mt-8"><GanadoCta /></div>
       <div className="mt-8"><SenasCta /></div>
       <div className="mt-8"><DiagnoseCta /></div>
 

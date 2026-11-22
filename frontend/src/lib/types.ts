@@ -71,3 +71,15 @@ export interface SenaZoneT {
 export interface ReliabilityRow { id: string; sena_id: string; name: string; observations: number; demo: number; evaluated: number; hits: number; rate: number | null; chance: number | null; campaigns: string[]; enough: boolean }
 export interface PachaWeek { start: string; end: string; rain_mm: number | null; normal_mm: number | null; frost_days: number | null; tmin: number | null; future: boolean; reports: Record<string, number>; senas: string[] }
 export interface PachagramaT { municipality: { name: string; department_name: string }; campaign: number; campaign_label: string; months: string[]; weeks: PachaWeek[]; data_available: boolean; outcome: Record<string, OutcomeT>; source: string; note: string }
+export interface NightT { date: string; tmin: number | null; snow: boolean; wind_kmh: number | null; level: 'extremo' | 'alto' | 'medio' | 'bajo'; label: string; reasons: string[]; actions: string[] }
+export interface NightsT { available: boolean; error?: string; source?: string; nights: NightT[]; worst?: NightT; note?: string }
+export interface DroughtT {
+  campaign_label: string; level: 'alta' | 'media' | 'baja'; signals: string[]; actions: string[]
+  rain?: { observed: number; normal: number; low: number; high: number; years: number; category: string; window: string }
+  last_season?: OutcomeT & { campaign_label: string }
+  senas: { n: number; votes: Record<string, number>; dry_share: number | null }
+}
+export interface WinterT { winter: string; frost_nights: number; hard_nights: number; min: number; rain_mm: number; normal_frost_nights: number | null; normal_hard_nights: number | null; normal_min: number | null; normal_rain_mm: number | null; years: number; snow_events: { date: string; precip_mm: number; tmin: number }[]; note: string }
+export interface LossSummaryT { campaign_label: string; reports: number; families: number; animals: number; by_species: { id: string; label: string; count: number }[]; by_cause: { id: string; label: string; count: number }[]; by_month: { month: string; count: number }[]; communities: { name: string; count: number }[]; has_demo: boolean }
+export interface LossT { id: number; date: string; species: string; species_label: string; count: number; cause: string; cause_label: string; community: string; notes: string }
+export interface LivestockReportT { generated_at: string; municipality: { name: string; department_name: string }; losses: LossSummaryT; rain?: OutcomeT; rain_campaign_label: string; winter: WinterT | null; requests: string[] }

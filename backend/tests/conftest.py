@@ -58,8 +58,9 @@ def app_client():
     dbmod.SessionLocal.configure(bind=engine)
     service.set_client(httpx.Client(transport=mock_transport()))
     from app.routers.field import diagnosis_limiter
+    from app.routers.livestock import loss_limiter
     from app.routers.senas import sena_limiter
-    for lim in (login_limiter, register_limiter, chat_limiter, diagnosis_limiter, sena_limiter):
+    for lim in (login_limiter, register_limiter, chat_limiter, diagnosis_limiter, sena_limiter, loss_limiter):
         lim.reset()
     assistant.reset_state()
     with TestClient(app) as c:
