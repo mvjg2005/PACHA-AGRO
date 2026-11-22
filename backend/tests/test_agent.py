@@ -258,3 +258,22 @@ def test_grok_error_explained_then_gemini(app_client, monkeypatch):
     d = chat(app_client, "hola")
     assert d["provider"] == "gemini" and d["reply"] == "Respuesta de Gemini"
     assert "400" in agent.LAST_ERROR["grok"] and "xai-secreto" not in agent.LAST_ERROR["grok"]
+
+
+def test_groq_key_in_grok_variable_is_detected(app_client, monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    s = get_settings()
+    monkeypatch.setattr(s, "xai_api_key", "gsk_clavedegroq123")
+    monkeypatch.setattr(s, "gemini_api_key", "AIzaX")
+    monkeypatch.setattr(agent.time, "sleep", lambda x: None)
+    _GrokClient.calls = []
+    _GrokClient.responses = [httpx.Response(400, json={"error": "Incorrect API key provided"}),
+                             httpx.Response(503, json={"error": {"message": "high demand"}}),
+                             httpx.Response(503, json={"error": {"message": "high demand"}}),
+                             httpx.Response(503, json={"error": {"message": "high demand"}})]
+    monkeypatch.setattr(agent.httpx, "Client", _GrokClient)
+    d = chat(app_client, "hola")
+    assert d["provider"] == "local" and "Groq" in d["ai_error"] and "503" in d["ai_error"]
+    st = app_client.get("/api/ai/agent/status").json()
+    assert "503" in st["backup_errors"]["gemini"] and st["key_hint"]["grok"].startswith("gsk_") and "clavedegroq" not in str(st)

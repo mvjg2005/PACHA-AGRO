@@ -22,6 +22,8 @@ def status():
             "model": {"claude": s.assistant_model, "grok": s.xai_model, "gemini": s.gemini_model}.get(prov),
             "last_error": agent.LAST_ERROR.get(prov),
             "backup": [p for p, k in (("grok", s.xai_api_key), ("gemini", s.gemini_api_key)) if k and p != prov],
+            "backup_errors": {p: agent.LAST_ERROR[p] for p, k in (("grok", s.xai_api_key), ("gemini", s.gemini_api_key)) if k and p != prov},
+            "key_hint": {p: agent.key_hint(k) for p, k in (("claude", s.anthropic_api_key), ("grok", s.xai_api_key), ("gemini", s.gemini_api_key)) if k},
             "voice": "navegador (Web Speech API)"}
 
 

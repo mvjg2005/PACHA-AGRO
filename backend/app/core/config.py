@@ -1,11 +1,21 @@
 """Configuración central. Todos los valores sensibles vienen de variables de entorno."""
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @field_validator("anthropic_api_key", "xai_api_key", "gemini_api_key", mode="before")
+    @classmethod
+    def clean_key(cls, v):
+        """Quita espacios, comillas y un «Bearer » pegado por error al copiar la clave."""
+        if not isinstance(v, str):
+            return v
+        v = v.strip().strip('"').strip("'").strip()
+        return v[7:].strip() if v.lower().startswith("bearer ") else v
 
     environment: str = "development"  # development | production
     database_url: str = "sqlite:///./agrobolivia.db"

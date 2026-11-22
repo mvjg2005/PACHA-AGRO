@@ -36,10 +36,23 @@ ERROR_HELP = {
 }
 
 
+EXPECTED_PREFIX = {"claude": "sk-ant-", "grok": "xai-", "gemini": "AIza"}
+
+
+def key_hint(key: str) -> str:
+    """Pista segura sobre la clave (inicio y largo), para detectar claves de otro servicio sin mostrarla."""
+    return f"{key[:4]}… ({len(key)} caracteres)"
+
+
 def _explain(provider: str, status: int, detail: str = "") -> str:
     help_ = ERROR_HELP.get(status, "error del servicio, intente más tarde" if status >= 500 else "error desconocido")
     name, model_var = NAMES[provider]
     msg = f"{name} respondió {status}: {help_}"
+    key = {"claude": get_settings().anthropic_api_key, "grok": get_settings().xai_api_key, "gemini": get_settings().gemini_api_key}[provider]
+    if status in (400, 401, 403) and key and not key.startswith(EXPECTED_PREFIX[provider]):
+        msg += f". La clave configurada no empieza con «{EXPECTED_PREFIX[provider]}»: parece de otro servicio"
+        if provider == "grok" and key.startswith("gsk_"):
+            msg += " (Groq, que es distinto de Grok de xAI)"
     if status == 404 or "model" in detail.lower():
         msg += f" ({model_var})"
     return msg + (f". Detalle: {detail[:160]}" if detail else "")
