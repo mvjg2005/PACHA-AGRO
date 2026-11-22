@@ -1,10 +1,21 @@
-# AgroBolivia
+# AgroBolivia (PACHA-AGRO)
 
 **Plataforma inteligente de asistencia agroclimática y comunicación comunitaria para agricultores de Bolivia.**
 
 > *Tu campo, tu comunidad, mejores decisiones.*
 
 Prototipo funcional para hackatón universitaria. Integra los tracks **Comunicación** (comunidades, reuniones, avisos, reportes y WhatsApp) y **Educación** (lecciones breves para interpretar el clima y reducir riesgos).
+
+> **PACHA-AGRO** es el nombre de marca que aparece en la interfaz; **AgroBolivia** es el nombre técnico del prototipo.
+
+| | |
+|---|---|
+| **Demo en vivo** | <https://agrobolivia.onrender.com> |
+| **Backend** | FastAPI + Python 3.12 |
+| **Frontend** | React 18 + TypeScript + Vite |
+| **Base de datos** | SQLite en desarrollo · PostgreSQL en producción |
+| **Despliegue** | Render |
+| **Licencia** | MIT |
 
 Portada en escritorio (tipografías Newsreader y Public Sans, íconos de línea propios, sin emoticones; cada bloque muestra datos reales con su fuente):
 
@@ -30,7 +41,7 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 | Criterio | Qué aporta PACHA-AGRO |
 |---|---|
 | **Innovación (40)** | Mide el acierto de los bioindicadores andinos con datos satelitales, con la vara del azar. Se suman la revisión de plantas por foto con IA y la asesoría con técnicos reales. |
-| **Viabilidad técnica (30)** | Todo funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 127 pruebas de backend, 12 de frontend y 33 en navegador de celular. Desplegable en Render con un archivo. |
+| **Viabilidad técnica (30)** | Funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 150 pruebas de backend y 16 de frontend verificadas por CI, más 34 casos E2E. Desplegable en Render con un archivo. |
 | **Impacto (30)** | Productoras y productores del Altiplano, valles y llanos: decidir cuándo sembrar, revisar plantas, hacer cuentas, organizarse en comunidad y valorar su propio saber. Funciona en celulares sencillos, con poca señal, lectura en voz alta y sin registrarse para lo esencial. |
 
 ## Qué funciona hoy
@@ -134,7 +145,7 @@ npx playwright install chromium
 npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **137/137** backend, **16/16** unitarias frontend, **34/34** extremo a extremo (también contra PostgreSQL actualizado desde la versión anterior). GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **150/150** backend y **16/16** unitarias frontend verificadas por CI. La suite E2E tiene **34 casos** y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Auditoría y presentación
 

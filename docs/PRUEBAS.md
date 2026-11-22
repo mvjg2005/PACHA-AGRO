@@ -1,12 +1,12 @@
 # Pruebas y validación
 
-Resultados documentados por el proyecto el 21-11-2026. El backend usa fixtures. La suite de navegador usa el servidor local y consulta las fuentes meteorológicas disponibles. En esta auditoría se añadió una prueba de regresión a `test_senas.py`; la ejecución completa posterior al cambio queda pendiente de CI o de una máquina con dependencias instaladas. Por ello, los recuentos de esta tabla representan la última ejecución registrada antes de ese cambio.
+Resultados del 22-11-2026. El backend usa fixtures. La suite de navegador usa el servidor local y consulta las fuentes meteorológicas disponibles. GitHub Actions ejecuta backend, frontend y compilación; la suite E2E se ejecuta aparte con Playwright.
 
 | Suite | Comando | Resultado |
 |---|---|---|
-| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **127/127** aprobadas |
-| Frontend unitarias (vitest) | `cd frontend && npm test` | **12/12** aprobadas |
-| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `npm run test:e2e -- http://localhost:8000` | **33/33** aprobadas (servidor recién iniciado; también contra PostgreSQL actualizado) |
+| Backend (pytest) | `cd backend && .venv/bin/python -m pytest` | **150/150** aprobadas |
+| Frontend unitarias (vitest) | `cd frontend && npm test` | **16/16** aprobadas |
+| Extremo a extremo (Playwright, Chromium, móvil, tableta y escritorio) | `npm run test:e2e -- http://localhost:8000` | **34 casos** (ejecutar en local o CI dedicado) |
 | Tipos TypeScript + compilación | `cd frontend && npm run build` | Sin errores |
 
 ## Preparación de la suite E2E
