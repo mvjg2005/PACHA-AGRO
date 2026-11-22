@@ -211,7 +211,7 @@ npx playwright install chromium
 npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **164/164** backend y **18/18** unitarias frontend. La suite E2E tiene **37 casos** (37/37 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **166/166** backend y **18/18** unitarias frontend. La suite E2E tiene **37 casos** (37/37 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 

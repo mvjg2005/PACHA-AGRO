@@ -296,3 +296,25 @@ def test_webhook_signature_verification(app_client, monkeypatch):
 def test_security_headers(app_client):
     r = app_client.get("/api/health")
     assert r.headers["X-Content-Type-Options"] == "nosniff" and r.headers["X-Frame-Options"] == "DENY"
+
+
+def test_admin_phone_with_8_digits_and_changed_password_can_log_in(app_client):
+    from app import db as dbmod
+    from app.seed import ensure_admin
+    with dbmod.SessionLocal() as db:
+        ensure_admin(db, "71234567", "primera-clave-1")
+        ensure_admin(db, "71234567", "nueva-clave-123")  # la clave cambió en la configuración
+    r = app_client.post("/api/auth/login", json={"phone": "71234567", "password": "nueva-clave-123"})
+    assert r.status_code == 200, r.text
+    assert app_client.get("/api/auth/me", headers={"Authorization": f"Bearer {r.json()['token']}"}).json()["role"] == "admin"
+    assert app_client.post("/api/auth/login", json={"phone": "71234567", "password": "primera-clave-1"}).status_code == 401
+
+
+def test_admin_phone_of_a_regular_account_is_not_promoted(app_client):
+    from app import db as dbmod
+    from app.seed import ensure_admin
+    r = app_client.post("/api/auth/register", json={"full_name": "Agricultora", "phone": "72223333", "password": "clave123"})
+    assert r.status_code in (200, 201), r.text
+    with dbmod.SessionLocal() as db:
+        ensure_admin(db, "72223333", "otra-clave-123")
+    assert app_client.post("/api/auth/login", json={"phone": "72223333", "password": "otra-clave-123"}).status_code == 401

@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
 from app.models import Community, Expert, LivestockLoss, Meeting, Membership, Notice, RegionalNotice, SenaObservation, User
 
 DEMO_PASSWORD = "demo1234"
@@ -15,11 +15,32 @@ DEMO_USERS = [
 ]
 
 
+def ensure_admin(db: Session, raw_phone: str, password: str) -> None:
+    """Cuenta administradora según ADMIN_PHONE y ADMIN_PASSWORD.
+
+    El celular se guarda como al ingresar (+591…), aunque en la variable se escriba con 8 dígitos.
+    Si la clave cambió en la configuración, se actualiza. No toca una cuenta común que ya use ese celular.
+    """
+    from app.schemas import normalize_phone
+    phone = normalize_phone(raw_phone)
+    u = db.scalar(select(User).where(User.phone.in_({phone, raw_phone}), User.role == "admin"))
+    if u is None:
+        if db.scalar(select(User).where(User.phone == phone)):
+            print("AVISO: ADMIN_PHONE ya pertenece a una cuenta común; use otro número para el administrador.")
+            return
+        db.add(User(full_name="Administrador", phone=phone, password_hash=hash_password(password), role="admin"))
+    else:
+        if u.phone != phone and not db.scalar(select(User).where(User.phone == phone)):
+            u.phone = phone
+        if not verify_password(password, u.password_hash):
+            u.password_hash = hash_password(password)
+    db.commit()
+
+
 def seed(db: Session) -> None:
     s = get_settings()
-    if s.admin_password and not db.scalar(select(User).where(User.phone == s.admin_phone)):
-        db.add(User(full_name="Administrador", phone=s.admin_phone, password_hash=hash_password(s.admin_password), role="admin"))
-        db.commit()
+    if s.admin_password:
+        ensure_admin(db, s.admin_phone, s.admin_password)
     if not s.seed_demo:
         return
     existing = db.scalar(select(User).where(User.is_demo.is_(True)).order_by(User.id))
