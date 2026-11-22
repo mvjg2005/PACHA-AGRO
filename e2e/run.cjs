@@ -663,7 +663,7 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     assert(p.errors.length === 0, p.errors.join(';'))
   })
 
-  await test('Sin internet: guardar la semana, abrir Ganado y Clima sin conexión, boletín SMS', async () => {
+  await test('Sin internet: guardar la semana, abrir Ganado y Clima, Pacha IA responde sin conexión, boletín SMS', async () => {
     const ctx = await browser.newContext({ ...phone, serviceWorkers: 'allow' })
     await ctx.addInitScript(() => { localStorage.setItem('agb_municipality', 'or-challapata'); localStorage.setItem('agb_onboarded', '1') })
     const p = await ctx.newPage(); p.errors = []; p.on('pageerror', e => p.errors.push(e.message))
@@ -682,6 +682,13 @@ const assert = (c, m) => { if (!c) throw new Error(m) }
     await p.goto(`${BASE}/#/clima`)
     await p.getByRole('heading', { name: /Avisos oficiales/ }).waitFor({ timeout: 30000 })
     assert(await p.getByTestId('offline-banner').isVisible(), 'no avisa que está sin conexión')
+    // Pacha IA sin internet: responde con lo guardado
+    await p.evaluate(() => localStorage.setItem('agb_agent_voice', 'false'))
+    await p.getByTestId('pacha-open').click()
+    await p.getByTestId('pacha-input').fill('¿Mis ovejas corren peligro esta noche?'); await p.keyboard.press('Enter')
+    await p.getByTestId('pacha-log').getByText(/^Sin internet/).first().waitFor({ timeout: 20000 })
+    const said = await p.getByTestId('pacha-log').innerText()
+    assert(!said.includes('No hay conexión'), 'Pacha IA no respondió sin internet: ' + said.slice(-400))
     await ctx.setOffline(false)
     const sms = await p.evaluate(async () => (await (await fetch('/api/ganado/boletin?municipality_id=or-challapata')).json()))
     assert(!sms.available || /^[\x00-\x7F]*$/.test(sms.sms), 'el SMS lleva caracteres que encarecen el mensaje')

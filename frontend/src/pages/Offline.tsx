@@ -56,7 +56,7 @@ export default function Offline() {
 
       <section className="panel space-y-4" aria-labelledby="save-title">
         <h2 id="save-title" className="font-display text-[1.4rem] font-semibold text-[var(--color-primary)]">1. Guardar la semana en el celular</h2>
-        <p className="text-sm">Se guardan el pronóstico de 7 días, las noches peligrosas para el ganado, la alerta de año seco y el boletín. Sin señal, la app los muestra con la fecha en que se guardaron.</p>
+        <p className="text-sm">Se guardan el pronóstico de 7 días, las noches peligrosas para el ganado, la alerta de año seco y el boletín. Sin señal, la app los muestra con la fecha en que se guardaron, y <strong>Pacha IA le responde con esos datos y se los lee en voz alta</strong>.</p>
         <label className="block"><span className="mb-1 block text-sm font-semibold">Municipio</span>
           <span className="block rounded-md border border-[#bdb6a6] bg-white px-3 py-2.5"><MunicipalitySelect className="w-full" /></span></label>
         <Button onClick={save} disabled={!m || busy || !online} className="w-full sm:w-auto" data-testid="save-offline">{busy ? 'Guardando…' : 'Guardar para usar sin internet'}</Button>

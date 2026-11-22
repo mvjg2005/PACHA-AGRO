@@ -14,7 +14,7 @@
 8. **Sin migraciones versionadas de esquema**: se usa `create_all` y una rutina mínima de columnas compatibles. Antes de evolucionar una base de producción debe incorporarse Alembic y probar migraciones sobre una copia.
 9. **Recuperación de clave sin SMS**: un administrador verifica a la persona y le proporciona una clave temporal.
 10. **Quechua y aimara**: la estructura existe, pero las traducciones y la revisión por hablantes están pendientes.
-11. **Modo sin conexión**: con señal se guarda la semana (pronóstico, noches peligrosas, alerta de año seco y boletín) y luego se ve sin internet. No permite enviar reportes sin señal ni sincronizarlos posteriormente; la cola de envío diferido sigue pendiente.
+11. **Modo sin conexión**: con señal se guarda la semana (pronóstico, noches peligrosas, alerta de año seco y boletín) y luego se ve sin internet; Pacha IA responde con esos datos y los lee en voz alta, pero sin señal el celular normalmente no puede reconocer la voz, así que la pregunta se escribe o se toca. No permite enviar reportes sin señal ni sincronizarlos posteriormente; la cola de envío diferido sigue pendiente.
 12. **Revisión de plantas por foto**: es una orientación preliminar, no un diagnóstico de laboratorio. Puede equivocarse con imágenes borrosas. No recomienda productos ni dosis. Sin `GROQ_API_KEY` ofrece guía por síntomas.
 13. **Fichas de cultivo**: contienen rangos generales y no reemplazan recomendaciones por variedad validadas por INIAF u otra entidad técnica.
 14. **Condiciones para fumigar**: usa criterios generales sobre viento, lluvia, temperatura y humedad a partir del pronóstico. Siempre prevalece la etiqueta del producto y la orientación técnica autorizada.

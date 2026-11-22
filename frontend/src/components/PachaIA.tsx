@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { api, ApiError } from '../lib/api'
+import { OFFLINE_SUGGESTIONS, offlineAnswer } from '../lib/offlineAgent'
 import { parseRich, type Inline } from '../lib/richtext'
 import { createSpeechRecognizer, isSpeechRecognitionSupported, isSpeechSynthesisSupported, speakText, stopSpeaking } from '../lib/speech'
 import { useApp } from '../lib/store'
@@ -49,7 +50,8 @@ export function PachaIA() {
   const welcome = (): Msg => ({
     id: 'welcome', role: 'assistant', time: now(),
     content: `¡Jallalla${user ? `, ${user.full_name.split(' ')[0]}` : ''}! Soy **Pacha IA**, su asistente agroclimático.\n\nPuede **hablarme con el micrófono** o **escribirme**. Le ayudo con el clima${m ? ` de ${m.name}` : ''}, las heladas, la siembra, plagas y su comunidad.`,
-    suggestions: [`¿Cómo está el clima hoy${m ? ` en ${m.name}` : ''}?`, '¿Hay riesgo de helada?', '¿Puedo fumigar hoy?', '¿Cuándo siembro quinua?'],
+    suggestions: typeof navigator !== 'undefined' && navigator.onLine === false ? OFFLINE_SUGGESTIONS
+      : [`¿Cómo está el clima hoy${m ? ` en ${m.name}` : ''}?`, '¿Hay riesgo de helada?', '¿Puedo fumigar hoy?', '¿Cuándo siembro quinua?'],
   })
   useEffect(() => { setMsgs(prev => (prev.length <= 1 ? [welcome()] : prev)) }, [municipalityId, user?.id])
   useEffect(() => { if (open) endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }) }, [msgs, open, busy])
@@ -79,6 +81,17 @@ export function PachaIA() {
     const history = msgs.filter(x => x.role !== 'system').slice(-6).map(x => ({ role: x.role, content: x.content }))
     setMsgs(p => [...p, { id: `u${Date.now()}`, role: 'user', content: q, time: now() }])
     setText(''); setBusy(true)
+    // Sin internet: responde en el celular con lo guardado y lo lee en voz alta (la voz del celular funciona sin señal).
+    const answerOffline = async () => {
+      const o = await offlineAnswer(q, municipalityId ?? 'or-challapata', m?.name ?? 'su municipio')
+      const id = `o${Date.now()}`
+      setMsgs(p => [...p, { id, role: 'assistant', content: o.reply, speech: o.speech, time: now(), suggestions: o.suggestions }])
+      if (voiceOn && isSpeechSynthesisSupported()) { setSpeakingId(id); speakText(o.speech, { onEnd: () => setSpeakingId(null), onError: () => setSpeakingId(null) }) }
+    }
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      try { await answerOffline() } finally { setBusy(false) }
+      return
+    }
     try {
       const ask = () => api<Reply>('/api/ai/agent/chat', { timeoutMs: 45000, body: {
         message: q, municipality_id: municipalityId, lat: gps && gps.municipalityId === municipalityId ? gps.lat : null,
@@ -94,7 +107,8 @@ export function PachaIA() {
       setMsgs(p => [...p, { id, role: 'assistant', content: r.reply, speech: r.speech_text, time: now(), sources: r.sources, suggestions: r.suggested_questions, experts: r.experts, aiError: r.ai_error }])
       if (voiceOn && isSpeechSynthesisSupported()) { setSpeakingId(id); speakText(r.speech_text, { onEnd: () => setSpeakingId(null), onError: () => setSpeakingId(null) }) }
     } catch (e) {
-      setMsgs(p => [...p, { id: `e${Date.now()}`, role: 'system', content: (e as Error).message || 'No se pudo conectar con Pacha IA. Intente de nuevo.', time: now() }])
+      if (e instanceof ApiError && (e.status === 0 || e.status >= 502)) await answerOffline()
+      else setMsgs(p => [...p, { id: `e${Date.now()}`, role: 'system', content: (e as Error).message || 'No se pudo conectar con Pacha IA. Intente de nuevo.', time: now() }])
     } finally { setBusy(false) }
   }
 
@@ -107,7 +121,10 @@ export function PachaIA() {
       lang: 'es-BO',
       onStart: () => setListening(true),
       onResult: (t, final) => { setText(t); if (final && t.trim()) { setListening(false); send(t) } },
-      onError: err => { setVoiceErr(err); setListening(false) },
+      onError: err => {
+        setListening(false)
+        setVoiceErr(navigator.onLine === false ? 'Sin internet el celular no puede escuchar. Escriba su pregunta o toque una de las preguntas rápidas: igual le respondo y se lo leo en voz alta.' : err)
+      },
       onEnd: () => setListening(false),
     })
     recRef.current?.start()
