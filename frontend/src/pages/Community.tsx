@@ -1,5 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { DepartmentList, MunicipalityList } from '../components/LocationPicker'
+import { Wall } from '../components/Wall'
 import { Button, Card, ErrorBox, Field, Loading, Notice, PageTitle, inputCls } from '../components/ui'
 import { api } from '../lib/api'
 import { useApp } from '../lib/store'
@@ -22,6 +23,7 @@ export default function CommunityHome() {
         </Card>
         <a href="#/ingresar" className="flex min-h-14 items-center justify-center rounded-md bg-bosque text-lg font-semibold text-white">Ingresar</a>
         <a href="#/registro" className="flex min-h-14 items-center justify-center rounded-md border border-bosque bg-white text-lg font-semibold text-bosque">Crear cuenta</a>
+        <div className="pt-4"><Wall /></div>
       </div>
     )
   }
@@ -33,13 +35,23 @@ function Mine() {
   const [list, setList] = useState<Community[] | null>(null)
   const [err, setErr] = useState<string | null>(null)
   const [view, setView] = useState<'mine' | 'join' | 'create'>('mine')
-  const load = () => { setErr(null); api<Community[]>('/api/me/communities').then(setList).catch(e => setErr(e.message)) }
+  const [pending, setPending] = useState(0)
+  const load = () => {
+    setErr(null); api<Community[]>('/api/me/communities').then(setList).catch(e => setErr(e.message))
+    if (user?.role === 'admin') api<Community[]>('/api/admin/communities?status=pending').then(l => setPending(l.length)).catch(() => setPending(0))
+  }
   useEffect(load, [])
   if (view === 'join') return <Join onDone={() => { setView('mine'); load() }} />
   if (view === 'create') return <Create onDone={() => { setView('mine'); load() }} />
   return (
     <div className="space-y-4">
       <PageTitle title="Mi comunidad" subtitle={`Hola, ${user!.full_name.split(' ')[0]}.`} />
+      {user?.role === 'admin' && (
+        <Notice tone={pending ? 'warn' : 'info'}>
+          {pending ? <><strong>{pending} {pending === 1 ? 'comunidad espera' : 'comunidades esperan'} su aprobación.</strong> </> : 'Usted es administrador. '}
+          <a href="#/admin" className="font-semibold underline" data-testid="admin-pending-link">Abrir el panel de administración</a>
+        </Notice>
+      )}
       {err ? <ErrorBox message={err} onRetry={load} /> : !list ? <Loading /> : list.length === 0 ? (
         <Notice>Aún no pertenece a ninguna comunidad. Busque la suya y pida unirse.</Notice>
       ) : (
@@ -67,6 +79,7 @@ function Mine() {
       <Button className="w-full" onClick={() => setView('join')}>Buscar y unirme a una comunidad</Button>
       <Button variant="secondary" className="w-full" onClick={() => setView('create')}>Registrar una comunidad nueva</Button>
       <a href="#/perfil" className="block min-h-12 py-3 text-center font-semibold text-bosque underline underline-offset-4">Mi cuenta y avisos por WhatsApp</a>
+      <div className="pt-2"><Wall /></div>
     </div>
   )
 }
@@ -116,16 +129,16 @@ function Create({ onDone }: { onDone: () => void }) {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [err, setErr] = useState<string | null>(null)
-  const [done, setDone] = useState(false)
+  const [done, setDone] = useState<string | null>(null)
   const submit = async (e: FormEvent) => {
     e.preventDefault(); setErr(null)
-    try { await api('/api/communities', { body: { name, municipality_id: muni, description } }); setDone(true) } catch (e) { setErr((e as Error).message) }
+    try { const c = await api<Community>('/api/communities', { body: { name, municipality_id: muni, description } }); setDone(c.status) } catch (e) { setErr((e as Error).message) }
   }
   return (
     <div className="space-y-4">
       <PageTitle title="Registrar comunidad" subtitle="Un administrador revisará la solicitud para evitar comunidades falsas." />
       <button className="min-h-12 font-semibold text-bosque underline" onClick={onDone}>← Volver</button>
-      {done ? (<><Notice tone="ok">Solicitud enviada. Cuando un administrador la apruebe, usted será el representante.</Notice><Button className="w-full" onClick={onDone}>Listo</Button></>) :
+      {done ? (<><Notice tone="ok">{done === 'approved' ? 'Comunidad registrada y aprobada. Usted es su representante.' : 'Solicitud enviada. Cuando un administrador la apruebe, usted será el representante.'}</Notice><Button className="w-full" onClick={onDone}>Listo</Button></>) :
         !dept ? <DepartmentList onPick={setDept} /> : !muni ? <MunicipalityList departmentId={dept} onPick={setMuni} /> : (
           <form className="space-y-4" onSubmit={submit}>
             <Field label="Nombre de la comunidad"><input className={inputCls} value={name} onChange={e => setName(e.target.value)} minLength={3} maxLength={120} required /></Field>

@@ -23,6 +23,7 @@
 17. **Servicios externos e IA**: según la configuración, el texto de consultas y las fotos analizadas pueden enviarse al proveedor de IA. Véase la [política de privacidad](../frontend/src/pages/Legal.tsx) y no se deben incluir datos personales innecesarios.
 18. **E2E**: las pruebas Playwright requieren instalar la dependencia Node y el navegador Chromium. Se ejecutan localmente; el workflow CI actual verifica backend, pruebas unitarias frontend y build, no ejecuta la suite E2E.
 19. **Ganado en riesgo**: los umbrales de noches peligrosas y el consumo de forraje son referencias generales, no recomendaciones veterinarias. El satélite (~50 km) no distingue lluvia de nieve: los «días compatibles con nevada» son precipitación con helada. Las pérdidas las reportan las familias y no se verifican.
+20. **Muro del campo**: la moderación es comunitaria (tres reportes ocultan una publicación) y el administrador puede borrar. No hay fotos en las publicaciones ni notificaciones de respuestas todavía.
 
 ## Próximos pasos sugeridos
 

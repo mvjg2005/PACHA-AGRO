@@ -281,3 +281,28 @@ class LivestockLoss(Base):
     notes: Mapped[str] = mapped_column(String(300), default="")
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
+
+
+class Post(Base):
+    """Publicación del muro del campo (o respuesta, si tiene parent_id). Visible para todos."""
+    __tablename__ = "posts"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    parent_id: Mapped[int | None] = mapped_column(ForeignKey("posts.id"), nullable=True, index=True)
+    municipality_id: Mapped[str] = mapped_column(String(60), index=True)
+    department_id: Mapped[str] = mapped_column(String(40), index=True)
+    kind: Mapped[str] = mapped_column(String(12), default="general")
+    text: Mapped[str] = mapped_column(Text)
+    reports: Mapped[int] = mapped_column(Integer, default=0)
+    hidden: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, index=True)
+
+
+class PostReaction(Base):
+    """«Me sirve» o reporte de una persona sobre una publicación (uno de cada uno por persona)."""
+    __tablename__ = "post_reactions"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    post_id: Mapped[int] = mapped_column(ForeignKey("posts.id"), index=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    kind: Mapped[str] = mapped_column(String(10))  # util | reporte
+    __table_args__ = (UniqueConstraint("post_id", "user_id", "kind", name="uq_post_reaction"),)

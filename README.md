@@ -63,6 +63,7 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 | Registro e inicio de sesión de agricultores (celular + clave) | Sí |
 | Comunidades con aprobación del administrador; solicitudes de unión aprobadas por el representante | Sí |
 | Reuniones, confirmación de asistencia, avisos, reportes de helada/granizo, historial | Sí |
+| **Muro del campo**: publicaciones abiertas a todos (preguntas, clima, ganado, siembra, compra y venta), respuestas, «Me sirve», filtros por municipio o departamento y reportes que ocultan lo ofensivo | Sí |
 | Panel de administración: comunidades, permisos, usuarios, reportes | Sí |
 | Asistente de WhatsApp | **SIMULADOR** (no conectado). Arquitectura y webhook oficial listos para credenciales |
 | Módulo educativo "Aprendamos sobre nuestro campo" (7 lecciones con preguntas y fuentes) | Sí: español · quechua/aimara pendientes de revisión lingüística |
@@ -211,7 +212,7 @@ npx playwright install chromium
 npm run test:e2e -- http://localhost:8000
 ```
 
-Resultados actuales: **166/166** backend y **18/18** unitarias frontend. La suite E2E tiene **37 casos** (37/37 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
+Resultados actuales: **171/171** backend y **18/18** unitarias frontend. La suite E2E tiene **38 casos** (38/38 aprobados en local) y se ejecuta con `npm run test:e2e`; GitHub Actions ejecuta backend, frontend y build en cada push a `main` (`.github/workflows/ci.yml`). Detalle en [docs/PRUEBAS.md](docs/PRUEBAS.md).
 
 ## Documentación
 

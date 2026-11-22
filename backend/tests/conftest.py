@@ -60,7 +60,8 @@ def app_client():
     from app.routers.field import diagnosis_limiter
     from app.routers.livestock import loss_limiter
     from app.routers.senas import sena_limiter
-    for lim in (login_limiter, register_limiter, chat_limiter, diagnosis_limiter, sena_limiter, loss_limiter):
+    from app.routers.wall import post_limiter
+    for lim in (login_limiter, register_limiter, chat_limiter, diagnosis_limiter, sena_limiter, loss_limiter, post_limiter):
         lim.reset()
     assistant.reset_state()
     with TestClient(app) as c:
