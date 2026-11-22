@@ -293,3 +293,13 @@ def test_groq_error_then_gemini_error_both_reported(app_client, monkeypatch):
     assert d["provider"] == "local" and "Groq respondió 401" in d["ai_error"] and "503" in d["ai_error"]
     st = app_client.get("/api/ai/agent/status").json()
     assert "503" in st["backup_errors"]["gemini"]
+
+
+def test_time_budget_falls_back_to_local_quickly(app_client, monkeypatch):
+    from app.core.config import get_settings
+    from app.services import agent
+    monkeypatch.setattr(get_settings(), "groq_api_key", "gsk_x")
+    monkeypatch.setattr(agent, "AI_BUDGET_S", 0)
+    monkeypatch.setattr(agent.httpx, "Client", lambda **kw: (_ for _ in ()).throw(AssertionError("no debe llamar a la IA")))
+    d = chat(app_client, "hola")
+    assert d["provider"] == "local" and "tiempo" in d["ai_error"]

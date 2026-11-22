@@ -9,6 +9,7 @@ Formato: Markdown simple (**negritas** y listas con «- »), que la interfaz mue
 """
 import logging
 import re
+import threading
 import time
 
 import httpx
@@ -212,7 +213,7 @@ def ask_claude(message: str, context: str, history: list[dict]) -> str | None:
     if not s.anthropic_api_key:
         return None
     import anthropic
-    client = anthropic.Anthropic(api_key=s.anthropic_api_key, timeout=30.0, max_retries=1)
+    client = anthropic.Anthropic(api_key=s.anthropic_api_key, timeout=_timeout(), max_retries=1)
     try:
         r = client.beta.messages.create(
             model=s.assistant_model, max_tokens=2000, betas=["server-side-fallback-2026-07-01"], fallbacks="default",
@@ -233,6 +234,17 @@ def ask_claude(message: str, context: str, history: list[dict]) -> str | None:
 
 
 RETRY_STATUS = {429, 500, 502, 503, 504}  # saturación o fallas pasajeras del servicio
+AI_BUDGET_S = 28.0  # tiempo máximo para conseguir respuesta de la IA; luego responde el motor local
+_req = threading.local()
+
+
+def _time_left() -> float:
+    return getattr(_req, "deadline", time.monotonic() + AI_BUDGET_S) - time.monotonic()
+
+
+def _timeout() -> float:
+    """Tiempo de espera de una llamada: nunca más de 15 s ni más de lo que queda del presupuesto."""
+    return max(3.0, min(15.0, _time_left()))
 
 
 def _gemini_once(c: httpx.Client, model: str, payload: dict, key: str) -> tuple[str | None, int | None, str]:
@@ -263,8 +275,11 @@ def ask_gemini(message: str, context: str, history: list[dict]) -> str | None:
     models = [s.gemini_model] + [m.strip() for m in s.gemini_fallback_models.split(",") if m.strip() and m.strip() != s.gemini_model]
     errors = []
     try:
-        with httpx.Client(timeout=20.0) as c:
+        with httpx.Client(timeout=_timeout()) as c:
             for model in models:
+                if _time_left() < 4:
+                    errors.append(f"{model}: no se intentó, se acabó el tiempo de espera")
+                    break
                 for attempt in range(3 if model == models[0] else 2):
                     try:
                         text, code, detail = _gemini_once(c, model, payload, s.gemini_api_key)
@@ -274,7 +289,7 @@ def ask_gemini(message: str, context: str, history: list[dict]) -> str | None:
                     if text:
                         LAST_ERROR["gemini"] = None
                         return text
-                    if code in RETRY_STATUS and attempt < 2:
+                    if code in RETRY_STATUS and attempt < 2 and _time_left() > 8:
                         time.sleep(1.5 * (attempt + 1))  # 1,5 s y 3 s
                         continue
                     break
@@ -298,14 +313,14 @@ def _ask_openai_compatible(provider: str, message: str, context: str, history: l
                "messages": [{"role": "system", "content": SYSTEM_PROMPT}, *_history(history),
                             {"role": "user", "content": f"{context}\n\nConsulta: {message}"}]}
     try:
-        with httpx.Client(timeout=30.0) as c:
+        with httpx.Client(timeout=_timeout()) as c:
             for attempt in range(3):
                 res = c.post(OPENAI_COMPAT_URL[provider], json=payload, headers={"Authorization": f"Bearer {key}"})
                 if res.status_code == 200:
                     text = (res.json()["choices"][0]["message"].get("content") or "").strip()
                     LAST_ERROR[provider] = None if text else f"{name} respondió sin texto."
                     return text or None
-                if res.status_code in RETRY_STATUS and attempt < 2:
+                if res.status_code in RETRY_STATUS and attempt < 2 and _time_left() > 8:
                     time.sleep(1.5 * (attempt + 1))
                     continue
                 try:
@@ -475,7 +490,11 @@ def chat(db: Session, message: str, municipality_id: str | None, lat: float | No
     context = _context(location, w, crop, experts, resources, meetings)
 
     reply, provider = None, "local"
+    _req.deadline = time.monotonic() + AI_BUDGET_S
     for name, ask in (("claude", ask_claude), ("grok", ask_grok), ("groq", ask_groq), ("gemini", ask_gemini)):
+        if _time_left() < 4:
+            LAST_ERROR[name] = LAST_ERROR.get(name) if not provider_keys()[name] else f"{NAMES[name][0]} no se intentó: se acabó el tiempo de espera."
+            continue
         if reply := ask(message, context, history):
             provider = name
             break

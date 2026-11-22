@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
-import { api } from '../lib/api'
+import { api, ApiError } from '../lib/api'
 import { parseRich, type Inline } from '../lib/richtext'
 import { createSpeechRecognizer, isSpeechRecognitionSupported, isSpeechSynthesisSupported, speakText, stopSpeaking } from '../lib/speech'
 import { useApp } from '../lib/store'
@@ -80,9 +80,16 @@ export function PachaIA() {
     setMsgs(p => [...p, { id: `u${Date.now()}`, role: 'user', content: q, time: now() }])
     setText(''); setBusy(true)
     try {
-      const r = await api<Reply>('/api/ai/agent/chat', { timeoutMs: 45000, body: {
+      const ask = () => api<Reply>('/api/ai/agent/chat', { timeoutMs: 45000, body: {
         message: q, municipality_id: municipalityId, lat: gps && gps.municipalityId === municipalityId ? gps.lat : null,
         lon: gps && gps.municipalityId === municipalityId ? gps.lon : null, crop: user?.crops[0] ?? null, history } })
+      let r: Reply
+      try { r = await ask() } catch (e) {
+        // Si la conexión se cortó (por ejemplo, el servidor se estaba reiniciando), reintenta una vez.
+        if (!(e instanceof ApiError) || e.status !== 0 || /lenta/.test(e.message)) throw e
+        await new Promise(res => setTimeout(res, 2500))
+        r = await ask()
+      }
       const id = `a${Date.now()}`
       setMsgs(p => [...p, { id, role: 'assistant', content: r.reply, speech: r.speech_text, time: now(), sources: r.sources, suggestions: r.suggested_questions, experts: r.experts, aiError: r.ai_error }])
       if (voiceOn && isSpeechSynthesisSupported()) { setSpeakingId(id); speakText(r.speech_text, { onEnd: () => setSpeakingId(null), onError: () => setSpeakingId(null) }) }
