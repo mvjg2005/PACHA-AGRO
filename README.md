@@ -53,13 +53,6 @@ Las comunidades andinas anticipan el año con **señas** (bioindicadores): las P
 
 ![Señas que se miden: saber local frente a datos satelitales en Challapata, campaña 2024–2025](docs/img/senas.png)
 
-### Cómo responde a los criterios del jurado
-| Criterio | Qué aporta PACHA-AGRO |
-|---|---|
-| **Innovación (40)** | Mide el acierto de los bioindicadores andinos con datos satelitales, con la vara del azar, y los usa como alerta temprana de año seco para el ganado. Se suman la revisión de plantas por foto con IA y la asesoría con técnicos reales. |
-| **Viabilidad técnica (30)** | Funciona con datos reales y gratuitos (Open-Meteo, MET Norway y NASA POWER), con caché y respaldo. Base de datos PostgreSQL. 164 pruebas de backend y 18 de frontend, más 36 casos E2E. Desplegable en Render con un archivo. |
-| **Impacto (30)** | Parte de un problema real y documentado (pérdida de ganado en Huayñacagua). Productoras, productores y familias criadoras del Altiplano, valles y llanos: decidir cuándo sembrar, revisar plantas, hacer cuentas, organizarse en comunidad y valorar su propio saber. Funciona en celulares sencillos, con poca señal, lectura en voz alta y sin registrarse para lo esencial. |
-
 ## Qué funciona hoy
 
 | Función | Estado |
@@ -223,7 +216,7 @@ Resultados actuales: **164/164** backend y **18/18** unitarias frontend. La suit
 
 ## Auditoría y presentación
 
-- [docs/AUDITORIA_ABSTRACTHON.md](docs/AUDITORIA_ABSTRACTHON.md) — evaluación frente a los 3 criterios de Abstracthon, hallazgos, MVP recomendado, guion de 4 minutos y próximos pasos.
+- [docs/AUDITORIA_ABSTRACTHON.md](docs/AUDITORIA_ABSTRACTHON.md) — auditoría frente a los criterios de innovación, viabilidad técnica e impacto, con evidencia, riesgos y prioridades.
 
 ## Documentación
 

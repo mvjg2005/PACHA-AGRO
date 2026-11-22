@@ -1,160 +1,135 @@
-# Auditoría de PACHA-AGRO frente a Abstracthon
+# Auditoría de PACHA-AGRO frente a los criterios del jurado
 
-**Fecha de revisión:** 21 de noviembre de 2026  
-**Rama de trabajo:** `audit/abstracthon-mvp`  
-**Base revisada:** `main`  
-**Alcance:** lectura del README, estructura, frontend React, API FastAPI, autenticación, módulos de clima/siembra/señas, pruebas y documentación de operación.
+**Fecha de revisión:** 22 de noviembre de 2026
+**Base revisada:** `main` (`3d1fea1`)
+**Demo pública:** <https://agrobolivia.onrender.com>
+**Alcance:** README, código, documentación, CI y despliegue público.
+**Naturaleza:** autoevaluación argumentada. No es una nota oficial ni una predicción del jurado.
 
-> Esta es una auditoría estática del repositorio. No se ejecutó el sistema ni se repitieron las suites en un entorno limpio, tampoco se auditó un despliegue público. Los resultados de pruebas que aparecen abajo son los que documenta el propio proyecto, no una certificación independiente.
+> Esta auditoría separa lo que el proyecto **demuestra** de lo que todavía **promete**. Las cifras de pruebas provienen de GitHub Actions; la suite E2E se revisó por su runner y no se certifica aquí una ejecución completa en un entorno limpio.
 
-## 1. Diagnóstico ejecutivo
+## 1. Veredicto ejecutivo
 
-PACHA-AGRO ya supera el tamaño de un MVP básico: tiene una plataforma completa con recomendaciones de siembra, clima, comunidades, aprendizaje, asesoría, herramientas de campo y un módulo diferencial de bioindicadores andinos.
+PACHA-AGRO ya no es solo una app de clima. Tiene un diferenciador claro —medir el acierto de las señas andinas contra datos satelitales— y lo conecta con decisiones concretas: siembra, riesgo de helada para el ganado, forraje, organización comunitaria y herramientas para el campo.
 
-**La mejor historia para el jurado no es enumerar todos los módulos.** Es demostrar un ciclo concreto:
+La mejor presentación no es recorrer todos los módulos. Es contar un ciclo:
 
-1. La persona consulta condiciones de siembra para su municipio y cultivo.
-2. La plataforma explica la recomendación con clima, historial, factores y fuentes.
-3. La comunidad registra una seña local (por ejemplo, Qutu/Pléyades o leque leque).
-4. Al terminar la campaña, el sistema compara esa lectura con lluvia y heladas estimadas por NASA POWER, mediante terciles históricos.
-5. El Pachagrama reúne el calendario, los datos y las observaciones comunitarias.
+1. Una familia criadora de ovejas en Huayñacagua enfrenta un invierno con pasto seco y riesgo de nevadas.
+2. La app avisa qué noches son peligrosas y une ese riesgo con las señas de la comunidad.
+3. La persona registra una seña o una pérdida; al cerrar la campaña, la plataforma compara esa lectura con lluvia y heladas medidas por satélite.
+4. El Pachagrama y los reportes convierten esa evidencia en algo que la comunidad puede revisar y defender.
 
-Ese ciclo conecta innovación, funcionamiento técnico y utilidad comunitaria en una sola demostración.
+Ese es el aporte que conviene defender. La IA, las calculadoras y las parcelas amplían el producto, pero no sustituyen ese núcleo.
 
-### Evaluación orientativa según la rúbrica
+## 2. Evaluación orientativa
 
-La rúbrica asigna 40 puntos a Innovación, 30 a Viabilidad técnica y 30 a Impacto. El rango siguiente es una **autoevaluación argumentada**, no una nota oficial ni una predicción del jurado.
+La rúbrica asigna **40 puntos a Innovación, 30 a Viabilidad técnica y 30 a Impacto**.
 
-| Criterio | Rango orientativo | Evidencia observada | Qué limita una nota mayor |
+| Criterio | Rango orientativo | Fortaleza principal | Límite principal |
 |---|---:|---|---|
-| **Innovación (40)** | **34–38** | Registro de señas andinas; consenso local; contraste con datos satelitales; clasificación por terciles; comparación explícita con el azar (1 de cada 3); Pachagrama de 52 semanas. | Debe explicarse con claridad qué aporta frente a una app meteorológica convencional y demostrarse el ciclo completo. La cantidad de registros todavía limita las conclusiones sobre aciertos. |
-| **Viabilidad técnica (30)** | **23–26** | Frontend React/TypeScript; API FastAPI; persistencia SQLAlchemy con SQLite/PostgreSQL; caché meteorológica; modo sin conexión; controles de acceso; despliegue documentado. `docs/PRUEBAS.md` reporta 121 pruebas backend, 12 frontend y 33 E2E. | Los resultados de pruebas no se volvieron a ejecutar en esta auditoría. WhatsApp sigue en simulador, SENAMHI no está integrado, la recomendación agronómica completa se concentra en quinua del Altiplano, no hay Alembic y los límites de solicitudes están en memoria. |
-| **Impacto (30)** | **17–22** | Público identificado: productoras y productores rurales de Bolivia; decisiones de siembra, clima, aprendizaje y organización; diseño para conectividad limitada y lectura sencilla. | El repositorio reconoce que no hubo piloto con agricultores, medición de comprensión, encuesta, ni métricas de impacto. Quechua y aimara aún requieren traducción y revisión comunitaria. |
-| **Total orientativo (100)** | **74–86** | Producto desarrollado y diferenciador identificable. | La evidencia con usuarios reales es el principal factor que falta. |
+| **Innovación (40)** | **35–38** | Señas andinas medidas con terciles y comparadas contra el azar; Pachagrama; alerta temprana de año seco y noches peligrosas para el ganado. | La muestra de señas todavía es pequeña y no permite afirmar capacidad predictiva. |
+| **Viabilidad técnica (30)** | **25–28** | App desplegada, clima con respaldo, caché, roles, comunidades, pruebas y documentación. | WhatsApp sigue en simulador; reglas agronómicas completas solo para quinua; deuda de migraciones y límites distribuidos. |
+| **Impacto (30)** | **21–25** | Problema real y documentado en Huayñacagua; herramientas para poca señal, SMS/radio y organización comunitaria. | No hay piloto, métricas de uso ni evaluación antes/después con agricultores. |
+| **Total orientativo (100)** | **81–91** | Producto amplio, desplegado y con un diferenciador identificable. | La validación en campo y la evidencia de impacto son lo que más falta. |
 
-**Lectura de la rúbrica:** innovación es la fortaleza principal; la viabilidad tiene una base técnica sólida, pero debe mostrarse sin confundir simuladores con integraciones reales; impacto es el apartado más vulnerable porque el beneficio todavía es potencial y no está medido en campo.
+## 3. Innovación — 40 puntos
 
-## 2. Correspondencia directa con los criterios del jurado
+### Lo que sí es original
 
-### 2.1 Innovación — 40 puntos
+- **Medir el saber local, no solo exhibirlo.** La app registra señas y las compara con lluvia y heladas satelitales por municipio y campaña.
+- **Terciles y referencia al azar.** Una temporada se ubica frente a todas las temporadas desde 2001; por construcción, adivinar al azar acierta 1 de cada 3 veces. Eso evita presentar una coincidencia aislada como prueba.
+- **Pachagrama digital.** Reúne semana a semana lluvia, promedio histórico, heladas, reportes y señas.
+- **Conexión con un problema concreto.** La sección Ganado usa las señas como alerta temprana de año seco y el pronóstico para avisar noches peligrosas.
+- **Herramientas para el contexto rural.** Modo sin conexión, boletín SMS/radio, lectura en voz alta y calculadoras con quintales y arrobas.
 
-- **Originalidad:** el valor distintivo es convertir observaciones tradicionales en registros comparables por municipio y campaña, en vez de limitarse a publicar un catálogo de saberes.
-- **Creatividad:** pone el conocimiento comunitario y la serie meteorológica en una misma vista y permite ver cuándo existe evidencia suficiente y cuándo no.
-- **Diferenciación:** terciles históricos y referencia al azar ayudan a evitar presentar una coincidencia aislada como prueba de eficacia.
-- **Tecnología con valor:** NASA POWER aporta la serie histórica; Open-Meteo aporta pronóstico; la aplicación organiza el registro, el cálculo y la visualización.
+### Lo que no conviene exagerar
 
-**Cómo defenderlo:** mostrar una seña registrada, el resultado de una campaña ya cerrada y el Pachagrama. Explicar que la plataforma no declara que una seña “predice” por sí sola: acumula datos y mide su correspondencia. No afirmar que la precisión ya está probada.
+- No afirmar que las señas “predicen” el clima. La app **mide correspondencia**, no causalidad.
+- No afirmar que la precisión ya está demostrada: faltan más campañas y registros.
+- La IA por foto y el chat son complementos útiles, no el diferenciador central.
+- “Hasta donde sabemos” es más defendible que “no existe otra herramienta”.
 
-### 2.2 Viabilidad técnica — 30 puntos
+### Cómo defenderlo
 
-- La arquitectura separa interfaz, API, datos y servicios externos.
-- El sistema tiene cuentas, roles, comunidades, almacenamiento, manejo de errores, caché y modo sin conexión.
-- El proyecto documenta pruebas unitarias, de API y de navegador.
-- La orientación de siembra puede consultarse sin iniciar sesión; el registro comunitario requiere cuenta.
+Mostrar una campaña cerrada, la lectura de una seña, el resultado por terciles y la marca del azar. Luego abrir el Pachagrama y explicar qué puede y qué no puede concluirse con la muestra actual.
 
-**Qué debe decirse sin exagerar:**
+## 4. Viabilidad técnica — 30 puntos
 
-- WhatsApp es un simulador hasta configurar y verificar WhatsApp Business Cloud API.
-- No se reciben alertas oficiales de SENAMHI desde la plataforma; se ofrece el enlace institucional.
-- Las reglas agronómicas son experimentales y no sustituyen la validación de un ingeniero agrónomo.
-- NASA POWER tiene resolución aproximada de decenas de kilómetros y no representa necesariamente el microclima de una parcela.
-- El límite de intentos en memoria y la ausencia de migraciones Alembic son deuda técnica antes de operar a escala.
+### Fortalezas observadas
 
-### 2.3 Impacto — 30 puntos
+- **Stack coherente:** FastAPI + React/TypeScript, SQLite en desarrollo y PostgreSQL en producción.
+- **Demo pública:** <https://agrobolivia.onrender.com>.
+- **Clima con respaldo:** Open-Meteo como fuente principal y MET Norway cuando se agota el límite por IP; NASA POWER para historial y climatología.
+- **Caché persistente** y último dato disponible con su hora.
+- **Cuentas, roles, comunidades, aprobaciones, avisos y reportes** con controles de acceso.
+- **CI:** GitHub Actions reporta **164 pruebas de backend** y **18 de frontend**; el runner E2E tiene **36 casos**.
+- **Documentación operativa:** despliegue, fuentes, algoritmo, pruebas, límites y puesta en marcha.
 
-- **Problema relevante:** decisiones agrícolas condicionadas por clima variable, información dispersa y poca conectividad.
-- **Público claro:** agricultores y comunidades del Altiplano, valles y llanos bolivianos.
-- **Beneficio potencial:** reunir señales locales, clima, orientación explicable y coordinación comunitaria.
-- **Impacto comunitario:** preservar observaciones y construir evidencia que la comunidad pueda revisar.
+### Deuda técnica y riesgos
 
-**Qué falta para demostrar impacto:** entrevistas, una prueba piloto consentida, observación de tareas reales y métricas antes/después. La intención de ayudar no equivale todavía a un resultado medido.
+- **WhatsApp sigue siendo simulador.** El webhook está preparado, pero no hay integración real con Meta.
+- **Reglas agronómicas completas solo para quinua en el Altiplano.** Papa y maíz son demostración; haba y cebada no tienen reglas.
+- **Sin validación por agrónomos.** Los umbrales y calendarios son experimentales.
+- **Sin migraciones Alembic.** Se usa `create_all` y ajustes manuales de columnas.
+- **Límites de intentos en memoria.** No se comparten entre procesos ni resisten reinicios.
+- **E2E no está en CI.** Los 36 casos se ejecutan aparte; conviene automatizarlos.
+- **MET Norway tiene resolución gruesa en los Andes.** El respaldo mantiene la app en pie, pero puede diferir de Open-Meteo y de la parcela.
+- **Dependencia de servicios gratuitos.** Open-Meteo puede limitar por IP; conviene una clave pagada o un proveedor propio para uso real.
 
-## 3. MVP recomendado para presentar
+### Cómo defenderlo
 
-El MVP no necesita otra aplicación ni más módulos. **Ya existe en el repositorio.** Recomiendo recortar el alcance de la presentación y centrar la prueba en este flujo funcional:
+Mostrar la demo funcionando, el aviso de respaldo cuando Open-Meteo falla, la API `/api/health`, una ejecución de pruebas y el despliegue en Render. Decir con claridad qué es simulador y qué está conectado de verdad.
 
-### MVP: “Decisiones de siembra con clima y saber local”
+## 5. Impacto — 30 puntos
 
-**Usuario principal:** agricultora o agricultor de Challapata, Oruro.  
-**Caso inicial:** quinua en el Altiplano.  
-**Resultado principal:** entender las condiciones, conocer por qué se recomienda una acción y registrar una observación local que después pueda contrastarse con datos.
+### Problema y público
 
-| Paso | Qué hace la persona | Qué debe demostrar PACHA-AGRO |
-|---|---|---|
-| 1. Elegir zona | Selecciona Oruro → Challapata → quinua. | Catálogo y flujo simples, sin obligar a crear cuenta para consultar. |
-| 2. Consultar | Responde las preguntas del asistente de siembra. | Semáforo, acción principal, factores, explicación, fuente y etiqueta “Orientación experimental”. |
-| 3. Revisar evidencia | Abre Clima y el historial. | Diferencia entre pronóstico, historial, caché y datos no disponibles; muestra fuentes. |
-| 4. Registrar una seña | Entra con una cuenta y registra seña, lectura, fecha y municipio. | La observación se guarda y queda identificada como observación comunitaria, no como medición meteorológica. |
-| 5. Medir una campaña | Consulta una campaña ya cerrada. | Resultado de lluvia/heladas por terciles, cantidad de años disponibles y comparación con la referencia de azar. |
-| 6. Interpretar | Abre el Pachagrama. | Vista semanal que reúne lluvia, promedio histórico, heladas y observaciones. |
+- **Problema real:** pérdida de ganado y gastos de forraje en inviernos secos; decisiones de siembra con clima variable; información dispersa y poca conectividad.
+- **Público:** productoras, productores y familias criadoras del Altiplano, valles y llanos de Bolivia.
+- **Beneficio potencial:** decidir cuándo sembrar, proteger crías, calcular forraje, organizarse en comunidad y conservar el saber local como evidencia.
 
-**No son parte del MVP que conviene demostrar en los cuatro minutos:** diagnóstico por fotografía con IA, todas las calculadoras, todas las pantallas administrativas y el simulador de WhatsApp. Son ampliaciones útiles, pero desvían la atención del aporte central.
+### Evidencia que ya existe
 
-### Criterios de aceptación del MVP
+- Caso documentado de Huayñacagua y de comunidades vecinas con pérdidas por nevadas.
+- Serie satelital de inviernos en Challapata y detección de días compatibles con nevada.
+- Señas registradas y tabla de aciertos por departamento.
+- Herramientas pensadas para poca señal: modo sin conexión, SMS/radio y lectura en voz alta.
+- Consulta de siembra y clima sin necesidad de registrarse.
 
-- [ ] Un visitante puede llegar a una recomendación de siembra sin registrarse.
-- [ ] La recomendación muestra la acción antes del detalle, los factores y las fuentes.
-- [ ] Se distinguen claramente datos reales, datos de demostración, observaciones comunitarias y estimaciones.
-- [ ] Una consulta sin datos suficientes informa que no hay evidencia suficiente; no inventa una recomendación.
-- [ ] Una campaña todavía abierta figura como pendiente, no como acierto o error.
-- [ ] Los resultados de señas muestran cantidad de observaciones y advierten cuando la muestra es pequeña.
-- [ ] El módulo deja claro que NASA POWER es una referencia satelital regional, no una estación instalada en la parcela.
-- [ ] Las recomendaciones se presentan como experimentales hasta completar validación agronómica.
+### Lo que falta para demostrar impacto
 
-## 4. Guion sugerido para el jurado — 4 minutos
+- Un piloto consentido con una comunidad.
+- Métricas antes/después: tiempo para decidir, comprensión de la recomendación, uso de forraje, pérdidas evitadas.
+- Entrevistas y observación de tareas reales.
+- Revisión lingüística de quechua y aimara.
+- Validación agronómica y veterinaria de las recomendaciones.
 
-**0:00–0:35 | Problema y propuesta.** “Los agricultores combinan pronósticos, experiencia y señales de la naturaleza, pero esos saberes pocas veces quedan registrados y contrastados. PACHA-AGRO conecta esas observaciones con datos climáticos históricos.”
+Sin esas mediciones, el impacto es **potencial y bien argumentado**, no un resultado comprobado.
 
-**0:35–1:25 | Decisión real.** Inicio → consulta de siembra → Oruro → Challapata → quinua. Mostrar la acción principal, el semáforo y la explicación. Señalar las fuentes y la etiqueta experimental.
+## 6. Riesgos que pueden bajar la nota
 
-**1:25–2:05 | Evidencia climática.** Abrir Clima y explicar qué viene de Open-Meteo y qué es historial NASA POWER. Mostrar el manejo de datos faltantes o caché si se presenta una interrupción.
+| Riesgo | Cómo mitigarlo en la presentación |
+|---|---|
+| Presentar muchos módulos y perder el hilo | Elegir un caso: Ganado + Señas, o Siembra + Clima. |
+| Confundir simulador con integración real | Decir “WhatsApp simulador” y “SENAMHI no integrado” sin que pregunten. |
+| Afirmar precisión predictiva de las señas | Explicar terciles, azar y tamaño de muestra. |
+| Prometer impacto sin datos | Hablar de hipótesis, piloto y métricas pendientes. |
+| Fallo de Open-Meteo en vivo | Mostrar el respaldo MET Norway y la fuente/licencia. |
+| Fallo de internet | Usar la semana guardada y la hora de actualización. |
+| Preguntas sobre IA | Aclarar que es opcional, que Groq tiene plan gratuito y que sin clave responde el motor local. |
 
-**2:05–3:20 | Diferenciador.** Abrir Señas que se miden. Mostrar una campaña ya cerrada, la lectura comunitaria, la clasificación observada y la referencia de azar. Luego abrir el Pachagrama.
+## 7. Prioridades antes de presentar
 
-**3:20–4:00 | Impacto y honestidad.** Explicar a quién ayuda, qué se necesita para un piloto y qué todavía no está validado. Decir expresamente que WhatsApp es simulador y que no hay integración de alertas oficiales SENAMHI.
+1. **Elegir un solo hilo narrativo** y ensayarlo en 4 minutos.
+2. **Grabar un video de respaldo de 60–90 segundos** con el flujo principal.
+3. **Probar en un celular real** y en modo sin conexión.
+4. **Verificar la demo** la mañana del evento: `/api/health`, clima, Señas y Ganado.
+5. **Tener a mano los números reales:** 164 backend, 18 frontend, 36 casos E2E.
+6. **No mostrar datos personales** ni contactos ficticios como si fueran reales.
+7. **Preparar una frase honesta sobre límites:** reglas experimentales, sin piloto, WhatsApp simulado y SENAMHI sin integración.
 
-## 5. Evidencias que conviene preparar
+## 8. Conclusión
 
-| Evidencia | Para qué criterio | Preparación |
-|---|---|---|
-| Video de respaldo de 60–90 segundos del flujo siembra → señas → Pachagrama | Innovación y viabilidad | Grabarlo con datos visibles y etiquetas reales/DEMO. |
-| Captura de una campaña cerrada y su serie histórica | Innovación | Incluir fuente, intervalo, terciles y número de años usados. |
-| Registro de pruebas automatizadas | Viabilidad | Mostrar comandos y resultados de una ejecución limpia; no basta con una cifra escrita en README. |
-| Validación de un profesional agrónomo | Viabilidad e impacto | Obtener revisión escrita de umbrales y calendario antes de recomendar uso real. |
-| Prueba piloto con agricultores | Impacto | Registrar consentimiento, tareas completadas, dificultades y comentarios sin publicar datos personales. |
-| Métricas de uso | Impacto | Medir tiempo para completar consulta, comprensión de la explicación, registros de señas y utilidad percibida. |
+PACHA-AGRO tiene una innovación defendible y una implementación amplia. Su mejor oportunidad no es agregar otra pantalla: es demostrar el ciclo **decisión → observación → medición → aprendizaje** y sostenerlo con evidencia.
 
-No presentar porcentajes de mejora, predicción o ahorro hasta obtener una medición que los respalde.
-
-## 6. Hallazgos de auditoría y cambios aplicados
-
-| Prioridad | Hallazgo | Acción |
-|---|---|---|
-| Alta | La política decía que las claves estaban “cifradas”, aunque el backend aplica hash PBKDF2-SHA256. | Corregir la explicación para que describa el mecanismo real. |
-| Alta | La política no explicaba que, cuando se activa la IA, el texto de la consulta y la foto de diagnóstico se envían a Anthropic para procesarse. | Añadir aviso de tratamiento por proveedor externo y recomendación de no incluir datos personales innecesarios. |
-| Media | La guía de limitaciones proponía crear una PWA con caché, aunque el repositorio ya incluye modo sin conexión. | Cambiar el pendiente por sincronización diferida de reportes cuando vuelva la conexión. |
-| Alta | El cálculo de señas validaba la existencia de la fila diaria, pero no la disponibilidad del valor específico de precipitación o temperatura mínima. Algunos nulos podían contarse como ausencia de lluvia/helada. | Corregir `_metric` para validar cada variable, exigir al menos 90 % de valores válidos y estimar proporcionalmente solo los faltantes permitidos; añadir prueba de regresión. La prueba nueva aún no se ha ejecutado en este entorno. |
-| Media | El runner E2E requería `playwright`, pero no existía dependencia declarada en un manifiesto de Node en la raíz. | Añadir manifiesto raíz con Playwright fijado y comando `test:e2e`; documentar instalación del navegador. |
-| Media | El diferenciador y la estrategia de exposición al jurado estaban repartidos entre README y documentación técnica. | Añadir este documento y enlazarlo desde el README. |
-
-## 7. Próximas mejoras priorizadas
-
-### Antes de presentar
-1. Ejecutar desde una instalación limpia backend, frontend y E2E; guardar evidencia de los resultados.
-2. Ensayar el flujo principal en un celular y preparar video de respaldo por conectividad.
-3. Evitar datos de prueba sin etiqueta. No mostrar contactos ficticios como técnicos reales.
-4. Preparar una explicación de 30 segundos de terciles y azar (1/3), sin afirmar que ya existe precisión predictiva demostrada.
-
-### Antes de un piloto real
-1. Revisión de reglas y fichas por un ingeniero agrónomo y por productores locales.
-2. Piloto pequeño y consentido con una comunidad; revisar lenguaje, accesibilidad y utilidad.
-3. Definir responsable de datos, contacto de privacidad, retención y procedimiento de atención.
-4. Incorporar migraciones de esquema con Alembic, copias de seguridad verificadas y límites distribuidos (por ejemplo, Redis) si se despliega con varias instancias.
-5. Revisar almacenamiento del token de sesión, política CSP, dependencias y seguridad mediante pruebas específicas.
-6. Integrar SENAMHI solo mediante un convenio o fuente oficial autorizada y conectar WhatsApp únicamente cuando la cuenta, plantillas y consentimiento estén comprobados.
-
-## 8. Veredicto
-
-**PACHA-AGRO tiene un diferenciador fuerte y un producto técnicamente amplio.** La oportunidad más clara para mejorar su evaluación no es agregar más pantallas: es demostrar el ciclo “decisión → observación → medición → aprendizaje” y respaldar el impacto con usuarios reales.
-
-Para Abstracthon, presenta el MVP de Challapata con quinua, explica las limitaciones sin esconderlas y separa lo que ya está implementado de lo que depende de convenios, credenciales o validación en campo.
+Para el jurado, la presentación más fuerte es la que muestra menos módulos y más profundidad: un problema real, una decisión concreta, una seña medida contra el satélite y una comunidad que puede usar esa evidencia. La honestidad sobre lo que falta —piloto, validación agronómica, WhatsApp real y métricas— aumenta la credibilidad en lugar de reducirla.
