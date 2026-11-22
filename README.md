@@ -178,13 +178,26 @@ render.yaml    Blueprint de Render
 | Administrador | el de `ADMIN_PHONE` | el de `ADMIN_PASSWORD` |
 
 ### Guion de demostración para el jurado (≈4 min)
-1. **Inicio → Consultar condiciones de siembra** Oruro → Challapata → Quinua → Pandela → Sí, húmedo → Depende de la lluvia. Resultado en 7 toques, con el *porqué* de cada criterio y su fuente.
-2. **Clima**: pronóstico real, riesgo de helada, historial NASA POWER, enlace a SENAMHI. Si el pronóstico no responde, se muestra el estado y se puede reintentar.
-3. **Comunidad** (representante 70000001): convocar reunión → "Recordar" (genera recordatorios *simulados* solo para quienes aceptaron WhatsApp).
-4. **WhatsApp** (agricultora 70000002): "¿Cuándo es la reunión de mi comunidad?" → "SI" → la asistencia se registra. "Quiero avisar que cayó granizo en mi zona." → queda como *observación comunitaria*.
-5. **Aprender**: lección "¿Qué es una helada?" con pregunta.
-6. **Señas** (Challapata, campaña 2015–2016 y luego 2024–2025): lo que anunciaron las señas frente a lo que midió el satélite, el Pachagrama de la campaña y la tabla «¿Las señas aciertan?» con la marca del azar.
-7. **Mi campo**: foto de una planta, calculadora de ganancia en quintales y cuaderno de una parcela.
+
+**Antes de empezar:** abra la demo, confirme `…/api/health`, inicie sesión con el representante `70000001` y tenga a mano la agricultora `70000002`. Si Open-Meteo está limitado, la app muestra el aviso de **pronóstico de respaldo con MET Norway**; no es un error.
+
+| Tiempo | Qué mostrar | Qué debe verse |
+|---|---|---|
+| **0:00–0:25** | **Inicio** | Propuesta, navegación móvil/escritorio y acceso a clima y siembra. |
+| **0:25–1:05** | **¿Cuándo sembrar?** → Oruro → Challapata → Quinua → Pandela → Sí, húmedo → Depende de la lluvia | Resultado en 7 toques, factor decisivo, acción principal, fuentes y confianza. |
+| **1:05–1:40** | **Clima** de Challapata | Pronóstico de 7 días, riesgo de helada, historial NASA POWER y aviso de respaldo si Open-Meteo falla. |
+| **1:40–2:10** | **Señas** → Challapata → campaña 2015–2016 y luego 2024–2025 | Lo que anunciaron las señas frente a lo medido por satélite, el Pachagrama y la tabla «¿Las señas aciertan?» con la marca del azar. |
+| **2:10–2:45** | **Mi campo** | Calculadora de ganancia en quintales o cuaderno de una parcela; opcional: revisión de una planta por foto. |
+| **2:45–3:20** | **Comunidad** (representante) y **WhatsApp** (agricultora) | Convocar reunión → “Recordar” simulado; la agricultora pregunta por la reunión, responde “SI” y reporta granizo como observación comunitaria. |
+| **3:20–3:50** | **Pacha IA** o **Asesoría** | Pregunte por el clima de su municipio o por un técnico; muestre que la IA no inventa teléfonos y que los contactos tienen consentimiento. |
+| **3:50–4:00** | **Cierre** | Qué es real, qué es demostración y qué falta validar (reglas agronómicas, WhatsApp real, SENAMHI). |
+
+**Plan de respaldo para la presentación**
+
+- Si no hay pronóstico: explique que se activó **MET Norway** y que la app muestra la fuente y la licencia.
+- Si no hay internet: use los últimos datos guardados y muestre la hora de actualización.
+- Si no hay `GROQ_API_KEY`: Pacha IA responde en **modo básico** con datos reales; dígalo con naturalidad.
+- Si WhatsApp no está conectado: recuerde que es un **simulador** y que el webhook oficial ya está preparado.
 
 ## Desplegar
 
