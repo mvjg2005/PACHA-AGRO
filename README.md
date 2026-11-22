@@ -216,7 +216,7 @@ Resultados actuales: **164/164** backend y **18/18** unitarias frontend. La suit
 
 ## Auditoría y presentación
 
-- [docs/AUDITORIA_ABSTRACTHON.md](docs/AUDITORIA_ABSTRACTHON.md) — evaluación frente a los 3 criterios de Abstracthon, hallazgos, MVP recomendado, guion de 4 minutos y próximos pasos.
+- [docs/AUDITORIA_ABSTRACTHON.md](docs/AUDITORIA_ABSTRACTHON.md) — auditoría frente a los criterios de innovación, viabilidad técnica e impacto, con evidencia, riesgos y prioridades.
 
 ## Documentación
 
